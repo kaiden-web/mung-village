@@ -1,0 +1,1736 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="우리 강아지와 함께 산책하는 마을, 멍동네">
+<meta property="og:title" content="멍동네">
+<meta property="og:description" content="우리 강아지와 산책하고, 소원 장식을 달고, 단짝 자물쇠를 잠가요">
+<style>html,body{margin:0;padding:0;height:100%}*{box-sizing:border-box}[hidden]{display:none!important}</style>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="adapter.js"></script>
+<title>멍동네</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: one full-screen illustrated stage, glass chrome floating on top (header, tip, action dock). Single committed look. */
+:root{
+  --ink:#1F2A44; --muted:#5B6680; --paper:rgba(255,255,255,.88); --paper-solid:#FFFFFF;
+  --honey:#F2A93B; --honey-deep:#C97C12; --honey-ink:#5A3604; --line:rgba(31,42,68,.14);
+  --berry:#D9485F; --pine:#2F7A55;
+  --f-display:"Jua","Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:#1B2350;color:var(--ink);font-family:var(--f-body);overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--honey);outline-offset:2px}
+
+#app{position:relative;height:100%;overflow:hidden}
+#stage{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation;cursor:pointer}
+
+/* header */
+.top{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;
+  padding-top:max(12px,env(safe-area-inset-top,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));pointer-events:none}
+.top > *{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:10px;background:var(--paper);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:16px;padding:8px 14px 8px 10px;box-shadow:0 6px 20px rgba(10,16,40,.18)}
+.brand svg{width:34px;height:34px;flex:none}
+.brand b{font-family:var(--f-display);font-weight:400;font-size:22px;letter-spacing:.5px;display:block;line-height:1}
+.brand small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
+.scenes{display:flex;gap:4px;background:var(--paper);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;padding:4px;box-shadow:0 6px 20px rgba(10,16,40,.18)}
+.scenes button{border:0;background:transparent;border-radius:999px;padding:8px 14px;font-family:var(--f-display);font-size:15px;color:var(--muted);white-space:nowrap}
+.scenes button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.meta{display:flex;gap:6px;align-items:center}
+.pill{background:var(--paper);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;padding:8px 12px;font-size:13px;box-shadow:0 6px 20px rgba(10,16,40,.18);border:0;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:#3BB273;box-shadow:0 0 0 3px rgba(59,178,115,.25)}
+
+/* ticker + tip */
+.ticker{position:absolute;left:50%;transform:translateX(-50%);top:calc(max(12px,env(safe-area-inset-top,0px)) + 64px);z-index:4;max-width:min(560px,calc(100% - 32px));
+  background:rgba(20,26,50,.62);color:#fff;border-radius:14px;padding:8px 14px;font-size:14px;text-align:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:opacity .4s}
+.ticker em{font-style:normal;color:#FFD58A;font-family:var(--f-display);margin-right:6px}
+.tip{position:absolute;z-index:4;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 92px);width:min(300px,calc(100% - 32px));
+  background:var(--paper);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:16px;padding:12px 14px;box-shadow:0 8px 24px rgba(10,16,40,.2)}
+.tip header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tip .lab{font-size:11.5px;letter-spacing:.6px;color:var(--honey-deep);font-weight:700}
+.tip h3{margin:4px 0 4px;font-family:var(--f-display);font-weight:400;font-size:17px}
+.tip p{margin:0;font-size:13.5px;line-height:1.6;color:#33405E}
+.tip .x{border:0;background:transparent;font-size:12px;color:var(--muted);padding:4px}
+.tip.closed p,.tip.closed h3{display:none}
+
+/* dock */
+.dock{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:max(16px,env(safe-area-inset-bottom,0px));display:flex;gap:6px;align-items:stretch;
+  background:var(--paper);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:22px;padding:6px;box-shadow:0 10px 30px rgba(10,16,40,.25);max-width:calc(100% - 32px)}
+.dock button{border:0;background:transparent;border-radius:16px;min-width:58px;padding:6px 8px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--ink)}
+.dock button:hover{background:rgba(31,42,68,.06)}
+.dock .ic{font-family:var(--f-display);font-size:19px;line-height:1.1}
+.dock .sep{width:1px;background:var(--line);margin:6px 2px}
+.dock .main{background:var(--honey);color:var(--honey-ink);padding-inline:14px}
+.dock .main:hover{background:#F6B95A}
+.dock .sub{background:rgba(31,42,68,.07)}
+.hint{position:absolute;z-index:3;left:50%;transform:translateX(-50%);bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 76px);color:#fff;font-size:12.5px;text-shadow:0 1px 4px rgba(0,0,0,.45);white-space:nowrap;pointer-events:none}
+
+/* sheets & overlays */
+.sheet{position:absolute;z-index:8;right:max(16px,env(safe-area-inset-right,0px));top:calc(max(12px,env(safe-area-inset-top,0px)) + 64px);bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 84px);width:min(360px,calc(100% - 32px));
+  background:var(--paper-solid);border-radius:20px;box-shadow:0 16px 40px rgba(10,16,40,.3);display:flex;flex-direction:column;overflow:hidden}
+.sheet header{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.sheet h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:20px}
+.sheet .body{padding:12px 18px 18px;overflow:auto;display:flex;flex-direction:column;gap:10px;min-height:0}
+.close{border:0;background:rgba(31,42,68,.07);border-radius:999px;padding:6px 12px;font-size:13px}
+.story{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:start;padding:10px 0;border-bottom:1px dashed var(--line)}
+.story .c{width:14px;height:14px;border-radius:50%;margin-top:4px;border:2px solid rgba(0,0,0,.15)}
+.story b{font-family:var(--f-display);font-weight:400;font-size:15px}
+.story span{color:var(--muted);font-size:12px;margin-left:4px}
+.story p{margin:3px 0 0;font-size:14px;line-height:1.55;word-break:break-word}
+.story .mine{display:flex;gap:6px;margin-top:6px}
+.story .mine button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 10px;font-size:12px}
+.empty{color:var(--muted);font-size:14px;line-height:1.6;padding:8px 0}
+
+.composer label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+.composer textarea{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:14px;padding:12px;font:inherit;font-size:15px;resize:none;height:92px;color:var(--ink);background:#FBFCFE}
+.count{text-align:right;font-size:12px;color:var(--muted);margin-top:4px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches button{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--line)}
+.swatches button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.shapes{display:flex;gap:8px;flex-wrap:wrap}
+.shapes button{width:56px;height:62px;border-radius:14px;border:0;background:#F4F1EA;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;color:var(--ink);cursor:pointer}
+.shapes button[aria-pressed="true"]{background:#FFF1C9;box-shadow:0 0 0 2.5px var(--honey-deep)}
+.shapes svg{width:34px;height:34px}
+.codebox{font-family:var(--f-display);font-size:34px;letter-spacing:6px;text-align:center;background:#FFF0F4;border-radius:14px;padding:10px;margin:6px 0 8px;color:var(--ink)}
+.palcard{display:flex;gap:12px;align-items:center;background:#FFF0F4;border-radius:16px;padding:12px;margin:6px 0 12px}
+.palcard svg{width:84px;height:90px;flex-shrink:0}
+.palcard b{font-family:var(--f-display);font-weight:400;font-size:18px;color:var(--ink);display:block}
+.palcard p{margin:4px 0 0;font-size:13px;line-height:1.55;color:#4A4F63}
+.pairs{list-style:none;margin:6px 0 12px;padding:0;display:flex;flex-direction:column;gap:8px}
+.pairs li{background:#F7F5F0;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.pairs li div{flex-grow:1;min-width:0}
+.pairs b{font-family:var(--f-display);font-weight:400;font-size:16px;color:var(--ink)}
+.pairs small{display:block;font-size:12px;color:var(--muted)}
+.pairs button{border:0;border-radius:10px;padding:9px 12px;background:#FFB3C7;color:#4A1F2C;font-family:var(--f-display);font-size:14px;white-space:nowrap;cursor:pointer}
+.primary{border:0;background:var(--ink);color:#fff;border-radius:14px;padding:13px 16px;font-family:var(--f-display);font-size:17px;width:100%}
+.primary:disabled{opacity:.4;cursor:default}
+.stamp-pill{background:var(--honey);color:var(--honey-ink);font-family:var(--f-display);font-size:14px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+.sec-h b{font-family:var(--f-display);font-weight:400;font-size:18px}
+.sec-h span{font-size:12px;color:var(--muted)}
+.done-banner{background:#FFF3DC;color:var(--honey-ink);border-radius:12px;padding:10px 12px;font-size:14px}
+.missions{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.missions li{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;background:#F6F8FB;border-radius:14px;padding:10px 12px}
+.missions li > div{min-width:0}
+.missions p{margin:0 0 6px;font-size:14px}
+.missions .chk{width:40px;height:40px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:11px;font-family:var(--f-display);color:#fff}
+.missions li.ok .chk{border:0;background:var(--berry);transform:rotate(-12deg)}
+.missions li.ok p{color:var(--muted)}
+.missions .num{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar2{height:6px;border-radius:6px;background:#E3E8F0;overflow:hidden}
+.bar2 i{display:block;height:100%;background:var(--honey);border-radius:6px}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.st{aspect-ratio:1;max-width:100%;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-size:12px;line-height:1.15;color:#A4ACBD;padding:4px;box-sizing:border-box}
+.st.on{border:3px double var(--berry);color:var(--berry);background:#FFF5F6}
+.st.on span{transform:rotate(-12deg)}
+.stamp-list{margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.7}
+.stamp-pop{position:absolute;inset:0;z-index:13;display:grid;place-items:center;pointer-events:none}
+.stamp-pop > div{width:170px;height:170px;border-radius:50%;border:6px double var(--berry);background:rgba(255,255,255,.92);color:var(--berry);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.stamp-pop small{font-size:13px;letter-spacing:2px}
+.stamp-pop b{font-family:var(--f-display);font-weight:400;font-size:30px}
+.stamp-pop.go > div{animation:slam 1.5s ease-out both}
+@keyframes slam{0%{transform:scale(2.4) rotate(-30deg);opacity:0}18%{transform:scale(.92) rotate(-12deg);opacity:1}26%{transform:scale(1) rotate(-12deg)}80%{opacity:1}100%{opacity:0;transform:scale(1) rotate(-12deg)}}
+.hold{position:relative;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.hold .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--honey)}
+.hold .hl{position:relative}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin:0}
+
+.pop{position:absolute;z-index:9;max-width:240px;background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 10px 30px rgba(10,16,40,.3);font-size:14px;line-height:1.5;pointer-events:none}
+.pop b{font-family:var(--f-display);font-weight:400;display:block;font-size:14px;color:var(--honey-deep)}
+.toast{position:absolute;z-index:12;left:50%;top:calc(max(12px,env(safe-area-inset-top,0px)) + 70px);transform:translate(-50%,-8px);background:var(--ink);color:#fff;border-radius:999px;padding:10px 18px;font-size:14px;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.trans{position:absolute;inset:0;z-index:11;display:grid;place-items:center;background:#FFF3E0;color:#4A3530;font-family:var(--f-display);font-size:26px;opacity:0;pointer-events:none;transition:opacity .35s}
+.trans.on{opacity:1}
+.sign{cursor:pointer}
+.sign:focus{outline:none}.sign:focus-visible rect.board{stroke:#E8573A}
+.flash{position:absolute;inset:0;background:#fff;z-index:11;opacity:0;pointer-events:none}
+.flash.go{animation:flash .6s ease-out}
+@keyframes flash{0%{opacity:.95}100%{opacity:0}}
+.countdown{position:absolute;inset:0;z-index:10;display:grid;place-items:center;font-family:var(--f-display);font-size:120px;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.4);pointer-events:none}
+
+.modal{position:absolute;inset:0;z-index:20;background:rgba(12,16,32,.55);display:grid;place-items:center;padding:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.card{background:#fff;border-radius:24px;padding:22px;width:min(460px,100%);max-height:calc(100% - 24px);overflow:auto;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px}
+.card h1{margin:0;font-family:var(--f-display);font-weight:400;font-size:28px;text-wrap:balance}
+.card h1 + p{margin:-6px 0 0;color:var(--muted);font-size:14px;line-height:1.6}
+.card input[type=text]{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:16px;color:var(--ink);background:#FBFCFE}
+.breeds{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.breeds button{border:2px solid var(--line);background:#F7F9FC;border-radius:16px;padding:6px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px}
+.breeds button[aria-pressed="true"]{border-color:var(--honey);background:#FFF6E6}
+.breeds svg{width:100%;max-width:72px;height:62px}
+.vetcard{position:absolute;z-index:9;width:min(290px,calc(100% - 32px));box-sizing:border-box;background:#fff;border-radius:18px;padding:14px;box-shadow:0 14px 36px rgba(10,16,40,.3);display:flex;flex-direction:column;gap:8px}
+.vetcard .who{font-family:var(--f-display);font-size:17px;display:flex;justify-content:space-between;align-items:center}
+.vetcard .who small{font-family:var(--f-body);font-size:11.5px;color:var(--honey-deep);font-weight:700;letter-spacing:.5px}
+.vetcard h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:15px;color:var(--ink)}
+.vetcard p{margin:0;font-size:13.5px;line-height:1.6;color:#33405E}
+.vetcard .row button{border:0;border-radius:12px;padding:10px 6px;font-family:var(--f-display);font-size:15px}
+.vetcard .go{background:var(--ink);color:#fff}
+.vetcard .treat{background:var(--honey);color:var(--honey-ink)}
+.say{position:absolute;z-index:6;max-width:260px;background:#fff;border:2.5px solid #2E2523;border-radius:16px;padding:9px 13px;font-size:14px;line-height:1.5;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.photo img{width:100%;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.row{display:flex;gap:8px}
+.kn{list-style:none;margin:6px 0 14px;padding:0;display:flex;flex-direction:column;gap:8px}
+.kn li{background:#F7F5F0;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.kn b{font-family:var(--f-display);font-weight:400;font-size:16px;color:var(--ink);line-height:1.35}
+.kn .tg{font-size:11.5px;font-weight:700;color:#8A5A00}
+.kn a{align-self:flex-start;margin-top:4px;background:#FFD43B;color:#2A2100;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;text-decoration:none}
+.kn-btn{border:0;border-radius:12px;padding:10px;background:#FFF3C4;color:#5A4300;font-family:var(--f-display);font-size:14.5px;cursor:pointer}
+.fr{list-style:none;margin:6px 0 14px;padding:0;display:flex;flex-direction:column;gap:8px}
+.fr li{background:#F7F5F0;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.fr li div{flex-grow:1;min-width:0}
+.fr b{font-family:var(--f-display);font-weight:400;font-size:16px;color:var(--ink)}
+.fr small{display:block;font-size:12px;color:var(--muted)}
+.fr button,.invite button{border:0;border-radius:10px;padding:9px 12px;background:var(--ink);color:#fff;font-family:var(--f-display);font-size:14px;white-space:nowrap;cursor:pointer}
+.invite{display:flex;gap:8px;margin:6px 0 10px}
+.invite input{flex-grow:1;min-width:0;border:1.5px solid #DDD6C8;border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink);background:#fff}
+#online{cursor:pointer;color:inherit;font:inherit}
+.row > *{flex:1}
+.ghost{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;font-family:var(--f-display);font-size:16px}
+
+.loader{position:absolute;inset:0;z-index:30;background:#EEEAE2;display:grid;place-items:center;text-align:center;transition:opacity .5s}
+.loader b{font-family:var(--f-display);font-weight:400;font-size:34px;display:block;margin-top:6px;color:#3D3A33}
+.loader p{color:#7A746A;font-size:13px;margin:6px 0 12px}
+.bar{width:140px;height:4px;border-radius:4px;background:#D9D3C7;margin:0 auto;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#6E7B5E;animation:load 1.3s ease-in-out forwards}
+@keyframes load{to{width:100%}}
+
+@media (max-width:720px){
+  .brand small{display:none}
+  .scenes{order:3;width:100%;justify-content:space-between}
+  .scenes button{flex:1;padding:8px 6px;font-size:14px}
+  .ticker{top:calc(max(12px,env(safe-area-inset-top,0px)) + 112px);font-size:13px}
+  .tip{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 92px)}
+  .dock button{min-width:46px;padding:6px 4px}
+  .dock .main{padding-inline:10px}
+  .sheet{left:max(16px,env(safe-area-inset-left,0px));width:auto;top:auto;height:62%}
+  .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div id="app">
+  <svg id="stage" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" role="img" aria-label="강아지들이 산책하는 동네 풍경">
+    <style>
+      .dog .tail{animation:wag .5s ease-in-out infinite alternate;transform-origin:-32px -38px}
+      .dog.walking .bob{animation:bob .32s ease-in-out infinite alternate}
+      .dog.sit .backlegs{opacity:0}
+      .dog.sit .torso{transform:translate(-2px,8px) rotate(-11deg)}
+      .dog.sit .headw{transform:translate(-6px,4px)}
+      .dog.paw .pawleg{transform:rotate(-70deg)}
+      .dog .pawleg{transform-origin:24px -18px;transition:transform .2s}
+      .dog .torso,.dog .headw{transition:transform .25s}
+      .dog.spin .spinw{animation:spin .55s ease-in-out 2}
+      .dog .bub{opacity:0;transform:scale(.4);transform-origin:0 20px;transition:.18s}
+      .dog.bark .bub{opacity:1;transform:scale(1)}
+      .dog.bark .headw{transform:rotate(-8deg) translate(2px,-3px)}
+      @keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+      @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+      @keyframes spin{0%{transform:scaleX(1)}50%{transform:scaleX(-1)}100%{transform:scaleX(1)}}
+      .snow circle{animation:fall linear infinite}
+      @keyframes fall{from{transform:translate(0,-160px)}to{transform:translate(30px,980px)}}
+      .bulb{animation:blink 1.6s ease-in-out infinite alternate}
+      @keyframes blink{from{opacity:1}to{opacity:.35}}
+      .wave{animation:wave 3.2s ease-in-out infinite alternate}
+      @keyframes wave{from{transform:translateX(-20px)}to{transform:translateX(20px)}}
+      .twinkle{animation:blink 2.2s ease-in-out infinite alternate}
+      .orn,.wtag,.vetc{cursor:pointer}
+      .heart{animation:rise 1.3s ease-out both}
+      @keyframes rise{from{transform:translateY(0) scale(.5);opacity:1}to{transform:translateY(-90px) scale(1.15);opacity:0}}
+      .quest{animation:bob .5s ease-in-out infinite alternate}
+      text{font-family:"Jua","Apple SD Gothic Neo",sans-serif}
+    </style>
+    <g id="bg"></g>
+    <g id="decor"></g>
+    <g id="dogs"></g>
+    <g id="fx"></g>
+  </svg>
+
+  <div class="top">
+    <div class="brand">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#F2A93B"/><ellipse cx="11" cy="17" rx="5" ry="9" fill="#1F2A44" transform="rotate(20 11 17)"/><ellipse cx="29" cy="17" rx="5" ry="9" fill="#1F2A44" transform="rotate(-20 29 17)"/><circle cx="20" cy="21" r="10" fill="#FFF6E6"/><circle cx="16.5" cy="19" r="1.8" fill="#1F2A44"/><circle cx="23.5" cy="19" r="1.8" fill="#1F2A44"/><ellipse cx="20" cy="24" rx="3" ry="2.2" fill="#1F2A44"/></svg>
+      <div><b>멍동네</b><small>설채현 수의사와 함께 만든 강아지 마을</small></div>
+    </div>
+    <nav class="scenes" aria-label="장소">
+      <button data-scene="sunrise">일출 언덕</button>
+      <button data-scene="xmas">트리 광장</button>
+      <button data-scene="locks">자물쇠 언덕</button>
+      <button data-scene="travel">바닷가</button>
+    </nav>
+    <div class="meta">
+      <button type="button" class="pill" id="online"><span class="dot"></span><span id="onlineTxt">산책 준비 중</span></button>
+      <button class="pill stamp-pill" id="stampBtn"><span id="stampTxt">산책 수첩</span></button>
+      <button class="pill" id="changeDog">내 강아지</button>
+    </div>
+  </div>
+
+  <div class="ticker" id="ticker" hidden></div>
+
+  <div class="vetcard" id="vetCard" hidden role="dialog" aria-labelledby="vetName">
+    <div class="who"><span id="vetName">설채현 수의사</span><small>수의사 체크</small></div>
+    <h3 id="vetTipT"></h3>
+    <p id="vetTipP"></p>
+    <div class="row"><button class="go" id="vetCheck">건강 체크 받기</button><button class="treat" id="vetTreat">간식 받기</button></div>
+    <button class="kn-btn" id="vetKn">설쌤이 추천하는 놀로 챌린지</button>
+    <button class="close" id="vetClose" style="align-self:center">닫기</button>
+  </div>
+  <div class="vetcard" id="playCard" hidden role="dialog" aria-labelledby="playT">
+    <div class="who"><span id="playName"></span><small>같이 놀기</small></div>
+    <h3 id="playT"></h3>
+    <p id="playP"></p>
+    <div class="row" id="playAsk"><button class="go" id="playBall">공놀이</button><button class="treat" id="playHeart">하트 주고받기</button></div>
+    <div class="row" id="playInv" hidden><button class="go" id="playYes">좋아요</button><button class="treat" id="playNo">다음에</button></div>
+    <button class="close" id="playClose" style="align-self:center">닫기</button>
+  </div>
+  <div class="say" id="say" hidden></div>
+
+  <div class="hint" id="hint">바닥을 누르면 걸어가요 · 길 끝 표지판까지 가면 다음 장소예요</div>
+
+  <div class="dock" id="dock">
+    <button data-act="sit"><span class="ic">앉아</span><span>앉기</span></button>
+    <button data-act="paw"><span class="ic">손!</span><span>손 주기</span></button>
+    <button data-act="spin"><span class="ic">빙글</span><span>돌기</span></button>
+    <button data-act="bark"><span class="ic">멍!</span><span>짖기</span></button>
+    <span class="sep"></span>
+    <button class="sub" id="palBtn" hidden><span class="ic">단짝</span><span>초대</span></button>
+    <button class="sub" id="storyBtn"><span class="ic" id="storyCount">0</span><span id="storyLab">이야기</span></button>
+    <button class="main" id="mainBtn"><span class="ic" id="mainIc"></span><span id="mainLab"></span></button>
+  </div>
+
+  <section class="sheet" id="sheet" hidden aria-labelledby="sheetTitle">
+    <header><h2 id="sheetTitle"></h2><button class="close" id="sheetClose">닫기</button></header>
+    <div class="body" id="sheetBody"></div>
+  </section>
+
+  <div class="pop" id="pop" hidden></div>
+  <div class="toast" id="toast"></div>
+  <div class="stamp-pop" id="stampPop" hidden><div><small>산책 도장</small><b></b></div></div>
+  <div class="flash" id="flash"></div>
+  <div class="trans" id="trans"><span id="transTxt"></span></div>
+  <div class="countdown" id="countdown" hidden></div>
+
+  <div class="modal" id="setup" hidden>
+    <form class="card" id="setupForm">
+      <h1>우리 강아지와 함께 들어가요</h1>
+      <p>회원가입 없이 산책할 수 있어요. 지금 동네에 있는 다른 강아지들도 함께 보여요.</p>
+      <div>
+        <label for="dogName" style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">강아지 이름</label>
+        <input type="text" id="dogName" maxlength="8" placeholder="예: 콩이" autocomplete="off">
+      </div>
+      <div class="breeds" id="breedPick"></div>
+      <button class="primary" type="submit" id="enterBtn">동네로 산책 가기</button>
+      <p class="note">트리와 소원 줄에 남긴 글은 다른 방문객에게 보여요. 내 글은 직접 고치거나 거둘 수 있어요. 보호자 이름이나 연락처는 적지 말아 주세요.</p>
+    </form>
+  </div>
+
+  <div class="modal" id="photoModal" hidden>
+    <div class="card photo">
+      <h1 style="font-size:22px" id="photoTitle">찰칵! 여행 사진이 나왔어요</h1>
+      <img id="photoImg" alt="우리 강아지와 찍은 바닷가 포토존 사진">
+      <div class="row"><button class="ghost" id="photoClose">닫기</button><button class="primary" id="photoSave">사진 저장하기</button></div>
+      <p class="note" id="photoNote" hidden>이 화면에서는 저장 버튼을 쓸 수 없어요. 사진을 길게 누르거나 오른쪽 클릭해서 저장해 주세요.</p>
+    </div>
+  </div>
+
+  <div class="loader" id="loader">
+    <div>
+      <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true"><path d="M6 22 L20 9 L34 22" fill="none" stroke="#8A8270" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="11" y="21" width="18" height="12" fill="none" stroke="#8A8270" stroke-width="2.2"/><circle cx="20" cy="27" r="2.4" fill="#8A8270"/></svg>
+      <b>멍동네</b>
+      <p>산책로를 정리하고 있어요</p>
+      <div class="bar"><i></i></div>
+      <p style="margin-top:12px">잠시 후 우리 강아지와 동네를 둘러볼 수 있어요.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const svg = $("stage"), bgG = $("bg"), decorG = $("decor"), dogsG = $("dogs");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+
+/* ---------- breeds ---------- */
+const BREEDS = {
+  maltese:{name:"말티즈", body:"#FFFFFF", muzzle:"#FFF6EE", ear:"#F3EAE0", ears:"floppy"},
+  maltipoo:{name:"말티푸", body:"#F3D2AE", muzzle:"#FBE8D4", ear:"#E8BA8A", ears:"curly", tuft:true},
+  poodle:{name:"푸들", body:"#E2A46C", muzzle:"#EEC195", ear:"#CF8C55", ears:"curly"},
+  shiba:{name:"시바", body:"#E3924A", muzzle:"#FFF1DF", ear:"#E3924A", ears:"pointy"},
+  corgi:{name:"웰시코기", body:"#EE9E47", muzzle:"#FFF6E8", ear:"#EE9E47", ears:"big", short:true},
+  bichon:{name:"비숑", body:"#FFFDF6", muzzle:"#FFFFFF", ear:"#F6EFE2", ears:"fluffy", big:true},
+  lab:{name:"블랙 래브", body:"#3A3330", muzzle:"#51473F", ear:"#2B2522", ears:"floppy"}
+};
+const BREED_KEYS = Object.keys(BREEDS);
+const OL = "#4A3530";
+
+function earsMarkup(b, R, front){
+  const c = b.ear, sw = `stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"`;
+  if (b.ears === "floppy") return front
+    ? `<ellipse cx="${-R*.6}" cy="${-R*.05}" rx="11" ry="21" transform="rotate(18 ${-R*.6} ${-R*.05})" fill="${c}" ${sw}/>`
+    : `<ellipse cx="${R*.5}" cy="${-R*.62}" rx="9" ry="14" transform="rotate(-30 ${R*.5} ${-R*.62})" fill="${c}" ${sw}/>`;
+  if (b.ears === "curly") return front
+    ? `<g fill="${c}" ${sw}><circle cx="${-R*.62}" cy="${-R*.15}" r="10"/><circle cx="${-R*.7}" cy="${R*.25}" r="10"/><circle cx="${-R*.6}" cy="${R*.6}" r="9"/></g>`
+    : `<circle cx="${R*.5}" cy="${-R*.65}" r="10" fill="${c}" ${sw}/>`;
+  if (b.ears === "pointy" || b.ears === "big") {
+    const k = b.ears === "big" ? 1.35 : 1;
+    return front
+      ? `<path d="M${-R*.75} ${-R*.35} L${-R*.55} ${-R*(.95+.35*k)} L${-R*.05} ${-R*.7}Z" fill="${c}" ${sw}/><path d="M${-R*.6} ${-R*.5} L${-R*.5} ${-R*(.95+.2*k)} L${-R*.25} ${-R*.72}Z" fill="#FFE6CF"/>`
+      : `<path d="M${R*.05} ${-R*.75} L${R*.4} ${-R*(.95+.35*k)} L${R*.7} ${-R*.5}Z" fill="${c}" ${sw}/>`;
+  }
+  if (b.ears === "fluffy") return front
+    ? `<g fill="${c}" ${sw}><circle cx="${-R*.7}" cy="${-R*.1}" r="12"/><circle cx="${-R*.75}" cy="${R*.3}" r="11"/></g>`
+    : `<circle cx="${R*.45}" cy="${-R*.7}" r="11" fill="${c}" ${sw}/>`;
+  return "";
+}
+
+function accessory(scene, where, R){
+  const sw = `stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"`;
+  if (scene === "sunrise" && where === "neck")
+    return `<g><path d="M8 -66 Q30 -50 52 -64 L54 -54 Q30 -40 6 -56Z" fill="#F2A93B" ${sw}/><path d="M14 -56 L8 -36 L20 -40 L22 -55Z" fill="#E0892A" ${sw}/><path d="M18 -60 Q30 -50 44 -60" stroke="#FFF1D6" stroke-width="3" fill="none"/></g>`;
+  if (scene === "xmas" && where === "head")
+    return `<g><path d="M${-R*.85} ${-R*.55} Q${-R*.1} ${-R*1.9} ${R*.85} ${-R*.6}Z" fill="#D9485F" ${sw}/><path d="M${-R*.1} ${-R*1.45} Q${-R*.9} ${-R*1.6} ${-R*1.2} ${-R*1.0}" stroke="#D9485F" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="${-R*1.22}" cy="${-R*.95}" r="7" fill="#fff" ${sw}/><rect x="${-R*.95}" y="${-R*.72}" width="${R*1.9}" height="12" rx="6" fill="#fff" ${sw} transform="rotate(-6)"/></g>`;
+  if (scene === "travel" && where === "head")
+    return `<g ${sw}><rect x="-10" y="-13" width="20" height="14" rx="6" fill="#1F2A44"/><rect x="15" y="-15" width="18" height="14" rx="6" fill="#1F2A44"/><path d="M10 -7 L15 -8" fill="none"/><path d="M-10 -8 L-28 -12" fill="none"/><path d="M-6 -10 L-2 -10" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></g>`;
+  if (scene === "locks" && where === "head")
+    return `<g transform="translate(${-R*.35} ${-R*.82}) rotate(-15)" ${sw}><path d="M0 0 L-16 -10 L-16 10Z" fill="#FF8FB1"/><path d="M0 0 L16 -10 L16 10Z" fill="#FF8FB1"/><circle r="5" fill="#FF6B9A"/></g>`;
+  return "";
+}
+
+function dogInner(key, scene, preview, crown){
+  const b = BREEDS[key] || BREEDS.maltese;
+  // chibi proportions: big round head, small bean body, stubby legs
+  const R = b.big ? 42 : 38, L = b.short ? 13 : 20, bodyY = b.short ? -24 : -31, headY = b.short ? -62 : -72;
+  const sw = `stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"`;
+  const leg = x => `<rect x="${x}" y="${-L}" width="13" height="${L+1}" rx="6.5" fill="${b.body}" ${sw}/>`;
+  const tail = key === "shiba"
+    ? `<path d="M-32 ${bodyY-8} c-18 -4 -22 -28 -4 -32 c11 -2 13 11 2 12" fill="none" stroke="${OL}" stroke-width="15" stroke-linecap="round"/><path d="M-32 ${bodyY-8} c-18 -4 -22 -28 -4 -32 c11 -2 13 11 2 12" fill="none" stroke="${b.body}" stroke-width="10" stroke-linecap="round"/>`
+    : `<path d="M-32 ${bodyY-6} q-16 -6 -14 -24" fill="none" stroke="${OL}" stroke-width="15" stroke-linecap="round"/><path d="M-32 ${bodyY-6} q-16 -6 -14 -24" fill="none" stroke="${b.body}" stroke-width="10" stroke-linecap="round"/>`;
+  const fluff = b.ears === "fluffy" ? `<g fill="${b.body}" ${sw}><circle cx="-26" cy="-22" r="15"/><circle cx="0" cy="-36" r="16"/><circle cx="26" cy="-24" r="14"/></g>`
+    : b.tuft ? `<g fill="${b.ear}" ${sw}><circle cx="-12" cy="${-R+3}" r="11"/><circle cx="6" cy="${-R-2}" r="12"/><circle cx="22" cy="${-R+7}" r="9"/></g>` : "";
+  const eye = (x, y, r) => `<g transform="translate(${x} ${y})"><ellipse rx="${r}" ry="${r*1.12}" fill="${OL}"/><circle r="${(r*.42).toFixed(1)}" cx="${(r*.32).toFixed(1)}" cy="${(-r*.38).toFixed(1)}" fill="#fff"/><circle r="${(r*.2).toFixed(1)}" cx="${(-r*.35).toFixed(1)}" cy="${(r*.35).toFixed(1)}" fill="#fff" opacity=".85"/></g>`;
+  const neckShift = (headY + R) - (-52);
+  return `
+  <g class="spinw"><g class="bob">
+    <g class="torso">
+      <g class="tail">${tail}</g>
+      <g class="backlegs">${leg(-27)}${leg(-13)}</g>
+      <ellipse cx="-2" cy="${bodyY}" rx="33" ry="23" fill="${b.body}" ${sw}/>
+      ${key==="corgi"||key==="shiba" ? `<ellipse cx="8" cy="${bodyY+9}" rx="18" ry="10" fill="${b.muzzle}"/>` : ""}
+      ${scene ? `<g transform="translate(-10 ${neckShift})">${accessory(scene, "neck", R)}</g>` : ""}
+      <g class="headw"><g transform="translate(20 ${headY})">
+        ${earsMarkup(b, R, false)}
+        ${fluff}
+        <circle r="${R}" fill="${b.body}" ${sw}/>
+        <ellipse cx="18" cy="13" rx="15" ry="11" fill="${b.muzzle}" ${sw}/>
+        <ellipse cx="29" cy="7" rx="6.5" ry="5" fill="${OL}"/><ellipse cx="27" cy="5.5" rx="2" ry="1.3" fill="#fff" opacity=".7"/>
+        <path d="M14 17 q4.5 5 9 0 q4.5 5 9 0" fill="none" stroke="${OL}" stroke-width="2.2" stroke-linecap="round"/>
+        <ellipse cx="-12" cy="13" rx="9" ry="5.5" fill="#FF8C9E" opacity=".5"/>
+        ${eye(0, -4, 6.4)}
+        ${eye(23, -6, 5.6)}
+        ${earsMarkup(b, R, true)}
+        ${scene ? accessory(scene, "head", R) : ""}
+        ${crown ? `<g transform="translate(${R*.2} ${scene === "xmas" ? -R*1.75 : -R-8}) rotate(10)"><path d="M-17 7 L-17 -9 L-8 -1 L0 -15 L8 -1 L17 -9 L17 7Z" fill="#FFD36B" ${sw}/><circle cy="-15" r="3.5" fill="#D9485F" ${sw} stroke-width="1.5"/><circle cx="-8" cy="2" r="2.5" fill="#4A7FD9"/><circle cx="8" cy="2" r="2.5" fill="#3BB273"/></g>` : ""}
+      </g></g>
+    </g>
+    <g>${leg(5)}<g class="pawleg">${leg(18)}</g></g>
+  </g></g>`;
+}
+
+/* ---------- scenes ---------- */
+const SCENES = {
+  sunrise:{label:"일출 언덕", walk:[690,872], body:"#1B2350",
+    main:{ic:"소원", lab:"소원 빌기"}, story:"소원", sheet:"소원나무에 걸린 소원", coll:"wishes",
+    tipT:"새벽 산책은 체온부터 챙겨요", tipP:"해 뜨기 전 공기는 생각보다 차가워요. 단모종이나 소형견은 얇은 옷을 입히고, 나가기 전에 실내에서 5분쯤 천천히 몸을 풀어 주면 관절이 편해요."},
+  xmas:{label:"트리 광장", walk:[656,872], body:"#142240",
+    main:{ic:"달기", lab:"장식 달기"}, story:"이야기", sheet:"트리에 걸린 이야기", coll:"ornaments",
+    tipT:"트리 장식은 강아지 눈높이 위로", tipP:"전구 전선과 반짝이 장식은 강아지가 닿지 않는 높이에 정리해 주세요. 초콜릿, 포도처럼 강아지가 먹으면 안 되는 간식은 테이블 위 닫힌 통에 두면 안심이에요."},
+  locks:{label:"자물쇠 언덕", walk:[648,872], body:"#2B2456",
+    main:{ic:"딸깍", lab:"자물쇠 걸기"}, story:"자물쇠", sheet:"언덕에 걸린 자물쇠", coll:"locks",
+    tipT:"사람 많은 곳에선 리드줄을 짧게", tipP:"관광지처럼 사람이 많은 곳에서는 리드줄을 짧게 잡고, 계단에서는 소형견을 안아서 이동해 주세요. 낯선 소리에 놀라면 잠깐 멈춰서 기다려 주면 금방 안정을 찾아요."},
+  travel:{label:"바닷가", walk:[624,872], body:"#7EC6EA",
+    main:{ic:"찰칵", lab:"사진 찍기"}, story:null,
+    tipT:"이동 중에는 자주 쉬어 가요", tipP:"차로 이동할 때는 1~2시간마다 내려서 물을 주고 잠깐 걸어요. 낯선 숙소에서는 집에서 쓰던 담요 하나가 우리 강아지 마음을 편하게 해 줘요."}
+};
+
+let rnd = (seed => () => (seed = (seed*16807) % 2147483647) / 2147483647)(7);
+function snowMarkup(n){
+  let s = '<g class="snow" fill="#fff">';
+  for (let i=0;i<n;i++){ const x=rnd()*1600, y=rnd()*820-60, r=2+rnd()*4, d=7+rnd()*9; s += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" opacity="${(.5+rnd()*.5).toFixed(2)}" style="animation-duration:${d.toFixed(1)}s;animation-delay:-${(rnd()*d).toFixed(1)}s"/>`; }
+  return s + "</g>";
+}
+function starsMarkup(n){
+  let s = '<g id="stars" fill="#fff">';
+  for (let i=0;i<n;i++){ s += `<circle class="twinkle" cx="${(rnd()*1600).toFixed(0)}" cy="${(rnd()*420).toFixed(0)}" r="${(1+rnd()*1.8).toFixed(1)}" style="animation-delay:-${(rnd()*2).toFixed(1)}s"/>`; }
+  return s + "</g>";
+}
+
+const BG = {
+  sunrise: () => `
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop id="sk0" offset="0"/><stop id="sk1" offset=".55"/><stop id="sk2" offset="1"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#FFE7A8" stop-opacity=".9"/><stop offset="1" stop-color="#FFB46B" stop-opacity="0"/></radialGradient></defs>
+    <rect width="1600" height="900" fill="url(#sky)"/>
+    ${starsMarkup(70)}
+    <g id="sunG"><circle cx="800" cy="0" r="230" fill="url(#glow)"/><circle cx="800" cy="0" r="72" fill="#FFD36B"/></g>
+    <path d="M0 560 L180 470 L330 520 L520 430 L700 505 L860 440 L1040 510 L1220 450 L1400 520 L1600 470 L1600 720 L0 720Z" fill="#6F6C9C"/>
+    <path d="M0 610 Q200 545 420 600 T860 590 T1300 600 T1600 580 L1600 740 L0 740Z" fill="#4E6E73"/>
+    <path d="M0 668 Q400 612 800 640 T1600 650 L1600 900 L0 900Z" fill="#8DB47A"/>
+    <path d="M0 760 Q500 700 900 740 T1600 735 L1600 900 L0 900Z" fill="#7CA56A"/>
+    <path d="M640 900 Q720 780 800 700 Q880 780 960 900Z" fill="#C9B48F" opacity=".7"/>
+    <g transform="translate(250 700)"><rect x="-70" y="-30" width="140" height="12" rx="4" fill="#9A6B45" stroke="${OL}" stroke-width="2.5"/><rect x="-60" y="-18" width="10" height="26" fill="#7C5234" stroke="${OL}" stroke-width="2.5"/><rect x="50" y="-18" width="10" height="26" fill="#7C5234" stroke="${OL}" stroke-width="2.5"/><rect x="-70" y="-58" width="140" height="12" rx="4" fill="#9A6B45" stroke="${OL}" stroke-width="2.5"/></g>
+    <g transform="translate(470 690)"><rect x="-5" y="-90" width="10" height="92" fill="#7C5234" stroke="${OL}" stroke-width="2.5"/><path d="M-62 -92 L62 -92 L76 -74 L62 -56 L-62 -56Z" fill="#F1E4C8" stroke="${OL}" stroke-width="2.5"/><text x="4" y="-66" text-anchor="middle" font-size="22" fill="#5A4630">일출 언덕</text></g>
+    <path d="M1312 700 Q1320 600 1302 520 L1286 470 L1310 474 L1324 528 L1340 466 L1364 474 L1346 540 Q1342 620 1358 700Z" fill="#8A5A3A" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>
+    <g fill="${OL}"><circle cx="1238" cy="432" r="84"/><circle cx="1422" cy="432" r="84"/><circle cx="1330" cy="368" r="99"/><circle cx="1258" cy="494" r="66"/><circle cx="1402" cy="494" r="66"/><circle cx="1330" cy="474" r="84"/></g>
+    <g fill="#5E9A5C"><circle cx="1238" cy="432" r="81"/><circle cx="1422" cy="432" r="81"/><circle cx="1330" cy="368" r="96"/><circle cx="1258" cy="494" r="63"/><circle cx="1402" cy="494" r="63"/><circle cx="1330" cy="474" r="81"/></g>
+    <g fill="#79B470"><circle cx="1296" cy="330" r="42"/><circle cx="1218" cy="404" r="30"/><circle cx="1404" cy="396" r="34"/></g>
+    <g transform="translate(1180 708)"><rect x="-5" y="-70" width="10" height="72" fill="#7C5234" stroke="${OL}" stroke-width="2.5"/><path d="M-58 -72 L58 -72 L58 -40 L-58 -40Z" fill="#F1E4C8" stroke="${OL}" stroke-width="2.5"/><text x="0" y="-49" text-anchor="middle" font-size="21" fill="#5A4630">소원나무</text></g>
+    <rect id="nightTint" width="1600" height="900" fill="#0E1433" pointer-events="none"/>`,
+  xmas: () => `
+    <defs><linearGradient id="skyx" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101A38"/><stop offset="1" stop-color="#2E4479"/></linearGradient>
+    <radialGradient id="treeGlow"><stop offset="0" stop-color="#FFD98A" stop-opacity=".45"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/></radialGradient></defs>
+    <rect width="1600" height="900" fill="url(#skyx)"/>
+    ${starsMarkup(50)}
+    <circle cx="1330" cy="120" r="46" fill="#FFF4D6"/><circle cx="1350" cy="108" r="46" fill="#1A2852" opacity=".0"/>
+    <g stroke="${OL}" stroke-width="2.5">
+      <path d="M40 620 L40 470 L130 400 L220 470 L220 620Z" fill="#7A4E3C"/><path d="M20 478 L130 388 L240 478" fill="#E9EEF5"/>
+      <rect x="70" y="500" width="40" height="40" fill="#FFD27A"/><rect x="150" y="500" width="40" height="40" fill="#FFD27A"/>
+      <path d="M250 620 L250 500 L340 430 L430 500 L430 620Z" fill="#5C6E8E"/><path d="M232 508 L340 418 L448 508" fill="#E9EEF5"/>
+      <rect x="320" y="540" width="40" height="80" fill="#8B5A3C"/><rect x="270" y="520" width="34" height="34" fill="#FFD27A"/>
+      <path d="M1180 620 L1180 480 L1280 410 L1380 480 L1380 620Z" fill="#8F4A4A"/><path d="M1160 488 L1280 398 L1400 488" fill="#E9EEF5"/>
+      <rect x="1210" y="510" width="40" height="40" fill="#FFD27A"/><rect x="1310" y="510" width="40" height="40" fill="#FFD27A"/>
+      <path d="M1410 620 L1410 500 L1495 440 L1580 500 L1580 620Z" fill="#4E6A5C"/><path d="M1394 508 L1495 428 L1596 508" fill="#E9EEF5"/>
+      <rect x="1475" y="540" width="40" height="80" fill="#8B5A3C"/>
+    </g>
+    <path d="M0 610 L1600 610 L1600 900 L0 900Z" fill="#E4ECF4"/>
+    <ellipse cx="800" cy="760" rx="660" ry="120" fill="#D3DEE9"/>
+    <circle cx="800" cy="420" r="380" fill="url(#treeGlow)"/>
+    <g stroke="${OL}" stroke-width="2.5" stroke-linejoin="round">
+      <rect x="780" y="590" width="40" height="44" fill="#7C5234"/>
+      <path d="M800 330 L1060 610 L540 610Z" fill="#2A6E4C"/>
+      <path d="M800 240 L1000 470 L600 470Z" fill="#2F7A55"/>
+      <path d="M800 170 L940 350 L660 350Z" fill="#358A60"/>
+      <path d="M800 128 L811 158 L843 158 L817 177 L827 208 L800 189 L773 208 L783 177 L757 158 L789 158Z" fill="#FFD36B"/>
+      <rect x="600" y="600" width="70" height="56" rx="6" fill="#D9485F"/><rect x="630" y="600" width="10" height="56" fill="#FFD36B" stroke="none"/>
+      <rect x="930" y="596" width="84" height="62" rx="6" fill="#4A7FD9"/><rect x="966" y="596" width="12" height="62" fill="#fff" stroke="none"/>
+      <rect x="1020" y="620" width="54" height="40" rx="6" fill="#F2A93B"/>
+    </g>
+    ${(() => { let s=""; const rows=[[300,430,260],[400,540,330],[500,610,420]]; let k=0;
+      rows.forEach(([y1,y2,hw])=>{ for(let i=0;i<=10;i++){ const t=i/10, x=800-hw*.8+t*hw*1.6, y=lerp(y1,y2,Math.abs(t-.5)*.2+t*.55)-30; s+=`<circle class="bulb" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="5" fill="${["#FFD36B","#FF8FA3","#9BE7FF"][k++%3]}" style="animation-delay:-${(k*.37%1.6).toFixed(2)}s"/>`; } });
+      return s; })()}
+    <g transform="translate(1110 700)"><rect x="-5" y="-80" width="10" height="82" fill="#7C5234" stroke="${OL}" stroke-width="2.5"/><path d="M-66 -82 L66 -82 L66 -46 L-66 -46Z" fill="#F1E4C8" stroke="${OL}" stroke-width="2.5"/><text x="0" y="-56" text-anchor="middle" font-size="22" fill="#5A4630">트리 광장</text></g>
+    ${snowMarkup(80)}`,
+  locks: () => `
+    <defs><linearGradient id="skyl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B2456"/><stop offset=".62" stop-color="#C77A9E"/><stop offset="1" stop-color="#FFC59E"/></linearGradient></defs>
+    <rect width="1600" height="900" fill="url(#skyl)"/>
+    ${starsMarkup(36)}
+    <path d="M880 480 Q1080 330 1296 300 Q1460 318 1600 420 L1600 520 L880 520Z" fill="#4A3B6B"/>
+    <g stroke="${OL}" stroke-width="2.5" stroke-linejoin="round">
+      <path d="M1296 70 L1296 160" fill="none"/>
+      <path d="M1284 160 L1308 160 L1314 320 L1278 320Z" fill="#EDE8F6"/>
+      <rect x="1258" y="196" width="76" height="42" rx="12" fill="#F7F2FF"/>
+      <rect x="1268" y="238" width="56" height="10" fill="#C9C1DE"/>
+      <g fill="#FFD98A" stroke="none"><rect x="1270" y="210" width="10" height="10"/><rect x="1290" y="210" width="10" height="10"/><rect x="1310" y="210" width="10" height="10"/></g>
+    </g>
+    <circle class="bulb" cx="1296" cy="66" r="7" fill="#FF6B8A"/>
+    <rect y="470" width="1600" height="90" fill="#3A2F57"/>
+    ${(() => { let s = '<g>'; for (let x = 0; x < 1600; x += 44){ const h = 20 + rnd()*60; s += `<rect x="${x}" y="${(500 - h).toFixed(0)}" width="40" height="${(h + 60).toFixed(0)}" fill="#33294F"/>`; for (let k = 0; k < 4; k++) if (rnd() > .45) s += `<rect x="${(x + 6 + (k%2)*18).toFixed(0)}" y="${(505 - h + 10 + Math.floor(k/2)*18).toFixed(0)}" width="8" height="8" fill="#FFD98A" opacity="${(.5 + rnd()*.5).toFixed(2)}"/>`; } return s + '</g>'; })()}
+    <path d="M0 560 L1600 560 L1600 900 L0 900Z" fill="#E2CDAE"/>
+    <g stroke="#CDB490" stroke-width="3"><path d="M0 640 L1600 640"/><path d="M0 720 L1600 720"/><path d="M0 810 L1600 810"/></g>
+    <g stroke="${OL}" stroke-width="2.5">${(() => { let s = ""; for (let x = 40; x <= 1580; x += 128) s += `<rect x="${x - 7}" y="478" width="14" height="112" rx="4" fill="#7D7690"/>`; return s; })()}</g>
+    <g fill="none" stroke="#9A93AE" stroke-width="5" stroke-linecap="round"><path d="M30 500 L1590 500"/><path d="M30 532 L1590 532"/><path d="M30 564 L1590 564"/></g>
+    <g transform="translate(170 720)"><rect x="-5" y="-78" width="10" height="80" fill="#7C5234" stroke="${OL}" stroke-width="2.5"/><path d="M-70 -80 L70 -80 L70 -44 L-70 -44Z" fill="#F1E4C8" stroke="${OL}" stroke-width="2.5"/><text x="0" y="-54" text-anchor="middle" font-size="21" fill="#5A4630">자물쇠 언덕</text></g>`,
+  travel: () => `
+    <defs><linearGradient id="skyt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7EC6EA"/><stop offset="1" stop-color="#E4F5FB"/></linearGradient></defs>
+    <rect width="1600" height="900" fill="url(#skyt)"/>
+    <circle cx="1400" cy="120" r="56" fill="#FFE58A"/>
+    <g fill="#fff" opacity=".9"><ellipse cx="300" cy="150" rx="90" ry="26"/><ellipse cx="360" cy="135" rx="60" ry="28"/><ellipse cx="1000" cy="210" rx="110" ry="24"/><ellipse cx="1060" cy="195" rx="60" ry="24"/></g>
+    <path d="M120 470 Q260 400 420 470Z" fill="#7FA9A0"/>
+    <rect y="460" width="1600" height="140" fill="#3BA3C9"/>
+    <g class="wave" fill="none" stroke="#BFEAF7" stroke-width="4" stroke-linecap="round"><path d="M40 500 q30 -12 60 0 t60 0"/><path d="M520 530 q30 -12 60 0 t60 0"/><path d="M980 495 q30 -12 60 0 t60 0"/><path d="M1300 550 q30 -12 60 0 t60 0"/></g>
+    <g stroke="${OL}" stroke-width="2.5" stroke-linejoin="round" transform="translate(1340 0)">
+      <path d="M-40 560 L-26 330 L26 330 L40 560Z" fill="#fff"/>
+      <path d="M-34 460 L34 460 L37 500 L-37 500Z" fill="#D9485F"/><path d="M-29 380 L29 380 L31 415 L-31 415Z" fill="#D9485F"/>
+      <rect x="-32" y="300" width="64" height="32" fill="#FFE58A"/><path d="M-40 300 L0 268 L40 300Z" fill="#D9485F"/>
+    </g>
+    <path d="M0 590 Q400 560 800 585 T1600 580 L1600 900 L0 900Z" fill="#F1DDB0"/>
+    <path d="M0 610 Q400 585 800 606 T1600 600" fill="none" stroke="#FFFFFF" stroke-width="6" opacity=".7"/>
+    ${(() => { let s=""; for(let i=0;i<46;i++){ const x=20+rnd()*300, y=640+rnd()*230; s+=`<g transform="translate(${x.toFixed(0)} ${y.toFixed(0)})"><path d="M0 0 L0 -26" stroke="#5C8F3A" stroke-width="3"/><circle cx="-4" cy="-28" r="6" fill="#FFD233"/><circle cx="4" cy="-31" r="6" fill="#FFDF4F"/><circle cx="0" cy="-36" r="5" fill="#FFE97A"/></g>`; } return s; })()}
+    <g stroke="${OL}" stroke-width="3" stroke-linejoin="round">
+      <rect x="610" y="250" width="22" height="370" fill="#9A6B45"/><rect x="968" y="250" width="22" height="370" fill="#9A6B45"/>
+      <rect x="590" y="240" width="420" height="300" rx="10" fill="none" stroke="#9A6B45" stroke-width="30"/>
+      <rect x="590" y="240" width="420" height="300" rx="10" fill="none"/>
+      <rect x="575" y="225" width="450" height="330" rx="14" fill="none"/>
+      <path d="M690 196 L910 196 L930 226 L670 226Z" fill="#F2A93B"/>
+    </g>
+    <text x="800" y="220" text-anchor="middle" font-size="24" fill="#5A3604">멍동네 여행 포토존</text>
+    <g fill="#F2A93B" stroke="${OL}" stroke-width="2"><circle cx="1180" cy="760" r="18"/><path d="M1180 742 L1180 778 M1162 760 L1198 760" stroke="#fff" stroke-width="3"/></g>
+    <g stroke="${OL}" stroke-width="2.5"><path d="M1460 780 L1440 640" stroke="#7C5234" stroke-width="6"/><path d="M1340 650 Q1440 560 1540 650Z" fill="#4A7FD9"/><path d="M1390 650 Q1440 575 1440 650 M1490 650 Q1440 575 1440 650" fill="#fff"/></g>`
+};
+
+/* ---------- state ---------- */
+let scene = "sunrise";
+let profile = store.get("mung.profile");
+const dogs = new Map();       // id -> dog
+let dawn = 0.32, dawnAnim = null;
+let room = null, db = null, user = null, downloads = null, myId = null;
+let shared = { wishes: [], ornaments: [], locks: [] };
+let localOnly = false;
+
+const NPCS = [
+  {id:"n1", name:"보리", breed:"poodle"}, {id:"n2", name:"두부", breed:"bichon"},
+  {id:"n3", name:"호두", breed:"shiba"}, {id:"n4", name:"밤이", breed:"lab"}, {id:"n5", name:"콩떡", breed:"corgi"}
+];
+
+function makeDog(o){
+  const g = document.createElementNS(NS, "g");
+  g.setAttribute("class", "dog");
+  g.innerHTML = `<ellipse cx="0" cy="2" rx="46" ry="9" fill="rgba(0,0,0,.18)"/><g class="flip"></g>
+    <g class="bubble" transform="translate(56 -150)"><g class="bub"><path d="M-30 -24 h60 a12 12 0 0 1 12 12 v16 a12 12 0 0 1 -12 12 h-34 l-12 12 l2 -12 h-16 a12 12 0 0 1 -12 -12 v-16 a12 12 0 0 1 12 -12z" fill="#fff" stroke="${OL}" stroke-width="2.5"/><text x="0" y="8" text-anchor="middle" font-size="24" fill="${OL}">멍!</text></g></g>
+    <g class="tag"></g>`;
+  const d = Object.assign({ x:800, y:780, tx:null, ty:null, f:1, act:"", actUntil:0, el:g, built:"" }, o);
+  if (d.vet){ g.setAttribute("tabindex", "0"); g.setAttribute("role", "button"); g.setAttribute("aria-label", "설채현 수의사와 이야기하기");
+    g.addEventListener("click", e => { e.stopPropagation(); openVet(); });
+    g.addEventListener("keydown", e => { if (e.key === "Enter") openVet(); }); }
+  if (d.remote){ g.setAttribute("tabindex", "0"); g.setAttribute("role", "button"); g.setAttribute("aria-label", "친구 강아지와 같이 놀기"); g.style.cursor = "pointer";
+    const op = e => { e.stopPropagation(); openPlay(d.id.slice(2)); };
+    g.addEventListener("click", op); g.addEventListener("keydown", e => { if (e.key === "Enter") op(e); }); }
+  dogs.set(d.id, d);
+  dogsG.appendChild(g);
+  buildDog(d);
+  return d;
+}
+function buildDog(d){
+  const key = d.breed + "|" + scene + "|" + d.name + "|" + !!d.crown;
+  if (d.built === key) return;
+  d.built = key;
+  if (d.vet){
+    d.el.querySelector(".flip").innerHTML = vetInner(scene, !metScenes.has(scene));
+    d.el.querySelector(".tag").innerHTML = `<rect x="-80" y="-238" width="160" height="34" rx="17" fill="#1F2A44" stroke="${OL}" stroke-width="2"/><text x="0" y="-214" text-anchor="middle" font-size="19" fill="#fff">설채현 수의사</text>`;
+    return;
+  }
+  d.el.querySelector(".flip").innerHTML = dogInner(d.breed, scene, false, d.crown);
+  const nm = (d.name || "멍멍이").slice(0, 10) + (d.wait ? " · 단짝을 기다려요" : d.npc ? " · 동네 친구" : "");
+  const w = Math.max(56, nm.length * 15 + 26), y = BREEDS[d.breed]?.short ? -126 : BREEDS[d.breed]?.big ? -144 : -138;
+  d.el.querySelector(".tag").innerHTML = `<rect x="${-w/2}" y="${y-18}" width="${w}" height="30" rx="15" fill="${d.me ? "#F2A93B" : "rgba(255,255,255,.92)"}" stroke="${OL}" stroke-width="2"/><text x="0" y="${y+3}" text-anchor="middle" font-size="17" fill="${d.me ? "#3A2402" : OL}">${esc(nm)}</text>`;
+}
+function removeDog(id){ const d = dogs.get(id); if (d){ d.el.remove(); dogs.delete(id); } }
+
+function setAct(d, act){
+  d.act = act;
+  d.actUntil = act === "sit" ? Infinity : performance.now() + (act === "spin" ? 1200 : 1500);
+  if (act === "sit" || act === "paw") d.tx = d.ty = null;
+}
+
+/* ---------- scene switching ---------- */
+const sceneBtns = document.querySelectorAll(".scenes button");
+const ROUTE = ["sunrise", "xmas", "locks", "travel"];
+function signSVG(s){
+  const i = ROUTE.indexOf(s), n = ROUTE.length, y = SCENES[s].walk[0] - 4;
+  const one = (x, to, dir) => { const lab = SCENES[to].label, t = dir < 0 ? "← " + lab : lab + " →";
+    return `<g class="sign" data-dir="${dir}" transform="translate(${x} ${y})" tabindex="0" role="button" aria-label="${lab}(으)로 걸어가기"><rect x="-6" y="-104" width="12" height="104" rx="5" fill="#8A5A3B" stroke="#4A3530" stroke-width="3"/><rect class="board" x="-84" y="-150" width="168" height="48" rx="16" fill="#FFF7E6" stroke="#4A3530" stroke-width="4"/><text x="0" y="-118" text-anchor="middle" font-family="Jua, sans-serif" font-size="23" fill="#4A3530">${t}</text></g>`; };
+  return one(112, ROUTE[(i + n - 1) % n], -1) + one(1488, ROUTE[(i + 1) % n], 1);
+}
+function setScene(s, fromHash, enter){
+  if (!SCENES[s]) s = "sunrise";
+  scene = s;
+  if (!fromHash && location.hash !== "#" + s) { try { history.replaceState(null, "", "#" + s); } catch(e){ location.hash = s; } }
+  sceneBtns.forEach(b => b.setAttribute("aria-pressed", b.dataset.scene === s));
+  const S = SCENES[s];
+  document.body.style.background = S.body;
+  bgG.innerHTML = BG[s]() + signSVG(s);
+  bgG.querySelectorAll(".sign").forEach(g => { const go = e => { e.stopPropagation(); const me = dogs.get("me"); if (!me) return; hidePop(); walkTo(me, +g.dataset.dir < 0 ? 60 : 1540, me.y); };
+    g.addEventListener("click", go); g.addEventListener("keydown", e => { if (e.key === "Enter") go(e); }); });
+  if (s === "sunrise") applyDawn(dawn);
+  $("mainIc").textContent = S.main.ic; $("mainLab").textContent = S.main.lab;
+  $("storyBtn").hidden = !S.story;
+  $("palBtn").hidden = s !== "locks";
+  $("storyLab").textContent = S.story || "";
+  closeSheet(); hidePop();
+  // my dog enters from the left edge of the walk area
+  const me = dogs.get("me");
+  if (me){
+    me.y = clamp(me.y, S.walk[0], S.walk[1]); if (me.act === "sit") me.act = ""; me.onArrive = null;
+    if (enter === "left"){ me.x = 70; me.tx = 250; me.ty = me.y; }
+    else if (enter === "right"){ me.x = 1530; me.tx = 1350; me.ty = me.y; }
+    else { me.x = 360 + Math.random()*120; me.y = S.walk[0] + 90; me.tx = me.ty = null; }
+  }
+  // NPCs: 3 per scene
+  NPCS.forEach(n => removeDog(n.id));
+  const pick = { sunrise:[0,2,4], xmas:[1,3,0], locks:[3,0,1], travel:[4,1,2] }[s] || [0,1,2];
+  pick.forEach((i, k) => { const n = NPCS[i]; makeDog({ ...n, npc:true, x: 600 + k*300 + Math.random()*80, y: S.walk[0] + 40 + Math.random()*(S.walk[1]-S.walk[0]-60), next: performance.now() + 1500 + k*900 }); });
+  removeDog("vet");
+  $("vetCard").hidden = true; $("say").hidden = true;
+  makeDog({ id:"vet", vet:true, npc:true, name:"설채현 수의사", breed:"maltese", x:({sunrise:1010, xmas:1050, locks:1060, travel:1100}[s] || 1000), y:S.walk[0] + 60, next: performance.now() + 7000 });
+  removeDog("palhost");
+  dogs.forEach(d => buildDog(d));
+  ensurePalHost();
+  renderDecor();
+  sendPresence(true);
+  if (lastCh) onPeers(lastCh);
+  track("visit", s);
+}
+sceneBtns.forEach(b => b.addEventListener("click", () => setScene(b.dataset.scene)));
+let palHost = null;
+function readPalHash(){ const m = /^#pal=([^&]+)/.exec(location.hash || ""); if (m){ try { palHost = decodeURIComponent(m[1]).slice(0, 128); } catch(e){} return true; } return false; }
+window.addEventListener("hashchange", () => { if (readPalHash()){ if (scene !== "locks") setScene("locks", true); if (profile) openPal(); return; } const h = location.hash.slice(1); if (h !== scene && SCENES[h]) setScene(h, true); });
+
+/* ---------- sunrise ---------- */
+const SKY0 = ["#151C45","#33386E","#8C5876"], SKY1 = ["#6FB8EA","#BFE2F5","#FFE0AE"];
+function mix(a,b,t){ const p=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)); const A=p(a),B=p(b); return "#"+A.map((v,i)=>Math.round(lerp(v,B[i],t)).toString(16).padStart(2,"0")).join(""); }
+function applyDawn(t){
+  ["sk0","sk1","sk2"].forEach((id,i) => { const el = $(id); if (el) el.setAttribute("stop-color", mix(SKY0[i], SKY1[i], clamp(t*1.1 + (i===2 ? .25 : 0),0,1))); });
+  const sun = $("sunG"); if (sun) sun.setAttribute("transform", `translate(0 ${lerp(640, 300, t)})`);
+  const st = $("stars"); if (st) st.setAttribute("opacity", clamp(1 - t*1.6, 0, 1));
+  const nt = $("nightTint"); if (nt) nt.setAttribute("opacity", clamp(.42 - t*.5, 0, .42));
+  document.body.style.background = mix(SKY0[0], SKY1[0], t);
+}
+function waitSun(){
+  if (dawnAnim) return;
+  if (dawn >= .99) dawn = .25;
+  const me = dogs.get("me"); if (me) setAct(me, "sit"), sendPresence(true);
+  const from = dawn, t0 = performance.now(), dur = 7000;
+  toast("다 같이 앉아서 해를 기다려요");
+  dogs.forEach(d => { if (d.npc) setAct(d, "sit"); });
+  const step = now => {
+    const k = clamp((now - t0)/dur, 0, 1), e = k<.5 ? 2*k*k : 1 - Math.pow(-2*k+2, 2)/2;
+    dawn = lerp(from, 1, e); if (scene === "sunrise") applyDawn(dawn);
+    if (k < 1) dawnAnim = requestAnimationFrame(step);
+    else { dawnAnim = null; const n = [...dogs.values()].filter(d => d.scene === undefined || d.scene === "sunrise").length;
+      toast(`해가 떴어요. 강아지 ${n}마리가 함께 봤어요`); track("sunrise");
+      dogs.forEach(d => { if (d.id !== "me") { setAct(d, "bark"); } }); }
+  };
+  dawnAnim = requestAnimationFrame(step);
+}
+
+/* ---------- decor: wishes & ornaments ---------- */
+function hash(s){ let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; }
+const SHAPES = {
+  ball:{n:"방울", d:c => `<circle r="16" fill="${c}" stroke="${OL}" stroke-width="2.5"/><circle cx="-5" cy="-5" r="4" fill="#fff" opacity=".7"/>`},
+  star:{n:"별", d:c => `<path d="M0 -19 L5.6 -6.2 L19 -5.9 L8.6 3 L12 16.5 L0 8.8 L-12 16.5 L-8.6 3 L-19 -5.9 L-5.6 -6.2Z" fill="${c}" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="-3" cy="-4" r="2.6" fill="#fff" opacity=".75"/>`},
+  heart:{n:"하트", d:c => `<path d="M0 16 C-24 0 -13 -20 0 -8 C13 -20 24 0 0 16Z" fill="${c}" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="-8" cy="-6" r="3" fill="#fff" opacity=".7"/>`},
+  bone:{n:"뼈다귀", d:c => `<g stroke="${OL}" stroke-width="2.5" fill="${c}"><circle cx="-15" cy="-6" r="7"/><circle cx="-15" cy="6" r="7"/><circle cx="15" cy="-6" r="7"/><circle cx="15" cy="6" r="7"/><rect x="-15" y="-6" width="30" height="12"/></g><rect x="-14" y="-4.6" width="28" height="9.2" fill="${c}"/><rect x="-16" y="-9.5" width="5" height="19" fill="${c}"/><rect x="11" y="-9.5" width="5" height="19" fill="${c}"/>`},
+  paw:{n:"발바닥", d:c => `<g fill="${c}" stroke="${OL}" stroke-width="2.3"><ellipse cx="0" cy="6" rx="11" ry="9"/><circle cx="-12" cy="-6" r="4.8"/><circle cx="-4.5" cy="-13" r="4.8"/><circle cx="4.5" cy="-13" r="4.8"/><circle cx="12" cy="-6" r="4.8"/></g>`},
+  bow:{n:"리본", d:c => `<g fill="${c}" stroke="${OL}" stroke-width="2.3" stroke-linejoin="round"><path d="M-3 4 L-9 18 L-4 16 L-1 19Z"/><path d="M3 4 L9 18 L4 16 L1 19Z"/><path d="M0 0 L-18 -10 Q-22 0 -18 10Z"/><path d="M0 0 L18 -10 Q22 0 18 10Z"/></g><circle r="5" fill="${c}" stroke="${OL}" stroke-width="2.3"/>`}
+};
+const SHAPE_KEYS = Object.keys(SHAPES);
+let pickShape = "star";
+const COLORS = [["#F2A93B","꿀"],["#D9485F","딸기"],["#4A7FD9","하늘"],["#3BB273","풀잎"],["#B57BE0","라벤더"],["#FFFFFF","눈"]];
+function safeColor(c){ return COLORS.some(x => x[0] === c) ? c : "#F2A93B"; }
+
+function renderDecor(){
+  decorG.innerHTML = "";
+  const list = curList();
+  if (scene === "xmas"){
+    list.forEach(o => {
+      const v = .18 + hash(o.id + "v") * .78, y = 190 + v * 400, hw = v * 250 * .82, x = 800 + (hash(o.id + "h") * 2 - 1) * hw;
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "orn"); g.setAttribute("transform", `translate(${x.toFixed(0)} ${y.toFixed(0)})`); g.setAttribute("tabindex", "0");
+      const sh = SHAPES[o.shape] || SHAPES.ball;
+      g.innerHTML = `<path d="M0 -30 L0 -17" stroke="#E8D9A0" stroke-width="2"/><g transform="rotate(${((hash(o.id + "t") - .5) * 16).toFixed(1)}) scale(1.1)">${sh.d(safeColor(o.color))}</g>${o.id === myId ? `<circle r="27" fill="none" stroke="#FFD36B" stroke-width="3" stroke-dasharray="4 4"/>` : ""}`;
+      g.addEventListener("click", e => { e.stopPropagation(); showPop(g, o); });
+      g.addEventListener("keydown", e => { if (e.key === "Enter") showPop(g, o); });
+      decorG.appendChild(g);
+    });
+  } else if (scene === "sunrise"){
+    list.slice(0, 60).forEach((o, i) => {
+      const a = hash(o.id + "a") * Math.PI * 2, rr = Math.sqrt(.12 + hash(o.id + "r") * .88);
+      const x = 1330 + Math.cos(a) * 150 * rr, y = 410 + Math.sin(a) * 96 * rr;
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "wtag"); g.setAttribute("transform", `translate(${x.toFixed(0)} ${y.toFixed(0)}) rotate(${((hash(o.id)-.5)*14).toFixed(1)})`); g.setAttribute("tabindex", "0");
+      g.innerHTML = `<path d="M0 0 L0 8" stroke="#5A4630" stroke-width="2"/><rect x="-10" y="8" width="20" height="28" rx="3" fill="${safeColor(o.color)}" stroke="${OL}" stroke-width="2"/><circle cx="0" cy="13" r="2.2" fill="#fff"/>${o.id === myId ? `<rect x="-14" y="4" width="28" height="36" rx="5" fill="none" stroke="#FFD36B" stroke-width="3" stroke-dasharray="4 4"/>` : ""}`;
+      g.addEventListener("click", e => { e.stopPropagation(); showPop(g, o); });
+      g.addEventListener("keydown", e => { if (e.key === "Enter") showPop(g, o); });
+      decorG.appendChild(g);
+    });
+  } else if (scene === "locks"){
+    list.slice(0, 120).forEach(o => {
+      const x = 60 + hash(o.id + "x") * 1480, rail = [500, 532, 564][Math.floor(hash(o.id + "y") * 3)];
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "wtag"); g.setAttribute("transform", `translate(${x.toFixed(0)} ${rail + 12}) rotate(${((hash(o.id)-.5)*16).toFixed(1)} 0 -12)`); g.setAttribute("tabindex", "0");
+      g.innerHTML = `<path d="M-7 -2 L-7 -10 A7 7 0 0 1 7 -10 L7 -2" fill="none" stroke="#C9C4D8" stroke-width="3.5"/><rect x="-11" y="-4" width="22" height="20" rx="6" fill="${safeColor(o.color)}" stroke="${OL}" stroke-width="2"/><path d="M0 12 C-6 7 -5 1 0 4.5 C5 1 6 7 0 12Z" fill="#fff" opacity=".9"/>${o.id === myId ? `<rect x="-15" y="-18" width="30" height="38" rx="7" fill="none" stroke="#FFD36B" stroke-width="3" stroke-dasharray="4 4"/>` : ""}`;
+      g.addEventListener("click", e => { e.stopPropagation(); showPop(g, o); });
+      g.addEventListener("keydown", e => { if (e.key === "Enter") showPop(g, o); });
+      decorG.appendChild(g);
+    });
+    pairs.forEach(p => {
+      const key = p.h + ":" + p.inv, x = 90 + hash(key + "x") * 1420, rail = [500, 532, 564][Math.floor(hash(key + "y") * 3)];
+      const mine = p.h === myId || p.g === myId;
+      const g = document.createElementNS(NS, "g");
+      g.setAttribute("class", "wtag"); g.setAttribute("tabindex", "0"); g.setAttribute("transform", `translate(${x.toFixed(0)} ${rail + 16}) rotate(${((hash(key)-.5)*12).toFixed(1)} 0 -16)`);
+      g.innerHTML = `<path d="M-9 -2 L-9 -14 A9 9 0 0 1 9 -14 L9 -2" fill="none" stroke="#F1DC8E" stroke-width="4"/><path d="M0 26 C-30 6 -17 -18 0 -5 C17 -18 30 6 0 26Z" fill="#FF9DB8" stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="0" cy="5" r="3.2" fill="${OL}"/><path d="M0 6 L0 12" stroke="${OL}" stroke-width="2.6" stroke-linecap="round"/><circle cx="-9" cy="-1" r="3" fill="#fff" opacity=".7"/>${mine ? `<circle cx="0" cy="5" r="30" fill="none" stroke="#FFD36B" stroke-width="3" stroke-dasharray="4 4"/>` : ""}`;
+      const o = { pair: `${p.hn} ♥ ${p.gn}`, at: p.at };
+      g.addEventListener("click", e => { e.stopPropagation(); showPop(g, o); });
+      g.addEventListener("keydown", e => { if (e.key === "Enter") showPop(g, o); });
+      decorG.appendChild(g);
+    });
+  }
+  $("storyCount").textContent = list.length;
+  updateTicker();
+  if (!$("sheet").hidden && $("sheet").dataset.mode === "list") openList();
+}
+
+let tickIdx = 0, tickTimer = null;
+function updateTicker(){
+  const list = curList();
+  const tk = $("ticker");
+  if (!list.length){ tk.hidden = true; return; }
+  const o = list[tickIdx % list.length];
+  tk.hidden = false;
+  tk.innerHTML = `<em>${esc(o.dog || "멍멍이")}네 보호자</em>${esc(o.text)}${o.dw ? `<br><em>${esc(o.dog || "멍멍이")}</em>${esc(o.dw)}` : ""}`;
+}
+tickTimer = setInterval(() => { tickIdx++; updateTicker(); }, 5200);
+
+function showPop(el, o){
+  const pop = $("pop"), r = el.getBoundingClientRect(), app = $("app").getBoundingClientRect();
+  pop.innerHTML = o.pair ? `<b>${esc(o.pair)}</b><div>단짝 자물쇠 · ${esc(fmtDate(o.at))}에 함께 잠갔어요</div>` : `<b>${esc(o.dog || "멍멍이")}네 · ${esc(BREEDS[o.breed]?.name || "강아지")}</b><div>보호자: ${esc(o.text)}</div>${o.dw ? `<div>${esc(o.dog || "멍멍이")}: ${esc(o.dw)}</div>` : ""}`;
+  pop.hidden = false;
+  const pw = pop.offsetWidth, ph = pop.offsetHeight;
+  pop.style.left = clamp(r.left - app.left + r.width/2 - pw/2, 12, app.width - pw - 12) + "px";
+  pop.style.top = clamp(r.top - app.top - ph - 10, 70, app.height - ph - 12) + "px";
+}
+function hidePop(){ $("pop").hidden = true; }
+
+/* ---------- sheet: list & composer ---------- */
+function curList(){ const c = SCENES[scene].coll; return c ? shared[c] : []; }
+function myEntry(){ return curList().find(o => o.id === myId); }
+function openList(){
+  const S = SCENES[scene], list = curList(), sh = $("sheet");
+  sh.dataset.mode = "list"; sh.hidden = false;
+  $("sheetTitle").textContent = `${S.sheet} ${list.length}개`;
+  const body = $("sheetBody"); body.innerHTML = "";
+  if (!list.length){
+    body.innerHTML = `<p class="empty">아직 걸린 이야기가 없어요.<br>아래 <b>${esc(S.main.lab === "해 기다리기" ? "소원 남기기" : S.main.lab)}</b>로 첫 이야기를 걸어 주세요.</p>`;
+  }
+  list.forEach(o => {
+    const div = document.createElement("div"); div.className = "story";
+    div.innerHTML = `<span class="c" style="background:${safeColor(o.color)}"></span><div><b>${esc(o.dog || "멍멍이")}</b><span>${esc(BREEDS[o.breed]?.name || "")}</span><p>보호자: ${esc(o.text)}</p>${o.dw ? `<p>${esc(o.dog || "멍멍이")}: ${esc(o.dw)}</p>` : ""}</div>`;
+    if (o.id === myId){
+      const m = document.createElement("div"); m.className = "mine";
+      m.innerHTML = `<button data-k="edit">고치기</button><button data-k="del">거두기</button>`;
+      m.querySelector('[data-k=edit]').onclick = openComposer;
+      m.querySelector('[data-k=del]').onclick = removeMine;
+      div.lastChild.appendChild(m);
+    }
+    body.appendChild(div);
+  });
+  { const b = document.createElement("button"); b.className = "primary"; b.textContent = myEntry() ? "내 글 고치기" : S.main.lab; b.onclick = openComposer; body.appendChild(b); }
+  if (localOnly){ const n = document.createElement("p"); n.className = "note"; n.textContent = "지금은 공유 저장소에 연결되지 않아서, 남긴 글이 이 기기에서만 보여요."; body.appendChild(n); }
+}
+let pickColor = COLORS[0][0];
+const COMPOSE = {
+  sunrise:{title:["소원나무에 함께 소원 빌기","우리 소원 고치기"], a:"보호자의 소원", ap:"예: 내년엔 같이 바다 보러 가자", b:"의 소원", bp:"예: 간식은 하루에 두 번!", hold:"꾹 눌러 함께 소원 빌기", col:"소원 종이 색"},
+  xmas:{title:["트리에 소원 장식 달기","우리 장식 고치기"], a:"보호자가 강아지에게", ap:"예: 올해도 매일 산책 같이 해 줘서 고마워", b:"가 보호자에게", bp:"예: 산책 한 바퀴만 더!", hold:"꾹 눌러 트리에 달기", col:"장식 색"},
+  locks:{title:["자물쇠 언덕에 함께 약속 걸기","우리 자물쇠 고치기"], a:"보호자의 약속", ap:"예: 평생 네 편이 되어 줄게", b:"의 약속", bp:"예: 현관에서 제일 먼저 반겨 줄게", hold:"꾹 눌러 자물쇠 잠그기", col:"자물쇠 색"}
+};
+function openComposer(){
+  const C = COMPOSE[scene]; if (!C) return;
+  const mine = myEntry(), sh = $("sheet"), dn = profile?.name || "우리 강아지";
+  pickColor = mine?.color || COLORS[scene === "xmas" ? 1 : scene === "locks" ? 4 : 0][0];
+  sh.dataset.mode = "compose"; sh.hidden = false;
+  $("sheetTitle").textContent = C.title[mine ? 1 : 0];
+  const josa = C.b.startsWith("가") ? (hasBatchim(dn) ? "이" : "가") + C.b.slice(1) : C.b;
+  const body = $("sheetBody");
+  body.innerHTML = `<div class="composer"><label for="msg">${esc(C.a)}</label>
+    <textarea id="msg" maxlength="40" placeholder="${esc(C.ap)}"></textarea>
+    <div class="count"><span id="cnt">0</span>/40</div></div>
+    <div class="composer"><label for="msg2">${esc(dn + josa)} <span style="opacity:.75">· 강아지 마음으로 대신 적어 주세요 (선택)</span></label>
+    <textarea id="msg2" maxlength="40" placeholder="${esc(C.bp)}" style="height:64px"></textarea></div>
+    ${scene === "xmas" ? `<div><label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">장식 모양</label><div class="shapes" id="shp"></div></div>` : ""}
+    <div><label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px">${esc(C.col)}</label><div class="swatches" id="sw"></div></div>
+    <button class="primary hold" id="save" disabled><span class="fill" id="fill"></span><span class="hl">${esc(C.hold)}</span></button>
+    <p class="note">버튼을 꾹 누르고 있으면 우리 강아지와 함께 빌어요. 한 집에 하나씩 걸 수 있고, 언제든 고치거나 거둘 수 있어요. 보호자 이름이나 연락처는 적지 말아 주세요.</p>`;
+  $("msg2").value = mine?.dw || "";
+  const ta = $("msg"); ta.value = mine?.text || ""; $("cnt").textContent = ta.value.length;
+  $("save").disabled = !ta.value.trim();
+  ta.addEventListener("input", () => { $("cnt").textContent = ta.value.length; $("save").disabled = !ta.value.trim(); });
+  const sw = $("sw"), shp = $("shp");
+  pickShape = SHAPES[mine?.shape] ? mine.shape : "star";
+  const drawShapes = () => { if (!shp) return; shp.innerHTML = ""; SHAPE_KEYS.forEach(k => { const b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-pressed", k === pickShape);
+    b.innerHTML = `<svg viewBox="-24 -24 48 48" aria-hidden="true">${SHAPES[k].d(pickColor)}</svg><span>${SHAPES[k].n}</span>`;
+    b.onclick = () => { pickShape = k; drawShapes(); }; shp.appendChild(b); }); };
+  drawShapes();
+  COLORS.forEach(([c, n]) => { const b = document.createElement("button"); b.type = "button"; b.style.background = c; b.setAttribute("aria-label", n); b.setAttribute("aria-pressed", c === pickColor);
+    b.onclick = () => { pickColor = c; sw.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); drawShapes(); }; sw.appendChild(b); });
+  const btn = $("save"); let t0 = 0, raf = 0;
+  const reset = () => { cancelAnimationFrame(raf); t0 = 0; $("fill").style.width = "0"; };
+  btn.addEventListener("pointerdown", e => {
+    if (btn.disabled) return;
+    t0 = performance.now(); try { btn.setPointerCapture(e.pointerId); } catch(_){}
+    const me = dogs.get("me"); if (me) { setAct(me, "sit"); sendPresence(true); }
+    const step = now => { if (!t0) return; const k = Math.min(1, (now - t0)/1300); $("fill").style.width = (k*100) + "%";
+      if (k < 1) raf = requestAnimationFrame(step); else { reset(); saveMine(); } };
+    raf = requestAnimationFrame(step);
+  });
+  ["pointerup","pointercancel"].forEach(ev => btn.addEventListener(ev, () => { if (t0) reset(); }));
+  btn.addEventListener("click", e => { if (e.detail === 0) saveMine(); });
+  setTimeout(() => ta.focus(), 50);
+}
+function closeSheet(){ $("sheet").hidden = true; }
+$("sheetClose").onclick = closeSheet;
+
+const BAD = ["씨발","시발","씨바","병신","븅신","개새","좆","존나","미친놈","미친년","꺼져","닥쳐","ㅅㅂ","ㅂㅅ","ㅄ","fuck","shit"];
+const isBad = t => { const z = String(t).replace(/[\s.·,_\-~!?*]/g, "").toLowerCase(); return BAD.some(w => z.includes(w)); };
+async function saveMine(){
+  const text = $("msg").value.trim().slice(0, 40); if (!text) return;
+  const dw = ($("msg2")?.value || "").trim().slice(0, 40);
+  if (isBad(text) || isBad(dw)){ toast("모두가 보는 곳이라 고운 말로 적어 주세요"); return; }
+  const coll = SCENES[scene].coll;
+  const doc = { text, dw, color: pickColor, dog: profile.name, breed: profile.breed, at: Date.now() };
+  if (scene === "xmas") doc.shape = pickShape;
+  $("save").disabled = true;
+  try {
+    if (db && myId) await db.collection(coll).doc(myId).set(doc);
+    else { const arr = (store.get("mung." + coll) || []).filter(o => o.id !== myId); arr.unshift({ id: myId, ...doc }); store.set("mung." + coll, arr); loadLocal(); }
+    closeSheet();
+    ritual();
+  } catch (e) {
+    $("save").disabled = false;
+    toast(e?.code === "permission_denied" || e?.code === "not_granted" ? "이 화면에서는 글을 남길 수 없어요" : "저장하지 못했어요. 잠시 후 다시 눌러 주세요");
+  }
+}
+async function removeMine(){
+  const coll = SCENES[scene].coll;
+  try {
+    if (db && myId) await db.collection(coll).doc(myId).delete();
+    else { store.set("mung." + coll, (store.get("mung." + coll) || []).filter(o => o.id !== myId)); loadLocal(); }
+    toast("내 글을 거뒀어요");
+  } catch(e){ toast("거두지 못했어요. 잠시 후 다시 눌러 주세요"); }
+}
+function loadLocal(){ shared.wishes = store.get("mung.wishes") || []; shared.ornaments = store.get("mung.ornaments") || []; shared.locks = store.get("mung.locks") || []; renderDecor(); }
+function ritual(){
+  const me = dogs.get("me"); if (!me) return;
+  const nm = profile.name + (hasBatchim(profile.name) ? "이" : "");
+  setAct(me, "sit"); sendPresence(true);
+  hearts(me.x, me.y - 110, 5);
+  track("wish");
+  setTimeout(() => { hearts(me.x, me.y - 120, 4); setAct(me, "spin"); sendPresence(true); }, 900);
+  if (scene === "sunrise"){ toast(`${nm}랑 함께 소원을 빌었어요`); setTimeout(waitSun, 600); }
+  else if (scene === "locks") toast(`딸깍! ${nm}랑 약속을 잠갔어요`);
+  else toast("트리에 소원 장식을 달았어요");
+}
+
+$("storyBtn").onclick = () => { const sh = $("sheet"); if (!sh.hidden && sh.dataset.mode === "list") closeSheet(); else openList(); };
+$("mainBtn").onclick = () => {
+  if (scene === "travel") takePhoto(); else openComposer();
+};
+
+/* ---------- photo ---------- */
+async function takePhoto(){
+  const cd = $("countdown"); cd.hidden = false;
+  for (const n of ["3","2","1"]) { cd.textContent = n; await new Promise(r => setTimeout(r, 650)); }
+  cd.hidden = true;
+  const me = dogs.get("me"); if (me) { setAct(me, "bark"); }
+  dogs.forEach(d => { if (d.npc) setAct(d, "sit"); });
+  await new Promise(r => setTimeout(r, 120));
+  const fl = $("flash"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
+  try {
+    const vb = svg.viewBox.baseVal;
+    const clone = svg.cloneNode(true);
+    clone.setAttribute("xmlns", NS); clone.setAttribute("width", vb.width); clone.setAttribute("height", vb.height);
+    clone.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    const src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(clone));
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = src; });
+    const cv = document.createElement("canvas"); cv.width = 1080; cv.height = 1240;
+    const c = cv.getContext("2d");
+    c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, cv.width, cv.height);
+    // crop tight around the photo frame and my dog so the dogs read large
+    const pw = 960, ph = 900, cw = Math.min(vb.width, 780), sh = cw * ph / pw, sy = Math.min(170, 900 - sh);
+    const frameCenter = 800 - vb.x, sx = clamp(((me ? me.x - vb.x : frameCenter) + frameCenter)/2 - cw/2, 0, vb.width - cw);
+    c.drawImage(img, sx, sy, cw, sh, 60, 60, pw, ph);
+    c.strokeStyle = "rgba(0,0,0,.08)"; c.lineWidth = 2; c.strokeRect(60, 60, pw, ph);
+    c.fillStyle = "#1F2A44"; c.font = '46px "Jua", sans-serif'; c.textBaseline = "alphabetic";
+    c.fillText("멍동네 바닷가 포토존", 64, 1060);
+    const d = new Date(), ds = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;
+    c.fillStyle = "#5B6680"; c.font = '30px "Gowun Dodum", sans-serif';
+    c.fillText(`${ds} · ${profile.name}${hasBatchim(profile.name) ? "이랑" : "랑"} 여행 중`, 64, 1110);
+    c.fillStyle = "#F2A93B"; c.beginPath(); c.arc(1000, 1070, 30, 0, Math.PI*2); c.fill();
+    c.fillStyle = "#1F2A44"; c.beginPath(); c.arc(990, 1064, 4, 0, 7); c.arc(1010, 1064, 4, 0, 7); c.fill();
+    c.beginPath(); c.ellipse(1000, 1078, 6, 4.5, 0, 0, 7); c.fill();
+    lastPhoto = cv; lastPhotoName = `멍동네-${profile.name}-여행사진.png`; $("photoTitle").textContent = "찰칵! 여행 사진이 나왔어요"; track("photo");
+    $("photoImg").src = cv.toDataURL("image/png");
+    $("photoNote").hidden = !!downloads; $("photoSave").hidden = !downloads;
+    setTimeout(() => { $("photoModal").hidden = false; }, 450);
+  } catch (e) { toast("사진을 만들지 못했어요. 다시 찍어 주세요"); }
+}
+let lastPhoto = null, lastPhotoName = "멍동네.png";
+function hasBatchim(s){ const ch = String(s).trim().slice(-1).charCodeAt(0); return ch >= 0xAC00 && ch <= 0xD7A3 && (ch - 0xAC00) % 28 !== 0; }
+$("photoClose").onclick = () => { $("photoModal").hidden = true; };
+$("photoSave").onclick = async () => {
+  if (!downloads || !lastPhoto) return;
+  const blob = await new Promise(r => lastPhoto.toBlob(r, "image/png"));
+  try { await downloads.save({ filename: lastPhotoName, data: blob }); toast("저장했어요"); }
+  catch (e) { if (e?.code !== "declined" && e?.code !== "cancelled") toast("저장하지 못했어요"); }
+};
+
+/* ---------- toast ---------- */
+const toastQ = []; let toastBusy = false;
+function toast(msg){ toastQ.push(msg); if (toastQ.length > 4) toastQ.shift(); if (!toastBusy) nextToast(); }
+function nextToast(){
+  const t = $("toast"), m = toastQ.shift();
+  if (m == null){ toastBusy = false; return; }
+  toastBusy = true; t.textContent = m; t.classList.add("on");
+  setTimeout(() => { t.classList.remove("on"); setTimeout(nextToast, 260); }, toastQ.length ? 1500 : 2400);
+}
+
+/* ---------- 산책 도장 & 오늘의 미션 ---------- */
+const STAMPS = [
+  {id:"v_sunrise", t:"일출 언덕", d:"일출 언덕에 처음 가기"},
+  {id:"v_xmas", t:"트리 광장", d:"트리 광장에 처음 가기"},
+  {id:"v_locks", t:"자물쇠 언덕", d:"자물쇠 언덕에 처음 가기"},
+  {id:"v_travel", t:"바닷가", d:"바닷가에 처음 가기"},
+  {id:"sun", t:"해돋이", d:"해 뜨는 것 함께 보기"},
+  {id:"wish", t:"첫 소원", d:"소원·장식·자물쇠 처음 남기기"},
+  {id:"check", t:"건강 체크", d:"설채현 수의사에게 건강 체크 받기"},
+  {id:"treat", t:"허니콤츄", d:"수의사에게 간식 받기"},
+  {id:"heart", t:"첫 친구", d:"동네 친구와 처음 하트 나누기"},
+  {id:"photo", t:"여행 사진", d:"바닷가에서 사진 찍기"},
+  {id:"walk", t:"산책길", d:"걸어서 다른 장소로 가기"},
+  {id:"stay", t:"쉼터", d:"한 장소에서 3분 머물기"},
+  {id:"pal", t:"단짝", d:"친구와 같이 놀기"},
+  {id:"knollo", t:"놀로", d:"놀로 챌린지 처음 골라 보기"}
+];
+const STAMP_OF = { sunrise:"sun", wish:"wish", check:"check", treat:"treat", heart:"heart", photo:"photo", route:"walk", stay:"stay", together:"pal", knollo:"knollo" };
+const MISSIONS = [
+  {id:"min", ev:"minutes", label:"산책 10분 하기 (머물러 있어도 돼요)", target:10},
+  {id:"steps", ev:"steps", label:"500걸음 산책하기", target:500},
+  {id:"route", ev:"route", label:"걸어서 다른 장소로 3번 이동하기", target:3},
+  {id:"stay", ev:"stay", label:"한 장소에서 3분 머물며 쉬기", target:1},
+  {id:"heart", ev:"heart", label:"동네 친구 3마리와 하트 나누기", target:3},
+  {id:"check", ev:"check", label:"설채현 수의사에게 건강 체크 받기", target:1},
+  {id:"tricks", ev:"act", label:"앉아·손·빙글·멍! 모두 해 보기", target:4, distinct:true},
+  {id:"visit", ev:"visit", label:"장소 4곳 모두 들르기", target:4, distinct:true},
+  {id:"photo", ev:"photo", label:"바닷가에서 여행 사진 찍기", target:1},
+  {id:"sunrise", ev:"sunrise", label:"일출 언덕에서 해 뜨는 것 보기", target:1},
+  {id:"wish", ev:"wish", label:"소원나무·트리·자물쇠에 마음 남기기", target:1},
+  {id:"treat", ev:"treat", label:"수의사에게 간식 받기", target:1},
+  {id:"knollo", ev:"knollo", label:"놀로 챌린지 하나 골라 보기", target:1}
+];
+const dayStr = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+let prog = Object.assign({ stamps:{}, day:"", m:{}, done:false, streak:0, lastDone:"" }, store.get("mung.prog") || {});
+function rollDay(){
+  const today = dayStr();
+  if (prog.day !== today){ prog.day = today; prog.m = {}; prog.done = false; prog.walkMin = 0; setCrown(false); }
+}
+function todays(){
+  const rest = MISSIONS.slice(1), out = [MISSIONS[0]];
+  let h = hash("mission" + dayStr());
+  while (out.length < 3){ const i = Math.floor(h * rest.length) % rest.length; const m = rest.splice(i, 1)[0]; out.push(m); h = hash(String(h)); }
+  return out;
+}
+const mVal = m => { const v = prog.m[m.id]; return m.distinct ? (Array.isArray(v) ? v.length : 0) : (v || 0); };
+const mDone = m => mVal(m) >= m.target;
+let saveProgT;
+function saveProg(){
+  store.set("mung.prog", prog);
+  clearTimeout(saveProgT);
+  saveProgT = setTimeout(() => { if (db && myId && !String(myId).startsWith("local-")) db.collection("data/users/" + myId).doc("progress").set(JSON.parse(JSON.stringify(prog))).catch(() => {}); }, 1500);
+}
+function track(ev, val){
+  if (!profile) return;
+  rollDay();
+  let changed = false;
+  const sid = ev === "visit" ? "v_" + val : STAMP_OF[ev];
+  if (sid && STAMPS.some(s => s.id === sid) && !prog.stamps[sid]){ prog.stamps[sid] = Date.now(); changed = true; stampPop(sid); }
+  todays().forEach(m => {
+    if (m.ev !== ev || mDone(m)) return;
+    if (m.distinct){ const arr = Array.isArray(prog.m[m.id]) ? prog.m[m.id] : []; if (!arr.includes(val)){ prog.m[m.id] = [...arr, val]; changed = true; } }
+    else { prog.m[m.id] = (prog.m[m.id] || 0) + (ev === "steps" ? val : 1); changed = true; }
+    if (mDone(m)){ toast(`미션 완료! ${m.label}`); const me = dogs.get("me"); if (me) hearts(me.x, me.y - 120, 3); }
+  });
+  if (!prog.done && todays().every(mDone)){
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    prog.streak = (prog.lastDone === dayStr(y) ? prog.streak : 0) + 1; prog.lastDone = prog.day; prog.done = true; changed = true;
+    celebrate();
+  }
+  if (changed){ saveProg(); renderStampBtn(); if (!$("sheet").hidden && $("sheet").dataset.mode === "stamps") openStamps(); }
+}
+function stampPop(id){
+  const s = STAMPS.find(x => x.id === id), el = $("stampPop");
+  el.querySelector("b").textContent = s.t;
+  el.hidden = false; el.classList.remove("go"); void el.offsetWidth; el.classList.add("go");
+  setTimeout(() => { el.hidden = true; }, 1500);
+  toast(`도장 쾅! ${s.d}`);
+}
+function setCrown(on){ const me = dogs.get("me"); if (me && !!me.crown !== on){ me.crown = on; buildDog(me); sendPresence(true); } }
+function celebrate(){
+  const me = dogs.get("me");
+  if (me){ for (let i = 0; i < 4; i++) setTimeout(() => hearts(me.x + (Math.random()*2-1)*60, me.y - 120, 4), i*260); setAct(me, "spin"); }
+  setCrown(true);
+  toast(`오늘의 미션 완료! 산책왕 왕관을 받았어요 · 연속 ${prog.streak}일째`);
+}
+function renderStampBtn(){
+  const n = Object.keys(prog.stamps).length, md = profile ? todays().filter(mDone).length : 0;
+  $("stampTxt").textContent = `미션 ${md}/3 · 도장 ${n}`;
+}
+function openStamps(){
+  rollDay();
+  const sh = $("sheet"); sh.dataset.mode = "stamps"; sh.hidden = false;
+  const n = Object.keys(prog.stamps).length, d = new Date();
+  $("sheetTitle").textContent = "산책 수첩";
+  const ms = todays();
+  const body = $("sheetBody");
+  body.innerHTML = `<div class="sec-h"><b>오늘의 미션</b><span>${d.getMonth()+1}월 ${d.getDate()}일 · 오늘 ${prog.walkMin || 0}분 산책</span></div>
+    ${prog.done ? `<div class="done-banner">오늘 미션을 모두 끝냈어요. 연속 ${prog.streak}일째 산책 중이에요!</div>` : ""}
+    <ul class="missions">${ms.map(m => { const v = Math.min(mVal(m), m.target), ok = mDone(m);
+      return `<li class="${ok ? "ok" : ""}"><span class="chk">${ok ? "완료" : ""}</span><div><p>${esc(m.label)}</p><div class="bar2"><i style="width:${(v/m.target*100).toFixed(0)}%"></i></div></div><span class="num">${v}/${m.target}</span></li>`; }).join("")}</ul>
+    <p class="note">미션은 매일 자정에 바뀌어요. 세 가지를 다 하면 우리 강아지에게 오늘 하루 산책왕 왕관을 씌워 줘요.</p>
+    <div class="sec-h"><b>산책 도장 ${n}/${STAMPS.length}</b><span>한 번 받으면 계속 남아요</span></div>
+    <div class="stamps">${STAMPS.map(s => `<div class="st ${prog.stamps[s.id] ? "on" : ""}" title="${esc(s.d)}"><span>${esc(s.t)}</span></div>`).join("")}</div>
+    <ul class="stamp-list">${STAMPS.filter(s => !prog.stamps[s.id]).slice(0, 3).map(s => `<li>다음 도장: ${esc(s.d)}</li>`).join("")}</ul>
+    <button class="kn-btn" id="toKn" style="width:100%;margin-top:12px">놀로 챌린지 보러 가기</button>`;
+  $("toKn").onclick = openKnollo;
+}
+$("stampBtn").onclick = () => { const sh = $("sheet"); if (!sh.hidden && sh.dataset.mode === "stamps") closeSheet(); else openStamps(); };
+let stepAcc = 0, secAcc = 0, staySc = "", staySec = 0;
+// time spent in the village counts as a walk, even standing still
+setInterval(() => {
+  if (!profile || document.hidden || !$("setup").hidden) return;
+  rollDay();
+  if (staySc !== scene){ staySc = scene; staySec = 0; }
+  if (++staySec === 180) track("stay");
+  if (++secAcc >= 60){
+    secAcc = 0; prog.walkMin = (prog.walkMin || 0) + 1; saveProg();
+    track("minutes", 1);
+    if (prog.walkMin % 5 === 0) toast(`오늘 ${prog.walkMin}분째 산책 중이에요`);
+    if (!$("sheet").hidden && $("sheet").dataset.mode === "stamps") openStamps();
+  }
+}, 1000);
+setInterval(() => { if (stepAcc >= 10){ const k = Math.floor(stepAcc / 10); stepAcc -= k * 10; track("steps", k); } }, 1000);
+
+/* ---------- input ---------- */
+function svgPoint(evt){ const p = svg.createSVGPoint(); p.x = evt.clientX; p.y = evt.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+svg.addEventListener("click", e => {
+  hidePop();
+  const me = dogs.get("me"); if (!me) return;
+  const p = svgPoint(e), W = SCENES[scene].walk;
+  me.tx = clamp(p.x, 60, 1540); me.ty = clamp(p.y, W[0], W[1]); me.onArrive = null;
+  if (me.act === "sit") me.act = "";
+  $("vetCard").hidden = true;
+});
+document.addEventListener("click", e => { if (!e.target.closest(".orn,.wtag")) hidePop(); });
+const keys = new Set();
+window.addEventListener("keydown", e => { if (e.target.closest("input,textarea")) return; if (e.key.startsWith("Arrow")) { keys.add(e.key); e.preventDefault(); } });
+window.addEventListener("keyup", e => keys.delete(e.key));
+document.querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", () => {
+  const me = dogs.get("me"); if (!me) return;
+  setAct(me, me.act === "sit" && b.dataset.act === "sit" ? "" : b.dataset.act);
+  sendPresence(true);
+  track("act", b.dataset.act);
+}));
+/* ---------- 설채현 수의사 ---------- */
+const metScenes = new Set();
+const fxG = $("fx");
+const CHECKS = [
+  "눈도 맑고 코도 촉촉해요. 오늘 컨디션 좋네요!",
+  "발바닥 패드 상태 좋아요. 산책 다녀오면 물기만 잘 닦아 주세요.",
+  "이빨도 깨끗한 편이에요. 지금처럼 양치 습관 이어 가요.",
+  "걸음걸이가 가볍네요. 지금처럼 꾸준히 걸으면 돼요.",
+  "털에 윤기가 나요. 보호자님이 잘 챙겨 주고 계시네요."
+];
+function vetInner(sc, quest){
+  const sw = `stroke="${OL}" stroke-width="2.5" stroke-linejoin="round"`;
+  const hat = sc === "xmas" ? `<g transform="translate(0 -30)"><path d="M-34 4 Q0 -52 32 0Z" fill="#D9485F" ${sw}/><circle cx="-36" cy="6" r="8" fill="#fff" ${sw}/><rect x="-36" y="-4" width="70" height="12" rx="6" fill="#fff" ${sw}/></g>`
+    : sc === "travel" ? `<g ${sw}><rect x="-4" y="-6" width="17" height="12" rx="5" fill="#1F2A44"/><rect x="16" y="-7" width="15" height="12" rx="5" fill="#1F2A44"/></g>` : "";
+  const scarf = sc === "sunrise" || sc === "locks" ? `<path d="M-26 -126 Q0 -112 26 -126 L28 -114 Q0 -100 -28 -114Z" fill="${sc === "locks" ? "#B57BE0" : "#4A7FD9"}" ${sw}/>` : "";
+  return `<g class="spinw"><g class="bob">
+    <rect x="-20" y="-54" width="16" height="54" rx="7" fill="#2B3A5C" ${sw}/><rect x="4" y="-54" width="16" height="54" rx="7" fill="#2B3A5C" ${sw}/>
+    <ellipse cx="-12" cy="0" rx="14" ry="6" fill="${OL}"/><ellipse cx="14" cy="0" rx="14" ry="6" fill="${OL}"/>
+    <rect x="-50" y="-114" width="16" height="52" rx="8" fill="#fff" ${sw} transform="rotate(10 -42 -114)"/>
+    <path d="M-36 -46 Q-40 -122 0 -124 Q40 -122 36 -46Z" fill="#FFFFFF" ${sw}/>
+    <path d="M-11 -122 L0 -98 L11 -122Z" fill="#BFE0F5" ${sw}/>
+    <path d="M0 -98 L0 -48" fill="none" ${sw}/>
+    <rect x="9" y="-100" width="20" height="9" rx="2" fill="#F2A93B" ${sw} stroke-width="1.5"/>
+    <path d="M-15 -120 Q-20 -92 -5 -86 Q10 -92 15 -120" fill="none" stroke="#5B6680" stroke-width="4"/>
+    <circle cx="-5" cy="-84" r="5.5" fill="#C9CED6" ${sw}/>
+    <rect x="32" y="-114" width="16" height="52" rx="8" fill="#fff" ${sw} transform="rotate(-10 40 -114)"/>
+    <circle cx="48" cy="-62" r="8" fill="#FFDCC2" ${sw}/><circle cx="-50" cy="-62" r="8" fill="#FFDCC2" ${sw}/>
+    <g transform="translate(0 -160)">
+      <circle cx="-31" cy="4" r="8" fill="#FFDCC2" ${sw}/>
+      <circle r="37" fill="#FFDCC2" ${sw}/>
+      <path d="M-38 0 Q-42 -46 0 -44 Q42 -46 38 -4 Q30 -26 10 -24 Q-10 -32 -25 -18 Q-33 -10 -38 0Z" fill="#2A2320" ${sw}/>
+      <g transform="translate(4 2)"><circle r="3.8" fill="${OL}"/><circle r="1.2" cx="1.2" cy="-1.2" fill="#fff"/></g>
+      <g transform="translate(21 1)"><circle r="3.6" fill="${OL}"/><circle r="1.2" cx="1.2" cy="-1.2" fill="#fff"/></g>
+      <path d="M7 14 q7 7 14 0" fill="none" stroke="${OL}" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="-6" cy="13" rx="7" ry="4" fill="#FF9AA2" opacity=".55"/><ellipse cx="29" cy="12" rx="5" ry="3.5" fill="#FF9AA2" opacity=".55"/>
+      ${hat}
+    </g>
+    ${scarf}
+  </g></g>
+  ${quest ? `<g class="questw" transform="translate(0 -262)"><g class="quest"><circle r="17" fill="#F2A93B" stroke="${OL}" stroke-width="2.5"/><text y="8" text-anchor="middle" font-size="24" fill="${OL}">!</text></g></g>` : ""}`;
+}
+function positionAbove(box, el){
+  const r = el.getBoundingClientRect(), app = $("app").getBoundingClientRect(), w = box.offsetWidth, h = box.offsetHeight;
+  box.style.left = clamp(r.left - app.left + r.width/2 - w/2, 12, app.width - w - 12) + "px";
+  box.style.top = clamp(r.top - app.top - h - 8, 70, app.height - h - 12) + "px";
+}
+function openVet(){
+  const v = dogs.get("vet"); if (!v) return;
+  metScenes.add(scene); v.el.querySelector(".questw")?.remove();
+  const S = SCENES[scene], card = $("vetCard");
+  $("vetTipT").textContent = S.tipT; $("vetTipP").textContent = S.tipP;
+  $("say").hidden = true; card.hidden = false; positionAbove(card, v.el);
+}
+let sayT;
+function say(d, text, ms){
+  const s = $("say"); s.textContent = text; s.hidden = false; positionAbove(s, d.el);
+  clearTimeout(sayT); sayT = setTimeout(() => { s.hidden = true; }, ms);
+}
+function hearts(x, y, n){
+  for (let i = 0; i < n; i++){
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("transform", `translate(${(x + (Math.random()*2-1)*30).toFixed(0)} ${y.toFixed(0)})`);
+    g.innerHTML = `<path class="heart" d="M0 8 C-14 -4 -7 -16 0 -8 C7 -16 14 -4 0 8Z" fill="#FF6B8A" stroke="${OL}" stroke-width="2" style="animation-delay:${(i*.15).toFixed(2)}s"/>`;
+    fxG.appendChild(g); setTimeout(() => g.remove(), 1600 + i*150);
+  }
+}
+function walkTo(d, x, y, cb){ const W = SCENES[scene].walk; d.tx = clamp(x, 60, 1540); d.ty = clamp(y, W[0], W[1]); if (d.act === "sit") d.act = ""; d.onArrive = cb; }
+function throwTreat(a, b, done){
+  const g = document.createElementNS(NS, "g");
+  g.innerHTML = `<path d="M-13 0 L-6.5 -11 L6.5 -11 L13 0 L6.5 11 L-6.5 11Z" fill="#F2A93B" stroke="${OL}" stroke-width="2.5"/><path d="M-6 0 L6 0 M0 -6 L0 6" stroke="#C97C12" stroke-width="2"/>`;
+  fxG.appendChild(g);
+  const x0 = a.x + a.f*40, y0 = a.y - 110, x1 = b.x + b.f*34, y1 = b.y - 80, t0 = performance.now();
+  const step = now => { const k = Math.min(1, (now - t0)/650), x = lerp(x0, x1, k), y = lerp(y0, y1, k) - Math.sin(k*Math.PI)*90;
+    g.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(k*360).toFixed(0)})`);
+    if (k < 1) requestAnimationFrame(step); else { g.remove(); done(); } };
+  requestAnimationFrame(step);
+}
+function vetAction(kind){
+  $("vetCard").hidden = true;
+  const me = dogs.get("me"), v = dogs.get("vet"); if (!me || !v) return;
+  v.busy = true; v.tx = v.ty = null;
+  const side = me.x < v.x ? -1 : 1;
+  walkTo(me, v.x + side*100, v.y + 6, () => {
+    me.f = -side; v.f = side;
+    const free = () => { v.busy = false; v.next = performance.now() + 6000; };
+    if (kind === "check"){
+      setAct(me, "sit"); sendPresence(true);
+      say(v, "어디 한번 볼까요? 청진기 살짝 대 볼게요", 1500);
+      setTimeout(() => { const ci = Math.floor(Math.random()*CHECKS.length); say(v, CHECKS[ci], 3800);
+        if (ci === 2) setTimeout(() => say(v, "양치가 아직 어렵다면 놀로 '낼름낼름 치약 먹기' 챌린지부터 해 봐요", 3800), 4000); hearts(me.x, me.y - 110, 3); setAct(me, "paw"); sendPresence(true); free(); track("check"); }, 1700);
+    } else {
+      setAct(me, "paw"); sendPresence(true);
+      say(v, `${profile.name}, 손! 잘했어요`, 1400);
+      setTimeout(() => throwTreat(v, me, () => { setAct(me, "spin"); sendPresence(true); hearts(me.x, me.y - 110, 4); toast("허니콤츄 하나 받았어요"); free(); track("treat"); }), 900);
+    }
+  });
+}
+$("vetCheck").onclick = () => vetAction("check");
+$("vetTreat").onclick = () => vetAction("treat");
+$("vetClose").onclick = () => { $("vetCard").hidden = true; };
+$("vetKn").onclick = () => { $("vetCard").hidden = true; openKnollo("vet"); };
+
+/* ---------- presence ---------- */
+let lastSent = 0, actAt = 0;
+function sendPresence(force){
+  if (!room || !profile) return;
+  const me = dogs.get("me"); if (!me) return;
+  const now = performance.now();
+  if (!force && now - lastSent < 110) return;
+  lastSent = now;
+  if (force) actAt = Date.now();
+  room.presence({ n: profile.name, b: profile.breed, s: scene, x: Math.round(me.x), y: Math.round(me.y), f: me.f, a: me.act || "", at: actAt, c: me.crown ? 1 : 0, q: playQ, r: playR }).catch(() => {});
+}
+let lastCh = null;
+function onPeers(ch){
+  lastCh = ch;
+  const seen = new Set();
+  let people = 0;
+  const list = [];
+  ch.peers.forEach(p => {
+    if (p.kind !== "viewer") return;
+    people++;
+    if (p.sameTab){ myPeer = p.peer; return; }
+    const pr = p.presence || {};
+    if (typeof pr.n !== "string" || !SCENES[pr.s]) return;
+    list.push({ peer: p.peer, n: pr.n.slice(0, 8), b: BREED_KEYS.includes(pr.b) ? pr.b : "maltese", s: pr.s });
+    playSignals(p.peer, pr);
+    const id = "p:" + p.peer; seen.add(id);
+    const breed = BREED_KEYS.includes(pr.b) ? pr.b : "maltese";
+    let d = dogs.get(id);
+    if (pr.s !== scene){ if (d) removeDog(id); return; }
+    if (!d) d = makeDog({ id, name: pr.n.slice(0, 8), breed, x: +pr.x || 800, y: +pr.y || 780, remote: true });
+    d.name = pr.n.slice(0, 8); d.breed = breed; d.crown = pr.c === 1; buildDog(d);
+    d.tx = clamp(+pr.x || d.x, 0, 1600); d.ty = clamp(+pr.y || d.y, 600, 880); d.rf = pr.f === -1 ? -1 : 1;
+    if (pr.at && pr.at !== d.lastAt){ d.lastAt = pr.at; if (pr.a) setAct(d, pr.a); else d.act = ""; d.tx = clamp(+pr.x || d.x, 0, 1600); d.ty = clamp(+pr.y || d.y, 600, 880); }
+  });
+  [...dogs.keys()].forEach(id => { if (id.startsWith("p:") && !seen.has(id)) removeDog(id); });
+  peersNow = list;
+  $("onlineTxt").textContent = people > 1 ? `지금 ${people}마리 산책 중 · 같이 놀기` : "지금 우리 강아지만 산책 중";
+  if (!$("sheet").hidden && $("sheet").dataset.mode === "friends") openFriends();
+}
+
+/* ---------- 같이 놀기 ---------- */
+let myPeer = null, peersNow = [], playQ = null, playR = null, playing = false;
+const handledQ = new Set();
+const GAMES = { ball:"공놀이", heart:"하트 주고받기" };
+const HOSTED = !!window.MUNG_HOSTED;
+const INVITE_URL = HOSTED ? location.origin + location.pathname : "https://claude.ai/artifact/AMkiCdhAaXB2tdqixFuxj7";
+const rang = n => n + (hasBatchim(n) ? "이랑" : "랑");
+const peerName = peer => (peersNow.find(p => p.peer === peer) || {}).n || "친구";
+function openPlay(peer){
+  if (!profile) return;
+  const d = dogs.get("p:" + peer), card = $("playCard"), n = peerName(peer);
+  $("vetCard").hidden = true; hidePop();
+  $("playName").textContent = n;
+  $("playT").textContent = `${rang(n)} 같이 놀까요?`;
+  $("playP").textContent = "놀자고 하면 친구 화면에 알림이 가요. 친구가 좋다고 하면 같이 놀아요.";
+  $("playAsk").hidden = false; $("playInv").hidden = true;
+  card.dataset.peer = peer; card.hidden = false; positionAbove(card, (d || dogs.get("me")).el);
+}
+function askPlay(k){
+  const card = $("playCard"), peer = card.dataset.peer; card.hidden = true;
+  if (!room){ toast("지금은 혼자 산책 중이라 같이 놀 수 없어요"); return; }
+  const q = { to: peer, k, t: Date.now() }; playQ = q; sendPresence(true);
+  toast(`${peerName(peer)}에게 ${GAMES[k]} 하자고 했어요`);
+  const me = dogs.get("me"), d = dogs.get("p:" + peer);
+  if (me && d) walkTo(me, d.x + (me.x < d.x ? -150 : 150), d.y);
+  setTimeout(() => { if (playQ === q){ playQ = null; sendPresence(true); toast("친구가 아직 답이 없어요. 조금 뒤에 다시 놀자고 해 봐요"); } }, 30000);
+}
+function playSignals(peer, pr){
+  const q = pr.q, r = pr.r;
+  if (q && typeof q === "object" && q.to === myPeer && GAMES[q.k] && typeof q.t === "number" && !handledQ.has(peer + ":" + q.t)){
+    handledQ.add(peer + ":" + q.t);
+    if (!playing && profile) showInvite(peer, pr.n.slice(0, 8), q);
+  }
+  if (r && typeof r === "object" && playQ && r.to === myPeer && r.t === playQ.t && playQ.to === peer){
+    const k = playQ.k; playQ = null; sendPresence(true);
+    if (r.ok) startGame(peer, k, true); else toast(`${peerName(peer)}${hasBatchim(peerName(peer)) ? "은" : "는"} 다음에 놀자고 해요`);
+  }
+}
+function showInvite(peer, n, q){
+  const card = $("playCard"), d = dogs.get("p:" + peer);
+  $("vetCard").hidden = true;
+  $("playName").textContent = n;
+  $("playT").textContent = `${n}${hasBatchim(n) ? "이" : "가"} ${GAMES[q.k]} 하자고 해요!`;
+  $("playP").textContent = d ? "좋아요를 누르면 바로 같이 놀아요." : `${n}${hasBatchim(n) ? "이" : "가"} 다른 장소에 있어요. 좋아요를 누르면 그곳으로 가요.`;
+  $("playAsk").hidden = true; $("playInv").hidden = false;
+  card.dataset.peer = peer; card.dataset.k = q.k; card.dataset.t = q.t; card.hidden = false;
+  positionAbove(card, (d || dogs.get("me")).el);
+  toast(`${n}${hasBatchim(n) ? "이" : "가"} 같이 놀자고 해요`);
+  setTimeout(() => { if (!card.hidden && card.dataset.t == q.t) card.hidden = true; }, 30000);
+}
+function replyPlay(ok){
+  const card = $("playCard"), peer = card.dataset.peer, k = card.dataset.k, t = +card.dataset.t;
+  card.hidden = true;
+  const r = { to: peer, t, ok }; playR = r; sendPresence(true);
+  setTimeout(() => { if (playR === r){ playR = null; sendPresence(true); } }, 8000);
+  if (!ok) return;
+  const fr = peersNow.find(p => p.peer === peer);
+  if (fr && fr.s !== scene) setScene(fr.s);
+  setTimeout(() => startGame(peer, k, false), fr && fr.s !== scene ? 900 : 200);
+}
+function throwThing(a, b, inner, done){
+  const g = document.createElementNS(NS, "g"); g.innerHTML = inner; fxG.appendChild(g);
+  const x0 = a.x + a.f*30, y0 = a.y - 100, x1 = b.x + b.f*30, y1 = b.y - 90, t0 = performance.now();
+  const step = now => { const k = Math.min(1, (now - t0)/700), x = lerp(x0, x1, k), y = lerp(y0, y1, k) - Math.sin(k*Math.PI)*130;
+    g.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(k*540).toFixed(0)})`);
+    if (k < 1) requestAnimationFrame(step); else { g.remove(); done(); } };
+  requestAnimationFrame(step);
+}
+const BALL = `<circle r="14" fill="#FF8A5B" stroke="${OL}" stroke-width="2.5"/><path d="M-13 -3 Q0 6 13 -3" fill="none" stroke="#fff" stroke-width="2.5"/>`;
+function startGame(peer, k, initiator){
+  const me = dogs.get("me"), d = dogs.get("p:" + peer), n = peerName(peer);
+  if (!me || !d || playing){ if (!d) toast(`${n}${hasBatchim(n) ? "이" : "가"} 지금 다른 곳에 있어요`); return; }
+  playing = true;
+  const finish = () => {
+    hearts((me.x + d.x)/2, Math.min(me.y, d.y) - 130, 5);
+    toast(`${rang(n)} ${GAMES[k]} 했어요!`);
+    track("together"); playing = false; sendPresence(true);
+  };
+  const run = () => {
+    me.f = d.x > me.x ? 1 : -1; d.rf = -me.f; d.f = -me.f; sendPresence(true);
+    if (k === "ball"){
+      let i = 0;
+      const next = () => {
+        if (i >= 4) return finish();
+        const a = i % 2 ? d : me, b = i % 2 ? me : d; i++;
+        setAct(a, "paw"); if (a === me) sendPresence(true);
+        throwThing(a, b, BALL, () => { setAct(b, "spin"); if (b === me) sendPresence(true); setTimeout(next, 450); });
+      };
+      next();
+    } else {
+      setAct(me, "sit"); setAct(d, "sit"); sendPresence(true);
+      let i = 0;
+      const beat = () => { hearts((me.x + d.x)/2, Math.min(me.y, d.y) - 110 - i*12, 3); if (++i < 5) setTimeout(beat, 550); else { setAct(me, "paw"); sendPresence(true); setTimeout(finish, 500); } };
+      beat();
+    }
+  };
+  if (initiator && Math.abs(me.x - d.x) > 220) walkTo(me, d.x + (me.x < d.x ? -150 : 150), d.y, run); else setTimeout(run, 300);
+}
+$("playBall").onclick = () => askPlay("ball");
+$("playHeart").onclick = () => askPlay("heart");
+$("playYes").onclick = () => replyPlay(true);
+$("playNo").onclick = () => replyPlay(false);
+$("playClose").onclick = () => { $("playCard").hidden = true; };
+function openFriends(){
+  const sh = $("sheet"); sh.dataset.mode = "friends"; sh.hidden = false;
+  $("sheetTitle").textContent = "같이 산책하기";
+  const fr = peersNow;
+  $("sheetBody").innerHTML = `<div class="sec-h"><b>지금 함께 접속한 친구 ${fr.length}</b><span>같은 링크로 들어온 사람</span></div>
+    ${fr.length ? `<ul class="fr">${fr.map(p => `<li><div><b>${esc(p.n)}</b><small>${esc(BREEDS[p.b]?.name || "")} · ${esc(SCENES[p.s].label)}에 있어요</small></div>${p.s === scene ? `<button data-play="${esc(p.peer)}">같이 놀자</button>` : `<button data-go="${esc(p.s)}">놀러 가기</button>`}</li>`).join("")}</ul>`
+      : `<p class="note" style="margin:8px 0 14px">지금은 우리 강아지만 산책 중이에요. 친구에게 링크를 보내 같이 산책해요.</p>`}
+    <div class="sec-h"><b>친구 초대하기</b><span>링크를 보내면 같은 동네에서 만나요</span></div>
+    <div class="invite"><input id="invUrl" readonly value="${INVITE_URL}" aria-label="초대 링크"><button id="invCopy">링크 복사</button></div>
+    <button class="kn-btn" id="toPal" style="width:100%;margin-bottom:10px">동시에 못 들어와도 괜찮아요 · 단짝 자물쇠 초대 코드</button>
+    <p class="note">같은 장소에 있는 친구 강아지를 눌러도 같이 놀 수 있어요. 공놀이나 하트 주고받기를 골라 보세요.</p>`;
+  $("sheetBody").querySelectorAll("[data-play]").forEach(b => b.onclick = () => { closeSheet(); openPlay(b.dataset.play); });
+  $("sheetBody").querySelectorAll("[data-go]").forEach(b => b.onclick = () => { setScene(b.dataset.go); });
+  $("toPal").onclick = () => { if (scene !== "locks") setScene("locks"); openPal(); };
+  $("invCopy").onclick = async () => {
+    const inp = $("invUrl");
+    try { await navigator.clipboard.writeText(INVITE_URL); toast("초대 링크를 복사했어요"); }
+    catch(e){ inp.focus(); inp.select(); toast("링크를 길게 눌러 복사해 주세요"); }
+  };
+}
+$("online").onclick = () => { const sh = $("sheet"); if (!sh.hidden && sh.dataset.mode === "friends") closeSheet(); else openFriends(); };
+
+/* ---------- 단짝 자물쇠 ---------- */
+let palDocs = {}, palJoins = {}, pairs = [], palReady = false;
+const fmtDate = t => { const d = new Date(t || Date.now()); return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`; };
+const palSeen = new Set(store.get("mung.palSeen") || []);
+function recomputePairs(){
+  const best = {};
+  Object.entries(palJoins).forEach(([g, list]) => list.forEach(e => {
+    const h = palDocs[e.h]; if (!h || !h.invs.includes(e.inv) || e.h === g) return;
+    const key = e.h + ":" + e.inv;
+    if (!best[key] || e.at < best[key].at) best[key] = { h: e.h, hn: h.n, hb: h.b, inv: e.inv, g, gn: e.n, gb: e.b, at: e.at };
+  }));
+  pairs = Object.values(best).sort((a, b) => b.at - a.at);
+  pairs.forEach(p => {
+    const key = p.h + ":" + p.inv;
+    if ((p.h === myId || p.g === myId) && !palSeen.has(key)){
+      palSeen.add(key); store.set("mung.palSeen", [...palSeen].slice(-50));
+      if (profile){ track("together"); if (p.h === myId) toast(`${p.gn}${hasBatchim(p.gn) ? "이" : "가"} 단짝 자물쇠를 함께 잠갔어요!`); }
+    }
+  });
+  if (scene === "locks") renderDecor();
+  ensurePalHost();
+  if (!$("sheet").hidden && $("sheet").dataset.mode === "pal") openPal();
+}
+const pairOf = (h, inv) => pairs.find(p => p.h === h && p.inv === inv);
+const lastInv = h => { const d = palDocs[h]; return d && d.invs.length ? d.invs[d.invs.length - 1] : null; };
+const inviteMsg = () => { const c = palDocs[myId]?.code || ""; return HOSTED ? `멍동네에서 ${profile?.name || "우리 강아지"}${hasBatchim(profile?.name || "") ? "이랑" : "랑"} 단짝 자물쇠 잠그자!\n${INVITE_URL}#pal=${encodeURIComponent(myId)}` : `멍동네에서 ${profile?.name || "우리 강아지"}${hasBatchim(profile?.name || "") ? "이랑" : "랑"} 단짝 자물쇠 잠그자!\n${INVITE_URL}\n자물쇠 언덕 > 단짝 자물쇠 > 초대 코드 ${c}`; };
+const newCode = () => { const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let c = ""; for (let i = 0; i < 6; i++) c += A[Math.floor(Math.random() * A.length)]; return c; };
+function guestPending(){
+  if (!palHost || palHost === myId || !palDocs[palHost]) return false;
+  const inv = lastInv(palHost);
+  return inv && !pairOf(palHost, inv);
+}
+function ensurePalHost(){
+  const want = scene === "locks" && guestPending();
+  const d = dogs.get("palhost");
+  if (!want){ if (d) removeDog("palhost"); return; }
+  if (d) return;
+  const h = palDocs[palHost], W = SCENES.locks.walk;
+  const nd = makeDog({ id: "palhost", npc: true, wait: true, name: h.n, breed: h.b, x: 980, y: W[0] + 70, next: performance.now() + 4000 });
+  nd.el.setAttribute("tabindex", "0"); nd.el.setAttribute("role", "button"); nd.el.style.cursor = "pointer";
+  nd.el.addEventListener("click", e => { e.stopPropagation(); openPal(); });
+}
+const miniDog = (b, flip) => `<svg viewBox="-80 -175 160 190" aria-hidden="true"><g class="dog"${flip ? ' transform="scale(-1 1)"' : ""}>${dogInner(b, "locks", true)}</g></svg>`;
+function openPal(){
+  const sh = $("sheet"); sh.dataset.mode = "pal"; sh.hidden = false;
+  $("sheetTitle").textContent = "단짝 자물쇠";
+  const body = $("sheetBody");
+  if (!db || String(myId).startsWith("local-")){ body.innerHTML = `<p class="note" style="margin:8px 0">지금은 공유 저장소에 연결되지 않아 단짝 자물쇠를 쓸 수 없어요.</p>`; return; }
+  let html = "";
+  if (!palHost || palHost === myId) html += `<div class="sec-h"><b>초대 코드가 있나요?</b><span>친구에게 받은 6자리 코드를 넣어 주세요</span></div>
+    <div class="invite"><input id="palCode" maxlength="6" autocomplete="off" placeholder="예: K7P2QX" aria-label="초대 코드" style="text-transform:uppercase;letter-spacing:2px;font-size:15px"><button id="palFind">찾기</button></div>`;
+  if (palHost && palHost !== myId){
+    const h = palDocs[palHost], inv = lastInv(palHost), done = inv && pairOf(palHost, inv);
+    if (!h) html += palReady ? `<p class="note" style="margin:8px 0 14px">초대장을 찾지 못했어요. 코드를 다시 확인해 주세요.</p>` : `<p class="note" style="margin:8px 0 14px">초대장을 불러오는 중이에요…</p>`;
+    else if (done && done.g === myId) html += `<div class="palcard">${miniDog(h.b)}<div><b>${esc(h.n)}${hasBatchim(h.n) ? "이" : "가"} 우리 단짝이에요</b><p>${esc(fmtDate(done.at))}에 자물쇠 언덕에서 함께 잠갔어요.</p></div></div>`;
+    else if (done) html += `<div class="palcard">${miniDog(h.b)}<div><b>이미 완성된 초대예요</b><p>${esc(h.n)}${hasBatchim(h.n) ? "은" : "는"} 다른 친구와 단짝 자물쇠를 잠갔어요. 아래에서 내 초대 코드를 만들어 보세요.</p></div></div>`;
+    else html += `<div class="palcard">${miniDog(h.b)}<div><b>${esc(h.n)}${hasBatchim(h.n) ? "이" : "가"} 단짝을 기다리고 있어요</b><p>${esc(profile?.name || "우리 강아지")}${hasBatchim(profile?.name || "") ? "과" : "와"} 함께 자물쇠를 잠그면 둘만의 기념 카드가 생겨요.</p></div></div><button class="primary" id="palJoin" style="width:100%;margin-bottom:14px">${esc(h.n)}${hasBatchim(h.n) ? "이랑" : "랑"} 함께 잠그기</button>`;
+  }
+  const inv = lastInv(myId), waiting = inv && !pairOf(myId, inv);
+  html += `<div class="sec-h"><b>내 단짝 초대</b><span>친구 한 명이 함께 잠그면 완성돼요</span></div>`;
+  if (waiting) html += `<p class="note" style="margin:6px 0">친구를 기다리는 중이에요. 링크를 받은 친구가 들어오면 ${esc(profile?.name || "우리 강아지")}${hasBatchim(profile?.name || "") ? "이" : "가"} 자물쇠 언덕에서 기다리고 있어요.</p>
+      <div class="codebox" aria-label="초대 코드">${esc(palDocs[myId]?.code || "")}</div>
+      <button class="primary" id="palCopy" style="width:100%;margin-bottom:8px">초대 메시지 복사</button>
+      <p class="note" style="margin:0 0 8px">링크와 코드가 함께 복사돼요. 친구는 링크로 들어와 자물쇠 언덕의 단짝 자물쇠에서 코드를 넣으면 돼요.</p>`;
+  html += `<button class="kn-btn" id="palNew" style="width:100%;margin-bottom:14px">${waiting ? "새 초대 코드 만들기" : "단짝 초대 코드 만들기"}</button>`;
+  const mine = pairs.filter(p => p.h === myId || p.g === myId);
+  html += `<div class="sec-h"><b>우리 단짝 ${mine.length}</b><span>자물쇠 언덕 난간에 하트 자물쇠로 걸려 있어요</span></div>`;
+  html += mine.length ? `<ul class="pairs">${mine.map((p, i) => `<li><div><b>${esc(p.hn)} ♥ ${esc(p.gn)}</b><small>${esc(fmtDate(p.at))} · ${esc(BREEDS[p.hb]?.name || "")} & ${esc(BREEDS[p.gb]?.name || "")}</small></div><button data-card="${i}">기념 카드</button></li>`).join("")}</ul>` : `<p class="note" style="margin:6px 0 12px">아직 단짝이 없어요. 초대 코드를 친구에게 보내 보세요.</p>`;
+  body.innerHTML = html;
+  $("palJoin")?.addEventListener("click", joinPal);
+  $("palNew").onclick = createInvite;
+  $("palCopy")?.addEventListener("click", async () => { try { await navigator.clipboard.writeText(inviteMsg()); toast("초대 메시지를 복사했어요"); } catch(e){ toast(`코드 ${palDocs[myId]?.code || ""}를 친구에게 알려 주세요`); } });
+  const find = () => {
+    const c = ($("palCode").value || "").trim().toUpperCase();
+    if (c.length < 6){ toast("6자리 코드를 넣어 주세요"); return; }
+    const hit = Object.entries(palDocs).find(([id, d]) => d.code === c);
+    if (!hit){ toast(palReady ? "그 코드의 초대를 찾지 못했어요" : "초대장을 불러오는 중이에요. 잠시 후 다시 눌러 주세요"); return; }
+    if (hit[0] === myId){ toast("내가 만든 초대 코드예요. 친구에게 보내 주세요"); return; }
+    palHost = hit[0]; if (scene !== "locks") setScene("locks"); ensurePalHost(); openPal();
+  };
+  $("palFind")?.addEventListener("click", find);
+  $("palCode")?.addEventListener("keydown", e => { if (e.key === "Enter") find(); });
+  body.querySelectorAll("[data-card]").forEach(b => b.onclick = () => palCard(mine[+b.dataset.card]));
+}
+async function createInvite(){
+  if (!profile) return;
+  const invs = [...(palDocs[myId]?.invs || []), Date.now()].slice(-20);
+  let code = newCode(); while (Object.values(palDocs).some(d => d.code === code)) code = newCode();
+  try {
+    await db.collection("pals").doc(myId).set({ n: profile.name, b: profile.breed, invs, code, at: Date.now() });
+    palDocs[myId] = { n: profile.name, b: profile.breed, invs, code }; openPal();
+    toast(`초대 코드 ${code}를 만들었어요`);
+  } catch(e){ toast("코드를 만들지 못했어요. 잠시 후 다시 눌러 주세요"); }
+}
+async function joinPal(){
+  const h = palDocs[palHost], inv = lastInv(palHost);
+  if (!h || !inv || !profile) return;
+  if (pairOf(palHost, inv)){ toast("이미 완성된 초대예요"); openPal(); return; }
+  const cur = (palJoins[myId] || []).filter(e => !(e.h === palHost && e.inv === inv));
+  const list = [...cur, { h: palHost, inv, n: profile.name, b: profile.breed, at: Date.now() }].slice(-20);
+  $("palJoin").disabled = true;
+  try { await db.collection("palJoins").doc(myId).set({ list }); }
+  catch(e){ $("palJoin").disabled = false; toast("잠그지 못했어요. 잠시 후 다시 눌러 주세요"); return; }
+  closeSheet();
+  const me = dogs.get("me"), hd = dogs.get("palhost");
+  const finish = () => {
+    if (me){ setAct(me, "sit"); sendPresence(true); }
+    if (hd) setAct(hd, "sit");
+    const cx = hd && me ? (hd.x + me.x)/2 : 800, cy = me ? me.y - 120 : 600;
+    for (let i = 0; i < 4; i++) setTimeout(() => hearts(cx + (Math.random()*2-1)*40, cy, 4), i*260);
+    toast(`딸깍! ${h.n}${hasBatchim(h.n) ? "이랑" : "랑"} 단짝 자물쇠를 잠갔어요`);
+    setTimeout(() => { const p = pairOf(palHost, inv) || { h: palHost, hn: h.n, hb: h.b, inv, g: myId, gn: profile.name, gb: profile.breed, at: Date.now() }; palCard(p); }, 1600);
+  };
+  if (me && hd){ hd.next = Infinity; hd.tx = hd.ty = null; if (hd.act === "sit") hd.act = ""; walkTo(me, hd.x + (me.x < hd.x ? -130 : 130), hd.y, finish); } else finish();
+}
+async function palCard(p){
+  try {
+    const W = 1080, H = 1350;
+    const stars = Array.from({ length: 40 }, (_, i) => `<circle cx="${(hash("s" + i) * W).toFixed(0)}" cy="${(hash("t" + i) * 520).toFixed(0)}" r="${(1.5 + hash("r" + i) * 3).toFixed(1)}" fill="#fff" opacity="${(.4 + hash("o" + i) * .5).toFixed(2)}"/>`).join("");
+    const svgStr = `<svg xmlns="${NS}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B2456"/><stop offset=".55" stop-color="#7A5BA8"/><stop offset="1" stop-color="#F6B8C6"/></linearGradient></defs>
+      <rect width="${W}" height="${H}" fill="url(#cg)"/>${stars}
+      <path d="M0 980 Q270 900 540 940 Q810 980 1080 900 L1080 ${H} L0 ${H}Z" fill="#5E8C5A"/>
+      <path d="M0 1040 Q300 990 540 1010 Q800 1030 1080 990 L1080 ${H} L0 ${H}Z" fill="#7BAE6E"/>
+      <g stroke="#4A3530" stroke-width="6"><path d="M60 760 L1020 760" stroke="#C9A27A"/><path d="M60 800 L1020 800" stroke="#C9A27A"/></g>
+      <g transform="translate(540 520) scale(5)"><path d="M-9 -2 L-9 -14 A9 9 0 0 1 9 -14 L9 -2" fill="none" stroke="#F1DC8E" stroke-width="4"/><path d="M0 26 C-30 6 -17 -18 0 -5 C17 -18 30 6 0 26Z" fill="#FF9DB8" stroke="#4A3530" stroke-width="2.2" stroke-linejoin="round"/><circle cx="0" cy="5" r="3.2" fill="#4A3530"/><path d="M0 6 L0 12" stroke="#4A3530" stroke-width="2.6" stroke-linecap="round"/><circle cx="-9" cy="-1" r="3" fill="#fff" opacity=".7"/></g>
+      <g transform="translate(330 1130) scale(3.3)">${dogInner(p.hb, "locks", false)}</g>
+      <g transform="translate(750 1130) scale(-3.3 3.3)">${dogInner(p.gb, "locks", false)}</g>
+    </svg>`;
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgStr); });
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const c = cv.getContext("2d"); c.drawImage(img, 0, 0);
+    c.textAlign = "center"; c.fillStyle = "#FFFFFF";
+    c.font = '40px "Gowun Dodum", sans-serif'; c.globalAlpha = .9; c.fillText("멍동네 자물쇠 언덕", W/2, 120); c.globalAlpha = 1;
+    c.font = '96px "Jua", sans-serif'; c.fillText("단짝 자물쇠", W/2, 230);
+    c.font = '64px "Jua", sans-serif'; c.fillText(`${p.hn} ♥ ${p.gn}`, W/2, 340);
+    c.fillStyle = "#3A2440"; c.font = '38px "Gowun Dodum", sans-serif';
+    c.fillText(`${fmtDate(p.at)} · 우리 둘이 함께 잠갔어요`, W/2, 1300);
+    lastPhoto = cv; lastPhotoName = `멍동네-단짝-${p.hn}-${p.gn}.png`;
+    $("photoTitle").textContent = "단짝 기념 카드가 나왔어요";
+    $("photoImg").src = cv.toDataURL("image/png"); $("photoImg").alt = `${p.hn}와 ${p.gn}의 단짝 자물쇠 기념 카드`;
+    $("photoNote").hidden = !!downloads; $("photoSave").hidden = !downloads;
+    closeSheet(); $("photoModal").hidden = false;
+  } catch(e){ toast("카드를 만들지 못했어요. 다시 눌러 주세요"); }
+}
+$("palBtn").onclick = () => { const sh = $("sheet"); if (!sh.hidden && sh.dataset.mode === "pal") closeSheet(); else openPal(); };
+
+/* ---------- 놀로 챌린지 ---------- */
+const KN = "https://www.knollo.store/play/challenge/";
+const KNOLLO = [
+  {id:"MAnY3xPbbvbz", t:"낼름낼름 치약 먹기 · 양치랑 친해져요", by:"정진수 트레이너", r:"300트릿", vet:1},
+  {id:"a8w5c0VHYuV1", t:"예뻐지고 싶니? 그럼 빗질을 하자", by:"", r:"300트릿", vet:1},
+  {id:"LP9Ge5FIOxuT", t:"매트만 있으면 너도 다 할 수 있어!", by:"설쌤 챌린지", r:"300트릿", vet:1},
+  {id:"cmuV1HwiYtuJ", t:"독립심 쑥! 기다려 챌린지", by:"설쌤 챌린지", r:"500트릿", vet:1},
+  {id:"DzySJCrvlNSI", t:"끌고 가지 않아요! 여유로운 산책 챌린지", by:"설쌤 챌린지", r:"500트릿", sc:"sunrise"},
+  {id:"finDs5F0SiSk", t:"매너워터 인증 챌린지", by:"", r:"20% 할인 쿠폰", sc:"sunrise"},
+  {id:"Px8Tw550Ixrq", t:"우리 댕냥이 단풍잎 꾸미기", by:"설쌤 챌린지", r:"100트릿", sc:"xmas"},
+  {id:"6ZK7dTkzjYxW", t:"소심한 강아지 자신감 업! 꺼내 먹어요 컵 속에 간식", by:"김재욱 트레이너", r:"500트릿", sc:"xmas"},
+  {id:"JaOI0pWzsXid", t:"코를 쏙! 도넛 코 챌린지", by:"", r:"300트릿", sc:"locks"},
+  {id:"JDfKmrfQfdQt", t:"산책이 즐거운 우리 아이 · 함께하는 공원 산책!", by:"정진수 트레이너", r:"300트릿", sc:"locks"},
+  {id:"LZhb4Af2ilwx", t:"시밀러룩 입고 사진을 찍어봐요", by:"설쌤 챌린지", r:"300트릿", sc:"travel"},
+  {id:"fg0oDSvQ2Hty", t:"더운 여름 음수량 늘리기 · 물 마시기 챌린지", by:"채민경 수의사", r:"300트릿", sc:"travel"},
+  {id:"BYqKbUZw1x1E", t:"노즈워크 feat. 휴지심", by:"김성진 트레이너", r:"300트릿"},
+  {id:"PfiYsJRHgwXw", t:"돌돌 말아요 수건 김밥", by:"설쌤 챌린지", r:"300트릿"}
+];
+const knItem = c => `<li><span class="tg">${c.by ? esc(c.by) + " · " : ""}${esc(c.r)}</span><b>${esc(c.t)}</b><a href="${KN + c.id}" target="_blank" rel="noopener" data-kn="${c.id}">놀로에서 도전하기 ↗</a></li>`;
+function openKnollo(from){
+  const sh = $("sheet"); sh.dataset.mode = "knollo"; sh.hidden = false;
+  $("sheetTitle").textContent = "놀로 챌린지";
+  const here = KNOLLO.filter(c => c.sc === scene), vet = KNOLLO.filter(c => c.vet);
+  const pool = KNOLLO.filter(c => c.sc !== scene && !c.vet), today = pool[Math.floor(hash("kn" + dayStr()) * pool.length) % pool.length];
+  const vetSec = `<div class="sec-h"><b>설채현 수의사 추천</b><span>건강 체크와 함께 해 봐요</span></div><ul class="kn">${vet.map(knItem).join("")}</ul>`;
+  $("sheetBody").innerHTML = (from === "vet" ? vetSec : "") +
+    `<div class="sec-h"><b>${esc(SCENES[scene].label)}에서 해 보기</b><span>이 장소와 어울리는 1분 챌린지</span></div><ul class="kn">${here.map(knItem).join("")}</ul>
+    <div class="sec-h"><b>오늘의 챌린지</b><span>매일 바뀌어요</span></div><ul class="kn">${knItem(today)}</ul>` +
+    (from === "vet" ? "" : vetSec) +
+    `<p class="note">놀로에서 챌린지에 성공하면 트릿을 받을 수 있어요. 멍동네 산책 도장과 놀로 트릿은 따로 쌓여요.</p>`;
+  $("sheetBody").querySelectorAll("[data-kn]").forEach(a => a.addEventListener("click", () => track("knollo")));
+}
+
+/* ---------- 걸어서 이동 ---------- */
+let routing = false, edgeCool = 0;
+function goRoute(dir){
+  if (routing) return;
+  routing = true;
+  const i = ROUTE.indexOf(scene), n = ROUTE.length, to = ROUTE[(i + dir + n) % n];
+  $("transTxt").textContent = `${SCENES[to].label}(으)로 걸어가는 중…`;
+  $("trans").classList.add("on");
+  setTimeout(() => {
+    setScene(to, false, dir > 0 ? "left" : "right");
+    track("route", to);
+    setTimeout(() => { $("trans").classList.remove("on"); routing = false; edgeCool = performance.now() + 1500; }, 350);
+  }, 650);
+}
+
+/* ---------- loop ---------- */
+let lastT = performance.now(), lastVB = "";
+function frame(now){
+  const dt = Math.min(.05, (now - lastT)/1000); lastT = now;
+  const W = SCENES[scene].walk;
+  const me = dogs.get("me");
+  if (me && keys.size){
+    const sp = 260*dt; let dx = 0, dy = 0;
+    if (keys.has("ArrowLeft")) dx -= sp; if (keys.has("ArrowRight")) dx += sp;
+    if (keys.has("ArrowUp")) dy -= sp*.6; if (keys.has("ArrowDown")) dy += sp*.6;
+    me.tx = clamp(me.x + dx*3, 60, 1540); me.ty = clamp(me.y + dy*3, W[0], W[1]); if (me.act === "sit") me.act = "";
+  }
+  dogs.forEach(d => {
+    if (d.vet && !d.busy && now > (d.next || 0)){
+      if (Math.random() < .5){ d.tx = clamp(d.x + (Math.random()*2-1)*260, 300, 1300); d.ty = W[0] + 30 + Math.random()*(W[1]-W[0]-60); }
+      d.next = now + 4000 + Math.random()*5000;
+    }
+    if (d.npc && !d.vet && now > (d.next || 0)){
+      const r = Math.random();
+      if (r < .55){ d.tx = clamp(d.x + (Math.random()*2-1)*420, 120, 1480); d.ty = W[0] + 20 + Math.random()*(W[1]-W[0]-20); if (d.act === "sit") d.act = ""; }
+      else if (r < .75) setAct(d, "sit"); else if (r < .87) setAct(d, "bark"); else setAct(d, "spin");
+      d.next = now + 2500 + Math.random()*4500;
+    }
+    let moving = false;
+    if (d.tx != null){
+      const dx = d.tx - d.x, dy = d.ty - d.y, dist = Math.hypot(dx, dy);
+      const speed = d.remote ? Math.max(200, dist*6) : (d.npc ? (d.vet ? 80 : 120) : 240);
+      if (dist > 2){ const s = Math.min(dist, speed*dt); d.x += dx/dist*s; d.y += dy/dist*s; if (d.me) stepAcc += s; moving = true; if (Math.abs(dx) > 1.5) d.f = dx > 0 ? 1 : -1; }
+      else { d.x = d.tx; d.y = d.ty; if (!d.remote) d.tx = d.ty = null; if (d.onArrive){ const cb = d.onArrive; d.onArrive = null; cb(); } }
+    }
+    if (d.remote && !moving && d.rf) d.f = d.rf;
+    if (d.act && d.act !== "sit" && now > d.actUntil) d.act = "";
+    const sc = .72 + (d.y - 620)/260*.38;
+    d.el.setAttribute("transform", `translate(${d.x.toFixed(1)} ${d.y.toFixed(1)}) scale(${sc.toFixed(3)})`);
+    d.el.querySelector(".flip").setAttribute("transform", `scale(${d.f} 1)`);
+    const cls = "dog" + (d.vet ? " vetc" : "") + (moving ? " walking" : "") + (d.act ? " " + d.act : "");
+    if (d.el.getAttribute("class") !== cls) d.el.setAttribute("class", cls);
+  });
+  // walking off the edge of the path goes to the next place
+  if (me && profile && !routing && now > edgeCool){
+    if (me.x >= 1532 && (me.tx == null || me.tx >= 1530)) goRoute(1);
+    else if (me.x <= 68 && (me.tx == null || me.tx <= 70)) goRoute(-1);
+  }
+  // dogs that meet say hello with hearts
+  if (me) dogs.forEach(d => {
+    if (d === me || d.vet) return;
+    if (Math.hypot(d.x - me.x, d.y - me.y) < 85 && now > (d.sniff || 0)){ d.sniff = now + 9000; hearts((d.x + me.x)/2, Math.min(d.y, me.y) - 110, 3); track("heart"); }
+  });
+  // depth sort
+  const order = [...dogs.values()].sort((a,b) => a.y - b.y);
+  order.forEach((d, i) => { if (dogsG.children[i] !== d.el) dogsG.appendChild(d.el); });
+  // camera follows my dog on narrow screens
+  const r = svg.getBoundingClientRect();
+  if (r.width && r.height){
+    const aspect = r.width / r.height, vw = Math.min(1600, 900*aspect);
+    const x0 = vw < 1600 ? clamp((me ? me.x : 800) - vw/2, 0, 1600 - vw) : 0;
+    const vb = `${x0.toFixed(0)} 0 ${vw.toFixed(0)} 900`;
+    if (vb !== lastVB){ svg.setAttribute("viewBox", vb); lastVB = vb; }
+  }
+  if (me && (moving_any(me))) sendPresence(false);
+  requestAnimationFrame(frame);
+}
+function moving_any(me){ return me.tx != null; }
+
+/* ---------- setup ---------- */
+let pickBreed = profile?.breed || "maltese";
+function renderBreedPick(){
+  const wrap = $("breedPick"); wrap.innerHTML = "";
+  BREED_KEYS.forEach(k => {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("aria-pressed", k === pickBreed);
+    b.innerHTML = `<svg viewBox="-70 -150 150 160" aria-hidden="true"><g class="dog">${dogInner(k, null, true)}</g></svg><span>${BREEDS[k].name}</span>`;
+    b.onclick = () => { pickBreed = k; wrap.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); };
+    wrap.appendChild(b);
+  });
+}
+function openSetup(){ $("dogName").value = profile?.name || ""; renderBreedPick(); $("setup").hidden = false; setTimeout(() => $("dogName").focus(), 60); }
+$("changeDog").onclick = openSetup;
+$("setupForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("dogName").value.trim().replace(/\s+/g, " ").slice(0, 8) || "멍멍이";
+  profile = { name, breed: pickBreed }; store.set("mung.profile", profile);
+  $("setup").hidden = true;
+  let me = dogs.get("me");
+  if (!me) me = makeDog({ id: "me", me: true, name, breed: pickBreed, x: 420, y: SCENES[scene].walk[0] + 100 });
+  me.name = name; me.breed = pickBreed; me.built = ""; buildDog(me);
+  setAct(me, "spin"); sendPresence(true);
+  toast(`${name}${hasBatchim(name) ? "이" : "가"} 동네에 도착했어요`);
+  rollDay(); if (prog.done) setCrown(true);
+  track("visit", scene); renderStampBtn();
+  if (palHost && palHost !== myId) setTimeout(() => { if ($("setup").hidden) openPal(); }, 1300);
+  else setTimeout(() => { const v = dogs.get("vet"); if (v && $("setup").hidden) say(v, `${name}, 어서 와요! 저를 누르면 건강 체크해 줄게요`, 3600); }, 1200);
+});
+
+/* ---------- boot ---------- */
+setScene(readPalHash() ? "locks" : (location.hash || "").slice(1), true);
+requestAnimationFrame(frame);
+setTimeout(() => { const l = $("loader"); l.style.opacity = 0; setTimeout(() => { l.remove(); openSetup(); }, 500); }, 1400);
+if (!myId) myId = store.get("mung.localId") || ("local-" + Math.random().toString(36).slice(2, 10));
+store.set("mung.localId", myId);
+
+(async () => {
+  if (!window.claude?.use){ localOnly = true; loadLocal(); $("onlineTxt").textContent = "혼자 산책 중"; return; }
+  const [r, d, u, dl] = await Promise.all(["room","db","user","downloads"].map(n => window.claude.use(n).catch(() => null)));
+  room = r; db = d; user = u; downloads = dl;
+  if (user){ try { const id = await user.id(); if (id) myId = id; } catch(e){} }
+  if (db && myId && !String(myId).startsWith("local-")){
+    try {
+      const snap = await db.collection("data/users/" + myId).doc("progress").get();
+      const v = snap && snap.data && snap.data();
+      if (v && Object.keys(v.stamps || {}).length >= Object.keys(prog.stamps).length){ prog = Object.assign({ stamps:{}, m:{} }, prog, JSON.parse(JSON.stringify(v))); store.set("mung.prog", prog); }
+      rollDay(); if (prog.done && dogs.get("me")) setCrown(true); renderStampBtn();
+    } catch(e){}
+  }
+  if (db && myId && !String(myId).startsWith("local-")){
+    ["wishes","ornaments","locks"].forEach(coll => {
+      let timer = setTimeout(() => { if (!shared[coll].length) toast("이야기를 불러오는 중이에요"); }, 10000);
+      db.collection(coll).orderBy("at", "desc").limit(300).onSnapshot(snap => {
+        clearTimeout(timer);
+        shared[coll] = snap.docs.map(s => { const v = s.data() || {}; return { id: s.id, text: String(v.text || "").slice(0, 60), dw: String(v.dw || "").slice(0, 40), color: v.color, dog: String(v.dog || "").slice(0, 8), breed: v.breed, at: v.at, shape: SHAPES[v.shape] ? v.shape : "" }; }).filter(o => o.text);
+        renderDecor();
+      }, () => { clearTimeout(timer); localOnly = true; loadLocal(); });
+    });
+  } else { db = null; localOnly = true; loadLocal(); }
+  if (db && myId && !String(myId).startsWith("local-")){
+    db.collection("pals").limit(300).onSnapshot(snap => {
+      const o = {};
+      snap.docs.forEach(x => { const v = x.data() || {}; if (Array.isArray(v.invs)) o[x.id] = { n: String(v.n || "멍멍이").slice(0, 8), b: BREED_KEYS.includes(v.b) ? v.b : "maltese", invs: v.invs.filter(t => typeof t === "number").slice(-20), code: typeof v.code === "string" ? v.code.slice(0, 8) : "" }; });
+      palDocs = o; palReady = true; recomputePairs();
+    }, () => {});
+    db.collection("palJoins").limit(300).onSnapshot(snap => {
+      const o = {};
+      snap.docs.forEach(x => { const v = x.data() || {}; if (Array.isArray(v.list)) o[x.id] = v.list.filter(e => e && typeof e.h === "string" && typeof e.inv === "number").slice(-20).map(e => ({ h: e.h, inv: e.inv, n: String(e.n || "멍멍이").slice(0, 8), b: BREED_KEYS.includes(e.b) ? e.b : "maltese", at: +e.at || 0 })); });
+      palJoins = o; recomputePairs();
+    }, () => {});
+  }
+  if (room){ room.onPeers(onPeers, () => { $("onlineTxt").textContent = "혼자 산책 중"; }); sendPresence(true); }
+  else $("onlineTxt").textContent = "혼자 산책 중";
+})();
+})();
+</script>
+
+</body>
+</html>
