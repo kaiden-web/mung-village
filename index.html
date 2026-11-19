@@ -113,7 +113,17 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
 .pairs button{border:0;border-radius:10px;padding:9px 12px;background:#FFB3C7;color:#4A1F2C;font-family:var(--f-display);font-size:14px;white-space:nowrap;cursor:pointer}
 .primary{border:0;background:var(--ink);color:#fff;border-radius:14px;padding:13px 16px;font-family:var(--f-display);font-size:17px;width:100%}
 .primary:disabled{opacity:.4;cursor:default}
-.stamp-pill{background:var(--honey);color:var(--honey-ink);font-family:var(--f-display);font-size:14px}
+.stamp-pill{background:var(--honey);color:var(--honey-ink);font-family:var(--f-display);font-size:15px;padding:7px 14px 7px 10px;gap:8px;box-shadow:0 6px 20px rgba(10,16,40,.25),0 0 0 2px #fff inset;cursor:pointer}
+.stamp-pill svg{width:22px;height:22px;flex-shrink:0}
+.stamp-pill .sp-t{font-size:16px}
+.stamp-pill .sp-n{background:rgba(255,255,255,.75);border-radius:999px;padding:2px 8px;font-size:12.5px}
+.stamp-pill.nudge{animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{box-shadow:0 6px 20px rgba(10,16,40,.25),0 0 0 0 rgba(242,169,59,.75)}50%{box-shadow:0 6px 20px rgba(10,16,40,.25),0 0 0 9px rgba(242,169,59,0)}}
+.dock .pal{background:#FFB3C7;color:#4A1F2C}
+.dock .pal:hover{background:#FF9DB8}
+.palsign{cursor:pointer}
+.palsign .bob{animation:qbob 1.4s ease-in-out infinite}
+@keyframes qbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
 .sec-h b{font-family:var(--f-display);font-weight:400;font-size:18px}
 .sec-h span{font-size:12px;color:var(--muted)}
@@ -269,7 +279,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
     </nav>
     <div class="meta">
       <button type="button" class="pill" id="online"><span class="dot"></span><span id="onlineTxt">산책 준비 중</span></button>
-      <button class="pill stamp-pill" id="stampBtn"><span id="stampTxt">산책 수첩</span></button>
+      <button class="pill stamp-pill" id="stampBtn" aria-label="산책 수첩 열기"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="15" height="18" rx="2.5" fill="#FFF7E6" stroke="#5A3604" stroke-width="1.8"/><path d="M8 3v18" stroke="#5A3604" stroke-width="1.8"/><circle cx="13.5" cy="11" r="3.4" fill="none" stroke="#D9485F" stroke-width="1.8"/><path d="M12 11l1.1 1.1L15.2 10" stroke="#D9485F" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg><span class="sp-t">산책 수첩</span><span id="stampTxt" class="sp-n">미션 0/3</span></button>
       <button class="pill" id="changeDog">내 강아지</button>
     </div>
   </div>
@@ -302,7 +312,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
     <button data-act="spin"><span class="ic">빙글</span><span>돌기</span></button>
     <button data-act="bark"><span class="ic">멍!</span><span>짖기</span></button>
     <span class="sep"></span>
-    <button class="sub" id="palBtn" hidden><span class="ic">단짝</span><span>초대</span></button>
+    <button class="pal" id="palBtn" hidden><span class="ic">단짝</span><span>친구 초대</span></button>
     <button class="sub" id="storyBtn"><span class="ic" id="storyCount">0</span><span id="storyLab">이야기</span></button>
     <button class="main" id="mainBtn"><span class="ic" id="mainIc"></span><span id="mainLab"></span></button>
   </div>
@@ -642,6 +652,17 @@ function signSVG(s){
     return `<g class="sign" data-dir="${dir}" transform="translate(${x} ${y})" tabindex="0" role="button" aria-label="${lab}(으)로 걸어가기"><rect x="-6" y="-104" width="12" height="104" rx="5" fill="#8A5A3B" stroke="#4A3530" stroke-width="3"/><rect class="board" x="-84" y="-150" width="168" height="48" rx="16" fill="#FFF7E6" stroke="#4A3530" stroke-width="4"/><text x="0" y="-118" text-anchor="middle" font-family="Jua, sans-serif" font-size="23" fill="#4A3530">${t}</text></g>`; };
   return one(112, ROUTE[(i + n - 1) % n], -1) + one(1488, ROUTE[(i + 1) % n], 1);
 }
+let palHinted = false;
+function palSignSVG(){
+  const y = SCENES.locks.walk[0] - 4;
+  return `<g class="palsign" transform="translate(1290 ${y})" tabindex="0" role="button" aria-label="단짝 자물쇠 친구 초대">
+    <rect x="-6" y="-112" width="12" height="112" rx="5" fill="#8A5A3B" stroke="#4A3530" stroke-width="3"/>
+    <rect x="-96" y="-190" width="192" height="82" rx="20" fill="#FFE3EA" stroke="#4A3530" stroke-width="4"/>
+    <text x="22" y="-156" text-anchor="middle" font-family="Jua, sans-serif" font-size="26" fill="#4A1F2C">단짝 자물쇠</text>
+    <text x="22" y="-124" text-anchor="middle" font-family="Jua, sans-serif" font-size="18" fill="#B0425E">친구 초대하기</text>
+    <g class="bob"><g transform="translate(-62 -150) scale(.95)"><path d="M-7 -2 L-7 -12 A7 7 0 0 1 7 -12 L7 -2" fill="none" stroke="#F1DC8E" stroke-width="3.5"/><path d="M0 20 C-23 5 -13 -14 0 -4 C13 -14 23 5 0 20Z" fill="#FF9DB8" stroke="#4A3530" stroke-width="2.4" stroke-linejoin="round"/><circle cx="0" cy="4" r="2.6" fill="#4A3530"/></g></g>
+  </g>`;
+}
 function setScene(s, fromHash, enter){
   if (!SCENES[s]) s = "sunrise";
   scene = s;
@@ -649,7 +670,10 @@ function setScene(s, fromHash, enter){
   sceneBtns.forEach(b => b.setAttribute("aria-pressed", b.dataset.scene === s));
   const S = SCENES[s];
   document.body.style.background = S.body;
-  bgG.innerHTML = BG[s]() + signSVG(s);
+  bgG.innerHTML = BG[s]() + signSVG(s) + (s === "locks" ? palSignSVG() : "");
+  bgG.querySelector(".palsign")?.addEventListener("click", e => { e.stopPropagation(); openPal(); });
+  bgG.querySelector(".palsign")?.addEventListener("keydown", e => { if (e.key === "Enter") openPal(); });
+  if (s === "locks" && profile && !palHinted){ palHinted = true; setTimeout(() => toast("분홍 표지판을 누르면 친구와 단짝 자물쇠를 잠글 수 있어요"), 900); }
   bgG.querySelectorAll(".sign").forEach(g => { const go = e => { e.stopPropagation(); const me = dogs.get("me"); if (!me) return; hidePop(); walkTo(me, +g.dataset.dir < 0 ? 60 : 1540, me.y); };
     g.addEventListener("click", go); g.addEventListener("keydown", e => { if (e.key === "Enter") go(e); }); });
   if (s === "sunrise") applyDawn(dawn);
@@ -1074,9 +1098,11 @@ function celebrate(){
 function renderStampBtn(){
   const n = Object.keys(prog.stamps).length, md = profile ? todays().filter(mDone).length : 0;
   $("stampTxt").textContent = `미션 ${md}/3 · 도장 ${n}`;
+  $("stampBtn").classList.toggle("nudge", !!profile && !store.get("mung.bookSeen"));
 }
 function openStamps(){
   rollDay();
+  if (!store.get("mung.bookSeen")){ store.set("mung.bookSeen", 1); $("stampBtn").classList.remove("nudge"); }
   const sh = $("sheet"); sh.dataset.mode = "stamps"; sh.hidden = false;
   const n = Object.keys(prog.stamps).length, d = new Date();
   $("sheetTitle").textContent = "산책 수첩";
@@ -1202,8 +1228,9 @@ function throwTreat(a, b, done){
   g.innerHTML = `<path d="M-13 0 L-6.5 -11 L6.5 -11 L13 0 L6.5 11 L-6.5 11Z" fill="#F2A93B" stroke="${OL}" stroke-width="2.5"/><path d="M-6 0 L6 0 M0 -6 L0 6" stroke="#C97C12" stroke-width="2"/>`;
   fxG.appendChild(g);
   const x0 = a.x + a.f*40, y0 = a.y - 110, x1 = b.x + b.f*34, y1 = b.y - 80, t0 = performance.now();
-  const step = now => { const k = Math.min(1, (now - t0)/650), x = lerp(x0, x1, k), y = lerp(y0, y1, k) - Math.sin(k*Math.PI)*90;
-    g.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(k*360).toFixed(0)})`);
+  const step = now => { const k = Math.min(1, (now - t0)/950), x = lerp(x0, x1, k), y = lerp(y0, y1, k) - Math.sin(k*Math.PI)*90;
+    const sc = k < .7 ? lerp(.9, 2.6, k / .7) : lerp(2.6, .25, (k - .7) / .3);
+    g.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(k*360).toFixed(0)}) scale(${sc.toFixed(2)})`);
     if (k < 1) requestAnimationFrame(step); else { g.remove(); done(); } };
   requestAnimationFrame(step);
 }
@@ -1682,6 +1709,7 @@ $("setupForm").addEventListener("submit", e => {
   toast(`${name}${hasBatchim(name) ? "이" : "가"} 동네에 도착했어요`);
   rollDay(); if (prog.done) setCrown(true);
   track("visit", scene); renderStampBtn();
+  if (!store.get("mung.bookSeen")) setTimeout(() => toast("위쪽 노란 '산책 수첩'에서 오늘의 미션을 확인해 보세요"), 4200);
   if (palHost && palHost !== myId) setTimeout(() => { if ($("setup").hidden) openPal(); }, 1300);
   else setTimeout(() => { const v = dogs.get("vet"); if (v && $("setup").hidden) say(v, `${name}, 어서 와요! 저를 누르면 건강 체크해 줄게요`, 3600); }, 1200);
 });
