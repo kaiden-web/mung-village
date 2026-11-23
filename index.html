@@ -131,6 +131,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .rec b{color:var(--ink)}
 
 .luckres{margin:12px 0 10px;padding:18px 16px;border-radius:18px;background:color-mix(in srgb,var(--lc) 16%,var(--card));border:2px solid color-mix(in srgb,var(--lc) 55%,transparent)}.luckres .cap{font-size:40px;width:68px;height:68px;margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,var(--lc) 50%,#fffdf8 50%);box-shadow:0 4px 12px rgba(0,0,0,.12)}.luckres b{font-size:19px;font-weight:800;display:block}.luckres p{margin:6px 0 0;color:var(--ink2);font-size:14.5px}
+.exres{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px 14px 8px;margin-bottom:12px}.exres .t{font-weight:800;font-size:17px}.exres>p{margin:4px 0 10px;color:var(--ink2);font-size:14px}.exbadge{position:absolute;top:12px;right:12px;font-size:12px;font-weight:700;color:#fff;background:#3b3043;border-radius:999px;padding:3px 9px}.exres .bar .lb{width:124px;flex:0 0 124px}.exres .bar .lb small{display:block;font-size:11px;font-weight:400;color:var(--ink2);margin-top:1px}.exget{list-style:none;padding:0;margin:0 0 12px;display:grid;gap:6px;font-size:14px}.exget li{background:var(--bg);border-radius:12px;padding:9px 12px}
+#rideCnt{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);z-index:40;pointer-events:none;text-align:center;color:#fff}#rideCnt:not(:empty){background:rgba(59,48,67,.78);border-radius:28px;padding:14px 26px 12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}#rideCnt b{display:block;font-size:96px;font-weight:900;line-height:1}#rideCnt small{font-size:18px;font-weight:800}#rideCnt.pop b{animation:cntPop .9s ease-out}@keyframes cntPop{0%{transform:scale(1.6);opacity:0}25%{opacity:1}100%{transform:scale(1);opacity:.9}}
 .intro{text-align:center;padding:26px 24px 24px}
 .intro .em{font-size:52px}
 .intro h2{font-weight:700;font-size:28px;margin:6px 0 6px}
@@ -329,7 +331,7 @@ const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false};
 const BOOTHS = [
   {id:"pick",   name:"설쌤 추천 마켓", icon:"🛍️", sub:"고민별로 골라 주는 놀로 상품", color:"#f28daa", light:"#fde3ea", pos:[-10.5, 1.5]},
-  {id:"assess", name:"우리 강아지 성향평가", icon:"🔍", sub:"설채현케어 미리보기", color:"#5fb8a0", light:"#dff3ec", pos:[10.5, 1.5]},
+  {id:"assess", name:"우리 강아지 성향평가", icon:"🔍", sub:"3분 테스트 · 예시 결과 보기", color:"#5fb8a0", light:"#dff3ec", pos:[10.5, 1.5]},
   {id:"knolloday", name:"놀로데이 특가", icon:"🎁", sub:"매월 22일 회원 혜택", color:"#c4512f", light:"#fbe3d4", pos:[-9.2, -7.6]},
   {id:"match",  name:"보호자 궁합 테스트", icon:"💞", sub:"나와 우리 강아지는 찰떡일까?", color:"#b48ae8", light:"#efe5fb", pos:[-9.2, -7.6]},
   {id:"quiz",   name:"댕냥상식 OX 퀴즈", icon:"💡", sub:"강아지 지식 체크", color:"#f2a84a", light:"#fdefd9", pos:[9.2, -7.6]},
@@ -944,7 +946,8 @@ function tickExtras(t,dt){
 SPOTS.carousel={door:new THREE.Vector3(0,0,4.3),act:()=>startRide()};
 SPOTS.vet={door:new THREE.Vector3(-1.8,0,9.3),act:()=>{me.rotation.y=Math.atan2(vet.position.x-me.position.x,vet.position.z-me.position.z);openBooth("consult");}};
 let ride=null;const _rv=new THREE.Vector3();
-function startRide(){if(ride)return;ride={t:0,cam:new THREE.Vector3(4.6,4.1,9.8),look:new THREE.Vector3(.3,1.7,0)};target=null;pathPts=[];openOnArrive=null;toast("🎠 회전목마 출발! 꽉 잡아요");}
+function startRide(){if(ride)return;ride={t:0,cam:new THREE.Vector3(4.6,4.1,9.8),look:new THREE.Vector3(.3,1.7,0)};target=null;pathPts=[];openOnArrive=null;toast("🎠 회전목마 출발! 잠시 뒤에 사진이 찍혀요");}
+function rideCount(n){let el=document.getElementById("rideCnt");if(!el){el=document.createElement("div");el.id="rideCnt";document.body.appendChild(el);}el.innerHTML=n>0?`<b>${n}</b><small>사진 찍어요! 📸</small>`:"";el.classList.remove("pop");void el.offsetWidth;if(n>0)el.classList.add("pop");}
 const batchim=s=>{const ch=String(s).trim().slice(-1).charCodeAt(0);return ch>=0xAC00&&ch<=0xD7A3&&(ch-0xAC00)%28!==0;};
 function memoryCard(){
   try{
@@ -969,8 +972,8 @@ function tickCarousel(t,dt){
   carousel.top.rotation.y+=dt*(ride?.85:.32);
   carousel.seats.forEach(s=>{s.seat.position.y=1.2+Math.sin(t*2.2+s.ph)*.32;});
   carousel.flag.rotation.y=t*1.2;carousel.lbl.position.y=8.6+Math.sin(t*2)*.12;
-  if(ride&&!ride.kind){ride.t+=dt;const s=carousel.seats[0];s.seat.getWorldPosition(_rv);me.position.set(_rv.x,_rv.y+.12,_rv.z);me.rotation.y=carousel.top.rotation.y+s.a+Math.PI;
-    if(ride.t>7&&_rv.z>1.25&&_rv.x>0&&_rv.x<1.9){ride=null;quest("ride");memoryCard();me.position.set(0,0,4.4);me.rotation.y=0;hearts();}}
+  if(ride&&!ride.kind){ride.t+=dt;{if(ride.cs==null&&ride.t>4){const rem=((.53-Math.atan2(_rv.x,_rv.z))%(Math.PI*2)+Math.PI*2)%(Math.PI*2);if((rem>1.5&&rem<2.9)||ride.t>14)ride.cs=ride.t;}if(ride.cs!=null){const c=Math.max(1,3-Math.floor(ride.t-ride.cs));if(c!==ride.c){ride.c=c;rideCount(c);}}}const s=carousel.seats[0];s.seat.getWorldPosition(_rv);me.position.set(_rv.x,_rv.y+.12,_rv.z);me.rotation.y=carousel.top.rotation.y+s.a+Math.PI;
+    if(ride.cs!=null&&ride.t-ride.cs>=3){ride=null;rideCount(0);if(typeof flash==="function")flash();quest("ride");memoryCard();me.position.set(0,0,4.4);me.rotation.y=0;hearts();}}
 }
 
 const VET_LINES=["어서 와요! 반가워요 🐾","저를 누르면 고민 상담해 드려요","회전목마에서 추억 남겨요 🎠","오늘도 즐겁게 산책해요"];
@@ -2063,23 +2066,25 @@ WALK.push({t:"c",x:RN.x,z:RN.z,r:RN.r-.5});
   const sp=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.62),TM({map:sg}));sp.position.set(0,2.2,7.3);g.add(sp);
   [-1.7,1.7].forEach(px=>g.add(mk(new THREE.CylinderGeometry(.1,.1,2.4,10),wood,px,1.2,7.3)));
   const lb=label("멍멍 운동장","🐕","#5fa86a",.95);lb.position.set(0,4.4,0);g.add(lb);
-  const runners=[];[[0,"#ffe0ea",1.3],[2.1,"#e3f1ff",1.05],[4.2,"#fff3c9",1.5],[1.1,"#dff6ec",.85]].forEach(([a0,coat,sp2],i)=>{const d=makeDog({coat,ear:"#d9b48f",scarf:["#f28daa","#ffd36b","#5fb8a0","#b48ae8"][i]},.8);scene.add(d);runners.push({d,a:a0,sp:sp2*.55,r:4.55+(i%2)*.5});});
+  const runners=[];[[0,"#ffe0ea",1.3],[2.1,"#e3f1ff",1.05],[4.2,"#fff3c9",1.5],[1.1,"#dff6ec",.85]].forEach(([a0,coat,sp2],i)=>{const d=makeDog({coat,ear:"#d9b48f",scarf:["#f28daa","#ffd36b","#5fb8a0","#b48ae8"][i]},.8);scene.add(d);runners.push({d,a:a0,sp:sp2*.2,r:4.55+(i%2)*.5});});
   const ball=mk(new THREE.SphereGeometry(.16,12,10),M("#d8f06a"),0,.3,0,false);scene.add(ball);
   tagClick(g,"runfield");
   obstacles.push({x:RN.x,z:RN.z,r:3.0});
   runField={g,runners,ball,lb};
   spot("runfield",RN.x,RN.z,6.4,()=>startZoomies());
 }
-function startZoomies(){if(ride)return;const c=new THREE.Vector3(RN.x,0,RN.z),out=new THREE.Vector3(-RN.x,0,-RN.z).normalize();
-  const a0=Math.atan2(me.position.x-RN.x,me.position.z-RN.z);
-  ride={t:0,kind:"run",a0,cam:c.clone().addScaledVector(out,9.5).add(new THREE.Vector3(0,12.5,0)),look:c.clone(),T:8};
-  target=null;pathPts=[];openOnArrive=null;toast("🐕 운동장 한 바퀴 전력 질주!");}
+function startZoomies(){if(ride)return;const c=new THREE.Vector3(RN.x,0,RN.z),out=new THREE.Vector3(-RN.x,0,-RN.z).normalize(),side=new THREE.Vector3(out.z,0,-out.x);
+  const from=SPOTS.runfield.door.clone(),to=c.clone().addScaledVector(out,1.2).addScaledVector(side,4.5);
+  ride={t:0,kind:"run",from,to,cam:c.clone().addScaledVector(out,12).add(new THREE.Vector3(0,8,0)),look:c.clone()};
+  runField.ball.visible=false;target=null;pathPts=[];openOnArrive=null;toast("🎾 공 던졌어요! 물어 와!");}
 function tickRunField(t,dt){if(!runField)return;
-  runField.runners.forEach((r,i)=>{r.a+=dt*r.sp;const x=RN.x+Math.sin(r.a)*r.r,z=RN.z+Math.cos(r.a)*r.r;r.d.position.set(x,Math.abs(Math.sin(t*9+i))*.12,z);r.d.rotation.y=Math.atan2(Math.cos(r.a),-Math.sin(r.a));if(i===0){runField.ball.position.set(RN.x+Math.sin(r.a+.25)*r.r,.2+Math.abs(Math.sin(t*5))*.6,RN.z+Math.cos(r.a+.25)*r.r);}});
+  runField.runners.forEach((r,i)=>{r.a+=dt*r.sp;const x=RN.x+Math.sin(r.a)*r.r,z=RN.z+Math.cos(r.a)*r.r;r.d.position.set(x,Math.abs(Math.sin(t*5+i))*.05,z);r.d.rotation.y=Math.atan2(Math.cos(r.a),-Math.sin(r.a));if(i===0){runField.ball.position.set(RN.x+Math.sin(r.a+.25)*r.r,.2+Math.abs(Math.sin(t*2.5))*.25,RN.z+Math.cos(r.a+.25)*r.r);}});
   runField.lb.position.y=4.4+Math.sin(t*2+2)*.12;
-  if(ride&&ride.kind==="run"){ride.t+=dt;const T=ride.t,a=ride.a0+Math.min(T/8,1)*Math.PI*2,R=4.8;
-    me.position.set(RN.x+Math.sin(a)*R,Math.abs(Math.sin(T*12))*.18,RN.z+Math.cos(a)*R);me.rotation.y=Math.atan2(Math.cos(a),-Math.sin(a));
-    if(T>8.1){ride=null;me.position.y=0;const d=SPOTS.runfield.door;me.position.set(d.x,0,d.z);me.rotation.y=Math.atan2(RN.x-d.x,RN.z-d.z);hearts();toast("🐕 한 바퀴 완주! 꼬리가 신났어요");}}
+  if(ride&&ride.kind==="run"){ride.t+=dt;const T=ride.t,f=ride.from,g2=ride.to;
+    const k=T<2.2?Math.min(1,T/2.2):T<2.8?1:Math.max(0,1-(T-2.8)/2.2),ease=k*k*(3-2*k);
+    me.position.set(f.x+(g2.x-f.x)*ease,0,f.z+(g2.z-f.z)*ease);
+    const dx=(T<2.5?1:-1)*(g2.x-f.x),dz=(T<2.5?1:-1)*(g2.z-f.z);me.rotation.y=Math.atan2(dx,dz);
+    if(T>5.1){ride=null;runField.ball.visible=true;me.position.set(f.x,0,f.z);me.rotation.y=Math.atan2(RN.x-f.x,RN.z-f.z);hearts();toast("🎾 공 물어 왔어요! 잘했어요");}}
 }
 /* ---------- 🍀 매일 행운 뽑기 (plaza) ---------- */
 // 운영 설정: 놀로스토어 '매일 쿠폰' 페이지 주소가 정해지면 url 만 바꾸면 돼요.
@@ -2372,20 +2377,13 @@ const AQ=[
   {k:"화장실",q:"정해진 곳에서 배변을 하나요?",o:["거의 잘 가려요","가끔 실수해요","자주 실수해요"]},
 ];
 function viewAssess(b){
-  const ans={};
-  openSheet(head(b,"설채현케어","우리 강아지 성향평가","설채현 수의사가 만든 성향평가의 5가지 영역을 가볍게 미리 살펴봐요.")+
-   `<div class="sh-body" id="ab">${AQ.map((q,i)=>`<div class="q"><div class="qt"><i>${i+1}</i>${q.q}</div><div class="opts">${q.o.map((o,j)=>`<button class="opt" data-q="${i}" data-v="${j}">${o}</button>`).join("")}</div></div>`).join("")}
-   <button class="btn2" id="aGo" disabled style="background:${b.color}">결과 미리보기</button></div>`);
-  sheet.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{const q=o.dataset.q;sheet.querySelectorAll(`.opt[data-q="${q}"]`).forEach(x=>x.classList.remove("on"));o.classList.add("on");ans[q]=+o.dataset.v;$("#aGo").disabled=Object.keys(ans).length<AQ.length;});
-  $("#aGo").onclick=()=>{
-    const lv=["편안","주의","살펴보기"],lvA=["보통","높음","아주 높음"],cols=["#5fb8a0","#f2a84a","#ef6a7a"];
-    const worst=AQ.map((q,i)=>({q,v:ans[i],i})).filter(x=>x.q.k!=="활동성").sort((a,b)=>b.v-a.v)[0];
-    const msg=worst.v===0?"전반적으로 편안한 편이에요. 정식 평가로 우리 강아지 유형을 알아보세요.":`<b>${worst.q.k}</b> 영역을 먼저 살펴보면 좋겠어요. 정식 평가에서 맞춤 트레이닝까지 안내받을 수 있어요.`;
-    $("#ab").innerHTML=`<div class="res" style="background:${b.light};color:#3b3043"><div class="t">${esc(dogName||"우리 강아지")} 성향 미리보기</div><p>${msg}</p></div>
-     ${AQ.map((q,i)=>{const v=ans[i];const act=q.k==="활동성";return `<div class="bar"><span class="lb">${q.k}</span><span class="tr2"><i style="width:0;background:${act?"#6aa8e6":cols[v]}" data-w="${30+v*35}%"></i></span><span class="lv" style="color:${act?"#6aa8e6":cols[v]}">${act?lvA[v]:lv[v]}</span></div>`}).join("")}
-     ${cta(K+"/care/assessment","설채현케어에서 정식 성향평가 하기")}<div class="note">간단 미리보기예요. 정식 평가는 더 많은 문항으로 우리 강아지 유형과 맞춤 케어를 알려 줘요.</div>`;
-    requestAnimationFrame(()=>requestAnimationFrame(()=>sheet.querySelectorAll(".tr2 i").forEach(i=>i.style.width=i.dataset.w)));
-  };
+  const EX=[["환경 불안도","낯선 소리·장소에서의 긴장",2,"보통"],["신체 민감도","만지기·손질에 대한 예민함",1,"낮음"],["자기 조절력","흥분했을 때 스스로 진정하는 힘",3,"높음"],["사회적 의존성","보호자와 떨어질 때의 마음",2,"보통"],["활동성","에너지와 움직임의 양",3,"높음"],["사회적 반응성","사람·강아지에게 보이는 반응",2,"보통"]];
+  openSheet(head(b,"설채현케어","우리 강아지 성향평가","3분 테스트로 알아보는 반려견의 진짜 성향. 결과는 이렇게 받아 볼 수 있어요.")+
+   `<div class="sh-body"><div class="exres"><span class="exbadge">예시 결과</span><div class="t">🐶 콩이 · 3살</div><p>낯선 곳에선 살짝 긴장하지만, 에너지가 넘치고 스스로 진정도 잘하는 아이예요.</p>
+     ${EX.map(([k,d,v,l])=>`<div class="bar"><span class="lb">${k}<small>${d}</small></span><span class="tr2"><i style="width:0;background:${b.color}" data-w="${v*30+5}%"></i></span><span class="lv" style="color:${b.color}">${l}</span></div>`).join("")}</div>
+   <ul class="exget"><li>📋 6가지 항목 질문에 답하기 · 약 3분</li><li>📊 항목별 등급과 진단</li><li>📝 우리 강아지 결과 리포트</li></ul>
+   ${cta(K+"/care/assessment/intro","3분 성향평가 시작하기")}<div class="note">위 결과는 이해를 돕기 위한 가상의 예시예요. 실제 결과는 놀로스토어에서 질문에 답하면 확인할 수 있어요.</div></div>`);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>sheet.querySelectorAll(".tr2 i").forEach(i=>i.style.width=i.dataset.w)));
 }
 
 /* --- 🎁 놀로데이 (놀로스토어 메인 프로모션) — 기간·혜택은 KD 에서만 고치면 돼요 --- */
