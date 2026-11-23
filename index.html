@@ -338,7 +338,7 @@ try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard V
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 // 보류 기능 스위치 (공개 버전은 build_fair.py 가 모두 false 로 바꿔요)
-const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false};
+const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false};
 const BOOTHS = [
   {id:"pick",   name:"설쌤 추천 마켓", icon:"🛍️", sub:"고민별로 골라 주는 놀로 상품", color:"#f28daa", light:"#fde3ea", pos:[-10.5, 1.5]},
   {id:"assess", name:"우리 강아지 성향평가", icon:"🔍", sub:"3분 테스트 · 예시 결과 보기", color:"#5fb8a0", light:"#dff3ec", pos:[10.5, 1.5]},
@@ -355,7 +355,12 @@ const byId = Object.fromEntries(BOOTHS.map(b=>[b.id,b]));
 const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const visited = new Set(store.get("knollo.fair.visited",[]));
 let coatIdx = store.get("knollo.fair.coat",0);
-let finishedShown = store.get("knollo.fair.done",false);
+let finishedShown = store.get("knollo.fair.done2",false);
+// 놀이기구 도장 (회전목마 · 바이킹 · 운동장)
+const RIDES=[{id:"ride",icon:"🎠",name:"회전목마"},{id:"vk",icon:"⛵",name:"바이킹"},{id:"run",icon:"🐕",name:"운동장"}];
+const rides=new Set(store.get("knollo.fair.rides",[]));
+const NS=NB+RIDES.length;
+const stampCount=()=>BOOTHS.filter(b=>visited.has(b.id)).length+RIDES.filter(r=>rides.has(r.id)).length;
 let dogName = store.get("knollo.fair.name","");
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
@@ -983,7 +988,7 @@ function tickCarousel(t,dt){
   carousel.seats.forEach(s=>{s.seat.position.y=1.2+Math.sin(t*2.2+s.ph)*.32;});
   carousel.flag.rotation.y=t*1.2;carousel.lbl.position.y=8.6+Math.sin(t*2)*.12;
   if(ride&&!ride.kind){ride.t+=dt;{if(ride.cs==null&&ride.t>4){const rem=((.53-Math.atan2(_rv.x,_rv.z))%(Math.PI*2)+Math.PI*2)%(Math.PI*2);if((rem>1.5&&rem<2.9)||ride.t>14)ride.cs=ride.t;}if(ride.cs!=null){const c=Math.max(1,3-Math.floor(ride.t-ride.cs));if(c!==ride.c){ride.c=c;rideCount(c);}}}const s=carousel.seats[0];s.seat.getWorldPosition(_rv);me.position.set(_rv.x,_rv.y+.12,_rv.z);me.rotation.y=carousel.top.rotation.y+s.a+Math.PI;
-    if(ride.cs!=null&&ride.t-ride.cs>=3){ride=null;rideCount(0);if(typeof flash==="function")flash();quest("ride");memoryCard();me.position.set(0,0,4.4);me.rotation.y=0;hearts();}}
+    if(ride.cs!=null&&ride.t-ride.cs>=3){ride=null;rideCount(0);if(typeof flash==="function")flash();quest("ride");memoryCard();rideStamp("ride");me.position.set(0,0,4.4);me.rotation.y=0;hearts();}}
 }
 
 const VET_LINES=["어서 와요! 반가워요 🐾","저를 누르면 고민 상담해 드려요","회전목마에서 추억 남겨요 🎠","오늘도 즐겁게 산책해요"];
@@ -2054,7 +2059,7 @@ function tickViking(t,dt){if(!viking)return;
   let amp=.28,ph=t*1.85;
   if(ride&&ride.kind==="vk"){ride.t+=dt;const T=ride.t;amp=T<4?.28+T/4*.8:T<8?1.08:Math.max(.12,1.08-(T-8)/3*.96);ph=ride.ph=(ride.ph||t*1.85)+dt*1.85;
     viking.ship.localToWorld(_vk.copy(viking.seat));me.position.copy(_vk);me.rotation.y=viking.g.rotation.y+Math.PI/2;me.position.y=_vk.y;
-    if(T>11.2){ride=null;const d=SPOTS.viking.door;me.position.set(d.x,0,d.z);me.rotation.y=Math.atan2(VK.x-d.x,VK.z-d.z);hearts();toast("⛵ 바이킹 완주! 바람이 시원했어요");}}
+    if(T>11.2){ride=null;const d=SPOTS.viking.door;me.position.set(d.x,0,d.z);me.rotation.y=Math.atan2(VK.x-d.x,VK.z-d.z);hearts();toast("⛵ 바이킹 완주! 바람이 시원했어요");rideStamp("vk");}}
   viking.sw.rotation.z=Math.sin(ph)*amp;viking.lb.position.y=8.8+Math.sin(t*2)*.12;
 }
 
@@ -2095,7 +2100,7 @@ function tickRunField(t,dt){if(!runField)return;
     const k=T<2.2?Math.min(1,T/2.2):T<2.8?1:Math.max(0,1-(T-2.8)/2.2),ease=k*k*(3-2*k);
     me.position.set(f.x+(g2.x-f.x)*ease,0,f.z+(g2.z-f.z)*ease);
     const dx=(T<2.5?1:-1)*(g2.x-f.x),dz=(T<2.5?1:-1)*(g2.z-f.z);me.rotation.y=Math.atan2(dx,dz);
-    if(T>5.1){ride=null;runField.ball.visible=true;me.position.set(f.x,0,f.z);me.rotation.y=Math.atan2(RN.x-f.x,RN.z-f.z);hearts();toast("🎾 공 물어 왔어요! 잘했어요");}}
+    if(T>5.1){ride=null;runField.ball.visible=true;me.position.set(f.x,0,f.z);me.rotation.y=Math.atan2(RN.x-f.x,RN.z-f.z);hearts();toast("🎾 공 물어 왔어요! 잘했어요");rideStamp("run");}}
 }
 /* ---------- 🍀 매일 행운 뽑기 (plaza) ---------- */
 // 운영 설정: 놀로스토어 '매일 쿠폰' 페이지 주소가 정해지면 url 만 바꾸면 돼요.
@@ -2169,7 +2174,7 @@ function todayQuests(){const pool=QPOOL.slice(),out=[];let h=hashF("quest"+qday(
 function qInit(){if(!QS||QS.day!==qday())QS={day:qday(),v:{},done:false,claimed:false};store.set("knollo.fair.quest",QS);}
 qInit();
 function quest(k,val){
-  qInit();const qs=todayQuests(),q=qs.find(x=>x.k===k);if(!q||QS.done)return;
+  if(!FEAT.missions)return;qInit();const qs=todayQuests(),q=qs.find(x=>x.k===k);if(!q||QS.done)return;
   if(q.n>1){const arr=Array.isArray(QS.v[k])?QS.v[k]:[];if(val&&!arr.includes(val))arr.push(val);QS.v[k]=arr;}else QS.v[k]=1;
   const prog=x=>x.n>1?(Array.isArray(QS.v[x.k])?QS.v[x.k].length:0):(QS.v[x.k]||0);
   if(prog(q)>=q.n)toast(`🏆 미션 완료! ${q.e} ${q.t}`);
@@ -2303,11 +2308,11 @@ function renderChips(){
   $("#chips").innerHTML=BOOTHS.map(b=>`<button class="chip${visited.has(b.id)?" v":""}" data-id="${b.id}"><span>${b.icon}</span>${b.house?"상담소":b.name.replace("놀로 ","").replace("우리 강아지 ","").replace("보호자 ","")}</button>`).join("")+`<button class="chip" data-id="carousel"><span>🎠</span>회전목마</button><button class="chip" data-id="viking"><span>⛵</span>바이킹</button><button class="chip" data-id="runfield"><span>🐕</span>운동장</button><button class="chip" data-id="lucky"><span>🍀</span>행운 뽑기</button>`;
   $("#chips").insertAdjacentHTML("beforeend",`${FEAT.playground?`<button class="chip${plays.size>=3?" v":""}" data-id="playground"><span>🎾</span>놀이터</button>`:""}<button class="chip" data-id="wall"><span>🤖</span>AI 포토월</button><button class="chip${SEASON.has("orn")?" v":""}" data-id="party"><span>🎄</span>파티</button>${FEAT.sunrise?`<button class="chip${SEASON.has("wish")?" v":""}" data-id="sunhill"><span>🌅</span>일출 언덕</button>`:""}${FEAT.courses?`<button class="chip${Object.keys(walks).length?" v":""}" data-id="courses"><span>🐾</span>산책 코스</button>`:""}<button class="chip${SEASON.has("cafe")?" v":""}" data-id="cafezone"><span>☕</span>멍카페</button>`);
   $("#chips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>walkTo(c.dataset.id));
-  const n=BOOTHS.filter(b=>visited.has(b.id)).length;$("#stampN").textContent=`${n}/${NB}`;$("#playN").textContent=`${plays.size}/3`;$("#playN").hidden=!FEAT.playground;$("#stampPill").classList.toggle("done",n>=NB&&(!FEAT.playground||plays.size>=3));
+  const n=stampCount();$("#stampN").textContent=`${n}/${NS}`;$("#playN").textContent=`${plays.size}/3`;$("#playN").hidden=!FEAT.playground;$("#stampPill").classList.toggle("done",n>=NS&&(!FEAT.playground||plays.size>=3));
 }
 renderChips();
 $("#stampPill").onclick=()=>showStamps();
-$("#questPill").onclick=()=>questSheet();renderQuestPill();
+$("#questPill").onclick=()=>questSheet();renderQuestPill();$("#questPill").hidden=!FEAT.missions;
 $("#xmasBtn").onclick=()=>{seasonOn=!seasonOn;store.set("knollo.fair.xmas",seasonOn);applySeason();toast(seasonOn?"🎄 크리스마스 모드! 눈이 내려요":"☀️ 낮으로 돌아왔어요");};$("#xmasBtn").classList.toggle("on",seasonOn);
 $("#fabShot").onclick=()=>takePhoto();
 $("#fabInv").onclick=()=>inviteSheet();
@@ -2329,8 +2334,17 @@ function stamp(id){
   hearts();quest("booth",id);
   if(visited.has(id))return;visited.add(id);store.set("knollo.fair.visited",[...visited]);renderChips();
   const b=byId[id];if(b.lbl)b.lbl.material.map=labelTex(b.name,b.icon,b.color,true);
-  toast(`${b.icon} ${b.house?"상담소":b.name} 도장 쾅! (${BOOTHS.filter(x=>visited.has(x.id)).length}/${NB})`);
-  if(BOOTHS.every(x=>visited.has(x.id))&&!finishedShown){finishedShown=true;store.set("knollo.fair.done",true);afterClose=()=>{showStamps(true);confetti();};}
+  toast(`${b.icon} ${b.house?"상담소":b.name} 도장 쾅! (${stampCount()}/${NS})`);
+  checkDone();
+}
+function rideStamp(k){
+  if(rides.has(k))return;rides.add(k);store.set("knollo.fair.rides",[...rides]);renderChips();
+  const r=RIDES.find(x=>x.id===k);setTimeout(()=>toast(`${r.icon} ${r.name} 도장 쾅! (${stampCount()}/${NS})`),2000);
+  checkDone();
+}
+function checkDone(){
+  if(stampCount()<NS||finishedShown)return;finishedShown=true;store.set("knollo.fair.done2",true);track("tour_complete",{});
+  const go=()=>{showStamps(true);confetti();};if(veil.hidden)setTimeout(go,2600);else afterClose=go;
 }
 const fx=[];
 const heartTex=tex(128,128,(x)=>{x.font="96px serif";x.textAlign="center";x.textBaseline="middle";x.fillText("💗",64,70);});
@@ -2543,14 +2557,16 @@ JSON만 출력: {"summary":"고민 한 줄 요약(50자 이내)","tries":["집�
 
 /* --- stamps / intro --- */
 function showStamps(finish){
-  const n=BOOTHS.filter(b=>visited.has(b.id)).length;
-  openSheet(`<div class="intro">${X}<div class="em">${finish?"🎉":"🎪"}</div><h2>${finish?"놀로랜드 완주!":"놀로랜드 도장판"}</h2>
-   <p>${finish?`부스 ${NB}곳을 모두 둘러봤어요. 놀로스토어에서 우리 강아지와 다음 이야기를 이어 가요.`:`부스에 들어가면 도장이 찍혀요. ${NB-n}곳 남았어요!`}</p>
+  const n=stampCount();
+  openSheet(`<div class="intro">${X}<div class="em">${finish?"🎉":"🎪"}</div><h2>${finish?"놀로랜드 도장 투어 완주!":"놀로랜드 도장 투어"}</h2>
+   <p>${finish?`부스 ${NB}곳과 놀이기구 ${RIDES.length}개를 모두 즐겼어요. 놀로스토어에서 오늘의 혜택도 확인해 보세요.`:`부스에 들어가거나 놀이기구를 타면 도장이 찍혀요. ${NS-n}개 남았어요!`}</p>
+   <div class="sec">🎪 부스 도장</div>
    <div class="stamps" style="grid-template-columns:repeat(${NB},1fr)">${BOOTHS.map(b=>`<div class="st${visited.has(b.id)?" on":""}" style="${visited.has(b.id)?`background:${b.light}`:""}">${visited.has(b.id)?b.icon:""}<small>${b.house?"상담소":b.name.split(" ").pop()}</small></div>`).join("")}</div>
+   <div class="sec">🎠 놀이기구 도장</div><div class="stamps three">${RIDES.map(r=>`<div class="st${rides.has(r.id)?" on":""}" style="${rides.has(r.id)?"background:#e2effc":""}">${rides.has(r.id)?r.icon:""}<small>${r.name}</small></div>`).join("")}</div>
    ${FEAT.playground?`<div class="sec">🎾 놀이 챌린지 ${plays.size}/3</div>`:""}<div class="stamps three"${FEAT.playground?"":" hidden"}>${Object.entries(ST).map(([k,v])=>`<div class="st${plays.has(k)?" on":""}" style="${plays.has(k)?"background:#e6f6ee":""}">${plays.has(k)?v.icon:""}<small>${v.name.split(" ")[0]}</small></div>`).join("")}</div>
    <div class="sec">🎄 시즌 도장</div><div class="stamps three">${[["orn","🎄","트리 장식",SEASON.has("orn"),1],["cafe","☕","멍카페",SEASON.has("cafe"),1],["wish","🌅","새해 소원",SEASON.has("wish"),FEAT.sunrise],["walk","🐾","산책 완주",Object.keys(walks).length>0,FEAT.courses]].filter(x=>x[4]).map(([k,e,n,on])=>`<div class="st${on?" on":""}" style="${on?"background:#fff1d6":""}">${on?e:""}<small>${n}</small></div>`).join("")}</div>
    <div style="height:18px"></div>
-   ${finish?cta(K,"놀로스토어 구경 가기"):`<button class="cta" data-close>계속 둘러보기</button>`}</div>`);
+   ${finish?cta(LUCKY.url,"🎟️ 놀로스토어 혜택 확인하기")+`<a class="cta ghost" href="${K}" target="_blank" rel="noopener">놀로스토어 구경 가기</a>`:`<button class="cta" data-close>계속 둘러보기</button>`}</div>`);
 }
 function confetti(){const cs=["#f28daa","#ffd36b","#5fb8a0","#6aa8e6","#b48ae8"];for(let i=0;i<70;i++){const d=document.createElement("i");d.className="cf";d.style.left=Math.random()*100+"%";d.style.background=cs[i%5];d.style.animationDelay=Math.random()*.8+"s";d.style.animationDuration=2+Math.random()*1.5+"s";$("#app").appendChild(d);setTimeout(()=>d.remove(),4200);}}
 function setName(n){dogName=n.trim().slice(0,10);store.set("knollo.fair.name",dogName);meLbl.material.map=labelTex(dogName||"우리 강아지","","#f28daa");}
@@ -2562,7 +2578,7 @@ function nameSheet(){
 }
 function intro(){
   openSheet(`<div class="intro">${X}<div class="em">🎪🐶</div><h2>놀로랜드에 오신 걸 환영해요</h2>
-   <p>우리 강아지와 광장을 걸으며 부스 ${NB}곳을 둘러보고,<br>회전목마와 멍카페에서 추억을 남겨요.</p>
+   <p>우리 강아지와 광장을 걸으며 부스 ${NB}곳과<br>회전목마 · 바이킹 · 운동장에서 도장 ${NS}개를 모아요.</p>
    <input id="nm" maxlength="10" placeholder="우리 강아지 이름 (예: 콩이)" value="${esc(dogName)}" style="width:100%;margin:14px 0 2px;padding:14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink);text-align:center">
    <div class="how"><div>👆 땅을 누르면 걸어가요</div><div>🎪 부스를 누르면 바로 들어가요</div>${FEAT.playground?"<div>🎾 놀이터에서 놀이 챌린지</div>":"<div>🎄 크리스마스 파티</div>"}<div>📸 사진 찍고 인스타 자랑</div></div>
    <button class="cta" id="inGo">입장하기</button></div>`);
