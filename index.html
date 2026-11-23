@@ -2622,15 +2622,20 @@ $("#load").remove();
 frame();
 if(!store.get("knollo.fair.seen",false)){intro();store.set("knollo.fair.seen",true);}
 
-/* ---------- 📈 GA4 이벤트 (공개 사이트에서만 gtag 가 있어요 · 이름 등 입력값은 보내지 않아요) ---------- */
-{const W=(fn,name,p)=>function(...a){track(name,typeof p==="function"?p(...a):p);return fn.apply(this,a);};
-openBooth=W(openBooth,"booth_open",id=>({booth:id}));
+/* ---------- 📈 GA4 이벤트 + 놀로스토어 링크 UTM (공개 사이트에서만 gtag 가 있어요 · 이름 등 입력값은 보내지 않아요) ---------- */
+let gaCtx="plaza";
+{const W=(fn,name,p,ctx)=>function(...a){const pp=typeof p==="function"?p(...a):p;if(ctx)gaCtx=typeof ctx==="function"?ctx(...a):ctx;track(name,pp);return fn.apply(this,a);};
+openBooth=W(openBooth,"booth_open",id=>({booth:id}),id=>"booth_"+id);
 startRide=W(startRide,"ride_start",{ride:"carousel"});startViking=W(startViking,"ride_start",{ride:"viking"});startZoomies=W(startZoomies,"ride_start",{ride:"fetch"});
-luckySheet=W(luckySheet,"lucky_open");memoryCard=W(memoryCard,"photo_card",{kind:"carousel"});takePhoto=W(takePhoto,"photo_take");inviteSheet=W(inviteSheet,"invite_open");
-truckSheet=W(truckSheet,"truck_open");cafeSheet=W(cafeSheet,"cafe_open");openAIStudio=W(openAIStudio,"ai_photowall_open");ornSheet=W(ornSheet,"ornament_open");spotsSheet=W(spotsSheet,"spots_open");
+luckySheet=W(luckySheet,"lucky_open",undefined,"lucky");memoryCard=W(memoryCard,"photo_card",{kind:"carousel"},"carousel");takePhoto=W(takePhoto,"photo_take",undefined,"photo");inviteSheet=W(inviteSheet,"invite_open",undefined,"invite");
+truckSheet=W(truckSheet,"truck_open",undefined,"truck");cafeSheet=W(cafeSheet,"cafe_open",undefined,"cafe");openAIStudio=W(openAIStudio,"ai_photowall_open",undefined,"photowall");ornSheet=W(ornSheet,"ornament_open",undefined,"party");spotsSheet=W(spotsSheet,"spots_open",undefined,"spots");
+const UTM={utm_source:"knolloland",utm_medium:"fair",utm_campaign:"knolloland"};
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("a[href],#inGo");if(!el)return;
   if(el.id==="inGo"){track("fair_enter");return;}
-  const h=el.getAttribute("href")||"";if(/knollo\.store/.test(h)||h.startsWith("/")){track("store_click",{link_url:h.split("?")[0].slice(0,120),link_text:(el.textContent||"").trim().slice(0,40)});}},true);
+  let u;try{u=new URL(el.getAttribute("href"),"https://www.knollo.store");}catch(x){return;}
+  if(!/(^|\.)knollo\.store$/.test(u.hostname)||u.hostname==="fair.knollo.store")return;
+  for(const k in UTM)u.searchParams.set(k,UTM[k]);u.searchParams.set("utm_content",gaCtx);el.href=u.toString();
+  track("store_click",{link_url:(u.origin+u.pathname).slice(0,120),link_text:(el.textContent||"").trim().slice(0,40),place:gaCtx});},true);
 }
 </script>
 
