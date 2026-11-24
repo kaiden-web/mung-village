@@ -363,7 +363,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 function track(n,p){try{if(typeof window.gtag==="function")window.gtag("event",n,p||{});}catch(e){}}
 const FF='"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
-try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 댕냥상식 퀴즈 멍카페 맛집 골목 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
 
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
@@ -401,7 +401,7 @@ const IS_TOUCH = matchMedia("(pointer:coarse)").matches;
 // 저사양 폰(메모리 4GB 이하 또는 코어 4개 이하)은 효과를 줄여 끊김·발열을 막아요
 // 저사양: 메모리 2GB 이하 또는 코어 2개 이하인 기기만 (보통 폰은 deviceMemory를 4로 알려 줘서 전엔 대부분이 저사양으로 잡혔어요)
 const LOW_END = IS_TOUCH && ((navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2));
-const PR_MAX = Math.min(devicePixelRatio || 1, LOW_END ? 1.5 : 2);
+const PR_MAX = Math.min(devicePixelRatio || 1, LOW_END ? 1.5 : IS_TOUCH ? 2.5 : 2);
 renderer.setPixelRatio(PR_MAX);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = LOW_END ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -450,7 +450,12 @@ const hcPT={};
 function hcPouch(f="chicken",s=1){const F=HC[f]||HC.chicken;if(!hcPT[f])hcPT[f]=tex(160,256,(x,W,H)=>{x.fillStyle=F.pouch;x.fillRect(0,0,W,H);x.fillStyle="rgba(255,255,255,.35)";x.fillRect(0,0,W,22);x.fillRect(0,H-18,W,18);
     x.save();x.translate(W/2+10,H/2);x.rotate(-Math.PI/2);x.fillStyle="#3b3043";x.font=`800 30px ${FF}`;x.textAlign="center";x.fillText("HONEY",0,-8);x.fillText("CHEW",0,26);x.restore();x.fillStyle="#3b3043";x.font=`800 22px ${FF}`;x.textAlign="center";x.fillText(F.n,W/2,H-30);});
   const g=new THREE.Group();g.add(mk(RB(.36*s,.62*s,.07*s,.03*s),M("#ffffff",{map:hcPT[f]}),0,0,0,false));return g;}
-function tex(w,h,draw){const cv=document.createElement("canvas");cv.width=w;cv.height=h;draw(cv.getContext("2d"),w,h);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
+// 글자 텍스처: 작은 간판·말풍선은 2배 해상도로 그리고, 한글 글꼴이 늦게 내려와도 다시 그려서 선명하게 맞춰요
+const TEXS=[];
+function paintTex(o){const x=o.cv.getContext("2d");x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,o.cv.width,o.cv.height);x.setTransform(o.S,0,0,o.S,0,0);o.draw(x,o.w,o.h);}
+function tex(w,h,draw){const S=(w<=720&&h<=420)?2:1;const cv=document.createElement("canvas");cv.width=w*S;cv.height=h*S;const o={cv,w,h,S,draw};paintTex(o);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;o.t=t;if(S>1)TEXS.push(o);return t;}
+{let rt=0;const redraw=()=>{clearTimeout(rt);rt=setTimeout(()=>{TEXS.forEach(o=>{try{paintTex(o);o.t.needsUpdate=true;}catch(e){}});},120);};
+ try{document.fonts.addEventListener("loadingdone",redraw);document.fonts.ready.then(redraw);setTimeout(redraw,3500);setTimeout(redraw,8000);}catch(e){}}
 function rr(x,X,Y,W,H,R){x.beginPath();x.moveTo(X+R,Y);x.arcTo(X+W,Y,X+W,Y+H,R);x.arcTo(X+W,Y+H,X,Y+H,R);x.arcTo(X,Y+H,X,Y,R);x.arcTo(X,Y,X+W,Y,R);x.closePath();}
 function labelTex(text,icon,color,done){
   const W=640,H=180;
