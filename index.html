@@ -256,6 +256,20 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 #gbar b{color:#ffd36b;font-weight:700}
 #gbar button{background:rgba(255,255,255,.16);color:inherit;border-radius:12px;padding:7px 12px;font-weight:700;font-size:14px;white-space:nowrap}
 .toast{top:132px;max-width:calc(100vw - 32px);white-space:normal;text-align:center}
+.radarw{position:relative;width:100%;max-width:330px;aspect-ratio:320/280;margin:10px auto 0}
+.radar{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.radar .rg{fill:none;stroke:var(--line);stroke-width:1.1}
+.radar .rg.o{fill:rgba(160,150,170,.07)}
+.radar .rk{font-size:12.5px;font-weight:600;fill:var(--ink2)}
+.rgrow{position:absolute;inset:0;transform:scale(.05);opacity:0;transition:transform 1s cubic-bezier(.2,1.25,.4,1),opacity .4s}
+.rgrow.on{transform:scale(1);opacity:1}
+.rfill{position:absolute;inset:0;opacity:.82}
+.exres.rep{text-align:center;padding-top:18px}
+.ravatar{width:64px;height:64px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;font-size:36px;background:#f6e7cf;border:2.5px solid var(--ink)}
+.rtype{font-size:14px;font-weight:700;color:var(--ink)}.rtype b{display:block;font-size:22px;font-weight:800;color:#3d8ef0;margin-top:4px}
+.rdesc{margin:12px 0 2px;padding:12px;border-radius:14px;background:rgba(71,144,238,.1);font-size:13.5px;line-height:1.6;color:var(--ink)}
+.rmind{margin:12px 0 4px;padding:16px;border-radius:18px;background:#fff7dc;color:#3b3043;text-align:center}
+.rmind .rh{font-weight:800;font-size:15px;text-align:left;margin-bottom:8px}.rmind p{margin:0;font-size:13.5px;line-height:1.7}.rmind .r2{margin-top:8px;font-weight:700}
 .cta.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
 .cta.ig{background:linear-gradient(90deg,#f58529,#dd2a7b,#8134af);color:#fff}
 .cta:disabled{opacity:.55}
@@ -2402,13 +2416,27 @@ const AQ=[
   {k:"화장실",q:"정해진 곳에서 배변을 하나요?",o:["거의 잘 가려요","가끔 실수해요","자주 실수해요"]},
 ];
 function viewAssess(b){
-  const EX=[["환경 불안도","낯선 소리·장소에서의 긴장",2,"보통"],["신체 민감도","만지기·손질에 대한 예민함",1,"낮음"],["자기 조절력","흥분했을 때 스스로 진정하는 힘",3,"높음"],["사회적 의존성","보호자와 떨어질 때의 마음",2,"보통"],["활동성","에너지와 움직임의 양",3,"높음"],["사회적 반응성","사람·강아지에게 보이는 반응",2,"보통"]];
+  // 실제 설채현케어 리포트와 같은 축 순서(위에서 시계 방향) · 점수(0~100)는 가상의 예시예요
+  const EX=[["사회적 반응성",70,"#ef5d2e"],["신체 민감도",48,"#f2832f"],["자기 조절력",78,"#f5a524"],["사회적 의존성",58,"#f7b81c"],["활동성",86,"#4790ee"],["환경 불안도",52,"#4790ee"]];
+  const W=320,H=280,cx=160,cy=140,R=92,pt=(i,r)=>{const a=-Math.PI/2+i*Math.PI/3;return [cx+Math.cos(a)*r,cy+Math.sin(a)*r];};
+  const ring=f=>EX.map((_,i)=>pt(i,R*f).map(v=>v.toFixed(1)).join(",")).join(" ");
+  const vp=EX.map(([,v],i)=>pt(i,R*v/100));
+  const clip=vp.map(([x,y])=>`${(x/W*100).toFixed(2)}% ${(y/H*100).toFixed(2)}%`).join(",");
+  const lab=EX.map(([k],i)=>{const [x,y]=pt(i,R+16),anc=Math.abs(x-cx)<4?"middle":x>cx?"start":"end";return `<text x="${x.toFixed(1)}" y="${(y+(i===0?-4:i===3?12:4)).toFixed(1)}" text-anchor="${anc}" class="rk">${k}</text>`;}).join("");
+  const fill=`conic-gradient(from 0deg at ${(cx/W*100).toFixed(2)}% ${(cy/H*100).toFixed(2)}%,${EX.map(([,,c],i)=>`${c} ${i*60}deg`).join(",")},${EX[0][2]} 360deg)`;
+  const radar=`<div class="radarw" role="img" aria-label="성향평가 예시 육각형 그래프">
+    <svg class="radar" viewBox="0 0 ${W} ${H}">${[1,.75,.5,.25].map(f=>`<polygon points="${ring(f)}" class="rg${f===1?" o":""}"/>`).join("")}${EX.map((_,i)=>{const [x,y]=pt(i,R);return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="rg"/>`;}).join("")}${lab}</svg>
+    <div class="rgrow" style="transform-origin:${(cx/W*100).toFixed(2)}% ${(cy/H*100).toFixed(2)}%"><div class="rfill" style="background:${fill};clip-path:polygon(${clip})"></div>
+    <svg class="radar" viewBox="0 0 ${W} ${H}">${vp.map(([x,y],i)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${EX[i][2]}"/>`).join("")}</svg></div></div>`;
   openSheet(head(b,"설채현케어","우리 강아지 성향평가","3분 테스트로 알아보는 반려견의 진짜 성향. 결과는 이렇게 받아 볼 수 있어요.")+
-   `<div class="sh-body"><div class="exres"><span class="exbadge">예시 결과</span><div class="t">🐶 콩이 · 3살</div><p>낯선 곳에선 살짝 긴장하지만, 에너지가 넘치고 스스로 진정도 잘하는 아이예요.</p>
-     ${EX.map(([k,d,v,l])=>`<div class="bar"><span class="lb">${k}<small>${d}</small></span><span class="tr2"><i style="width:0;background:${b.color}" data-w="${v*30+5}%"></i></span><span class="lv" style="color:${b.color}">${l}</span></div>`).join("")}</div>
-   <ul class="exget"><li>📋 6가지 항목 질문에 답하기 · 약 3분</li><li>📊 항목별 등급과 진단</li><li>📝 우리 강아지 결과 리포트</li></ul>
+   `<div class="sh-body"><div class="exres rep"><span class="exbadge">예시 결과</span><div class="ravatar">🐶</div>
+     <div class="rtype">콩이의 유형은<b>감성 풍부한 모험가</b></div>
+     <div class="rdesc">새로운 곳이 궁금해 앞장서 걷지만,<br>보호자 곁에선 금세 마음이 편안해지는 아이예요.</div>
+     ${radar}</div>
+   <div class="rmind"><div class="rh">콩이의 마음</div><p>내가 산책할 때 자꾸 앞서가는 건,<br>세상이 너무 궁금해서야.<br>그래도 뒤돌아보면 네가 있어서 든든해!</p><p class="r2">이제 설쌤이 내 마음을 자세히 해석해준댕!</p></div>
+   <ul class="exget"><li>📋 6가지 축 질문에 답하기 · 약 3분</li><li>🧩 우리 강아지만의 성향 유형</li><li>💬 아이의 목소리로 듣는 행동의 이유</li></ul>
    ${cta(K+"/care/assessment/intro","3분 성향평가 시작하기")}<div class="note">위 결과는 이해를 돕기 위한 가상의 예시예요. 실제 결과는 놀로스토어에서 질문에 답하면 확인할 수 있어요.</div></div>`);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>sheet.querySelectorAll(".tr2 i").forEach(i=>i.style.width=i.dataset.w)));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const g=sheet.querySelector(".rgrow");if(g)g.classList.add("on");}));
 }
 
 /* --- 🎁 놀로데이 (놀로스토어 메인 프로모션) — 기간·혜택은 KD 에서만 고치면 돼요 --- */
