@@ -190,6 +190,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 
 .duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}.duo>div{border-radius:16px;padding:12px;background:var(--bg);text-align:center}.duo span{font-size:30px;display:block}.duo b{font-weight:700;font-size:16px;display:block;margin-top:4px}.duo small{font-size:12px;color:var(--ink2)}
 .tip+.tip{margin-top:8px}
+.recpg.go{text-decoration:none;color:inherit;border-style:solid;cursor:pointer}.recpg.go em{margin-left:auto;font-style:normal;font-size:13px;font-weight:800;color:#2f8f74;white-space:nowrap}
 .recpg{display:flex;align-items:center;gap:10px;margin-top:10px;border:1.5px dashed #9fdcc2;border-radius:16px;padding:10px 12px}.recpg>span{font-size:26px}.recpg small{display:block;font-size:12px;color:var(--ink2)}.recpg b{font-weight:700;font-size:16px}
 .progs{display:flex;flex-direction:column;gap:8px}.prog2{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;text-decoration:none;color:inherit}.prog2>span{font-size:24px}.prog2 b{font-weight:700;font-size:15.5px;display:block}.prog2 small{font-size:12px;color:var(--ink2);line-height:1.4}
 .memo{margin-top:12px;background:#fff7e6;border-radius:16px;padding:14px;color:#3b3043}.memo b{font-weight:700;font-size:15.5px;display:block;margin-top:4px}.memo p{margin:4px 0 8px;line-height:1.55}.memo ul{margin:4px 0 6px;padding-left:18px;line-height:1.6}.vetnote{font-size:13.5px;color:#5a4a6a}
@@ -316,6 +317,14 @@ body:has(#veil:not([hidden])) .toast{top:calc(10px + env(safe-area-inset-top));z
 #tophint{position:absolute;right:10px;top:calc(62px + env(safe-area-inset-top));max-width:250px;background:#3b3043;color:#fff;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.55;box-shadow:var(--shadow);z-index:6;pointer-events:none;opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s}
 #tophint.on{opacity:1;transform:none}#tophint::before{content:"";position:absolute;top:-6px;right:22px;border:6px solid transparent;border-top:0;border-bottom-color:#3b3043}
 #tophint b{font-weight:800}
+#guide{position:absolute;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,12px);width:min(360px,calc(100vw - 24px));background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:16px 14px 10px;z-index:7;opacity:0;transition:opacity .3s,transform .3s}
+#guide.on{opacity:1;transform:translate(-50%,0)}
+#guide .gh b{display:block;font-size:18px;font-weight:800;color:#3b3043}#guide .gh small{display:block;font-size:13px;color:var(--ink2);margin-top:2px}
+#guide .gl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+#guide .gl button{display:flex;align-items:center;gap:8px;text-align:left;border:0;background:#fff7ee;border-radius:14px;padding:10px;min-height:58px;font:inherit;cursor:pointer}
+#guide .gl span{font-size:22px}#guide .gl b{display:block;font-size:14px;font-weight:800;color:#3b3043;line-height:1.25}#guide .gl small{display:block;font-size:12px;color:var(--ink2);line-height:1.3;margin-top:2px}
+#guide .gx{display:block;width:100%;border:0;background:none;color:var(--ink2);font:inherit;font-size:13px;padding:10px 0 4px;cursor:pointer}
+.mreal{display:flex;align-items:center;gap:10px;background:#fff7ee;border-radius:14px;padding:10px 12px;margin:12px 0 4px;text-align:left}.mreal span{font-size:24px}.mreal small{display:block;font-size:12px;color:var(--ink2)}.mreal b{display:block;font-size:15px;font-weight:800;color:#3b3043}
 @media (max-width:640px){.tr .pill{min-height:40px;min-width:40px;justify-content:center}#fabs .fab{width:54px;height:54px;font-size:19px;gap:2px}.fab span{display:block;font-size:12px}}
 @media (max-width:420px){.tr .pill{padding:6px 10px}.tr .pill .n{font-size:12px}#coatBtn::before{font-size:17px}}
 </style>
@@ -359,11 +368,11 @@ try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard V
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 // 보류 기능 스위치 (공개 버전은 build_fair.py 가 모두 false 로 바꿔요)
-const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false,stamps:false};
+const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false,stamps:false,invite:false};
 const BOOTHS = [
   {id:"pick",   name:"설쌤 추천 마켓", icon:"🛍️", sub:"고민별로 골라 주는 놀로 상품", color:"#f28daa", light:"#fde3ea", pos:[-10.5, 1.5]},
-  {id:"assess", name:"우리 강아지 성향평가", icon:"🔍", sub:"3분 테스트 · 예시 결과 보기", color:"#5fb8a0", light:"#dff3ec", pos:[10.5, 1.5]},
   {id:"knolloday", name:"놀로데이 특가", icon:"🎁", sub:"매월 22일 회원 혜택", color:"#c4512f", light:"#fbe3d4", pos:[-9.2, -7.6]},
+  {id:"assess", name:"우리 강아지 성향평가", icon:"🔍", sub:"3분 테스트 · 예시 결과 보기", color:"#5fb8a0", light:"#dff3ec", pos:[10.5, 1.5]},
   {id:"match",  name:"보호자 궁합 테스트", icon:"💞", sub:"나와 우리 강아지는 찰떡일까?", color:"#b48ae8", light:"#efe5fb", pos:[-9.2, -7.6]},
   {id:"quiz",   name:"댕냥상식 OX 퀴즈", icon:"💡", sub:"강아지 지식 체크", color:"#f2a84a", light:"#fdefd9", pos:[9.2, -7.6]},
   {id:"consult",name:"설채현 교육상담소", icon:"🩺", sub:"수의사 + 전문 트레이너 상담", color:"#6aa8e6", light:"#e2effc", pos:[0, -12.8], house:true},
@@ -391,7 +400,7 @@ const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
 const IS_TOUCH = matchMedia("(pointer:coarse)").matches;
 // 저사양 폰(메모리 4GB 이하 또는 코어 4개 이하)은 효과를 줄여 끊김·발열을 막아요
 const LOW_END = IS_TOUCH && ((navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4));
-const PR_MAX = Math.min(devicePixelRatio || 1, LOW_END ? 1.25 : IS_TOUCH ? 1.5 : 2);
+const PR_MAX = Math.min(devicePixelRatio || 1, LOW_END ? 1.5 : 2);
 renderer.setPixelRatio(PR_MAX);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = LOW_END ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -440,7 +449,7 @@ const hcPT={};
 function hcPouch(f="chicken",s=1){const F=HC[f]||HC.chicken;if(!hcPT[f])hcPT[f]=tex(160,256,(x,W,H)=>{x.fillStyle=F.pouch;x.fillRect(0,0,W,H);x.fillStyle="rgba(255,255,255,.35)";x.fillRect(0,0,W,22);x.fillRect(0,H-18,W,18);
     x.save();x.translate(W/2+10,H/2);x.rotate(-Math.PI/2);x.fillStyle="#3b3043";x.font=`800 30px ${FF}`;x.textAlign="center";x.fillText("HONEY",0,-8);x.fillText("CHEW",0,26);x.restore();x.fillStyle="#3b3043";x.font=`800 22px ${FF}`;x.textAlign="center";x.fillText(F.n,W/2,H-30);});
   const g=new THREE.Group();g.add(mk(RB(.36*s,.62*s,.07*s,.03*s),M("#ffffff",{map:hcPT[f]}),0,0,0,false));return g;}
-function tex(w,h,draw){const cv=document.createElement("canvas");cv.width=w;cv.height=h;draw(cv.getContext("2d"),w,h);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;}
+function tex(w,h,draw){const cv=document.createElement("canvas");cv.width=w;cv.height=h;draw(cv.getContext("2d"),w,h);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
 function rr(x,X,Y,W,H,R){x.beginPath();x.moveTo(X+R,Y);x.arcTo(X+W,Y,X+W,Y+H,R);x.arcTo(X+W,Y+H,X,Y+H,R);x.arcTo(X,Y+H,X,Y,R);x.arcTo(X,Y,X+W,Y,R);x.closePath();}
 function labelTex(text,icon,color,done){
   const W=640,H=180;
@@ -457,7 +466,7 @@ function labelTex(text,icon,color,done){
 function label(text, icon, color, scale=1, done=false){
   const t=labelTex(text,icon,color,done);
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false,toneMapped:false}));
-  sp.scale.set(4.4*scale,1.24*scale,1);sp.renderOrder=5;return sp;
+  const ls=(IS_TOUCH&&innerWidth<innerHeight)?1.18:1;sp.scale.set(4.4*scale*ls,1.24*scale*ls,1);sp.renderOrder=5;return sp;
 }
 const rand=(a,b)=>a+Math.random()*(b-a);
 
@@ -1980,11 +1989,11 @@ function sqMenuHTML(){const li=a=>a.map(([n,d,p])=>`<li><div>${n}${d?`<br><span>
   <p class="tip">가격은 네이버 플레이스 기준이에요. 전체 메뉴와 영업시간은 플레이스에서 확인해 주세요. 놀로스퀘어 이용 시 주차 할인이 있어요.</p>
   <a class="cta ghost" href="${SQ_CAFE.map}" target="_blank" rel="noopener">🗺️ 네이버 지도에서 보기 · 예약</a></div>`;}
 const MENU=[
-  {k:"puccino",e:"☕",n:"멍푸치노",d:"놀로 산양유로 만든 부드러운 우유 거품 한 잔",col:"#fff6ea",url:"/collection/pick",b:"놀로 산양유 보러 가기"},
-  {k:"turkey",e:"🦃",n:"터키츄 스테이크",d:"칠면조 힘줄을 오래오래 씹는 든든한 한 접시",col:"#f2c08a",url:"/product/YEYRJTCQWJ6M",b:"터키츄 보러 가기"},
-  {k:"hanwoo",e:"🐄",n:"한우뽈살 스틱",d:"한우 뽈살로 만든 쫄깃한 수제 스틱",col:"#c98a6a",url:"/collection/pick",b:"놀로 수제 간식 보러 가기"},
-  {k:"cookie",e:"🍪",n:"밀크세라 쿠키",d:"피부 영양을 생각한 이지트릿 쿠키",col:"#ffe3b8",url:"/collection/pick",b:"밀크세라 이지트릿 보러 가기"},
-  {k:"honey",e:"🍯",n:"허니콤츄 디저트",d:"양치 습관까지 챙기는 달콤한 마무리",col:"#f6b93b",url:"/product/4PUYY7K8BTF9",b:"허니콤츄 보러 가기"}
+  {k:"baro",e:"🍖",n:"바로트릿 한 접시",d:"치킨·소고기·황태, 칭찬할 때 바로 주는 한 입 트릿",col:"#f7d9b0",url:"/product/2FV7R4HURSN5",p:"놀로 바로트릿 3종",b:"바로트릿 보러 가기"},
+  {k:"turkey",e:"🦃",n:"터키츄 스테이크",d:"칠면조 힘줄을 오래오래 씹는 든든한 한 접시",col:"#f2c08a",url:"/product/YEYRJTCQWJ6M",p:"놀로 터키츄 칠면조 힘줄 스틱",b:"터키츄 보러 가기"},
+  {k:"hanwoo",e:"🐄",n:"한우스틱",d:"한우로 만든 쫄깃한 스틱, 즐겅즐겅 씹어요",col:"#c98a6a",url:"/product/8CKWZ5VUYNWV",p:"놀로 즐겅즐겅 한우스틱",b:"한우스틱 보러 가기"},
+  {k:"cookie",e:"🍪",n:"밀크세라 쿠키",d:"피부 영양을 생각한 이지트릿 쿠키",col:"#ffe3b8",url:"/product/JXABC32QM2K5",p:"바이레프 밀크세라 이지트릿",b:"밀크세라 이지트릿 보러 가기"},
+  {k:"honey",e:"🍯",n:"허니콤츄 디저트",d:"양치 습관까지 챙기는 달콤한 마무리",col:"#f6b93b",url:"/product/4PUYY7K8BTF9",p:"바이레프 허니콤츄",b:"허니콤츄 보러 가기"}
 ];
 let meal=null;
 function cafeSheet(){
@@ -2013,6 +2022,7 @@ function tickCafe(t,dt){
   if(meal.t>.6&&meal.t-dt<=.6)hearts();
   if(meal.t>2.4){const {dish,m}=meal;meal=null;me.userData.head.rotation.x=0;scene.remove(dish);hearts();quest("cafe");seasonStamp("cafe",`${m.e} 냠냠! 맛집 도장 쾅`);
     openSheet(`<div class="intro">${X}<div class="em">${m.e}</div><h2>${esc(m.n)} 맛있게 먹었어요!</h2><p>${esc(dname())}${batchim(dname())?"이":""}의 오늘 맛집 후기: “또 먹고 싶어요 🐾”</p>
+      <div class="mreal"><span>${m.e}</span><div><small>방금 먹은 메뉴는 진짜 놀로 간식이에요</small><b>${esc(m.p)}</b></div></div>
       ${cta(K+m.url,m.b)}<div class="btns"><button class="cta ghost" id="mShot">📸 인증 사진</button><button class="cta ghost" id="mMore">☕ 다른 메뉴</button></div></div>`);
     $("#mShot").onclick=()=>{closeSheet();setTimeout(takePhoto,250);};$("#mMore").onclick=()=>cafeSheet();}
 }
@@ -2289,9 +2299,12 @@ function step(dt){
   if(moving){
     mv.normalize();
     const prev=me.position.clone();
-    me.position.addScaledVector(mv,SPEED*dt);resolve(me.position);
+    // 멀리 가는 길(멍카페·바이킹 등)은 달려가요: 남은 거리가 길수록 빠르게, 가까워지면 원래 속도
+    const far=(target&&!keys.size)?Math.hypot(target.x-me.position.x,target.z-me.position.z):0;
+    const SP=SPEED*(far>7?Math.min(2.8,1+(far-7)*.18):1);
+    me.position.addScaledVector(mv,SP*dt);resolve(me.position);
     const moved=me.position.distanceTo(prev);
-    if(target&&moved<SPEED*dt*.15){stuck+=dt;if(stuck>.6&&!repathed){repathed=true;pathPts=findPath(me.position,target)||[];stuck=0;}else if(stuck>1.2){target=null;pathPts=[];stuck=0;if(openOnArrive){const id=openOnArrive;openOnArrive=null;arrive(id);}}}else stuck=0;
+    if(target&&moved<SP*dt*.15){stuck+=dt;if(stuck>.6&&!repathed){repathed=true;pathPts=findPath(me.position,target)||[];stuck=0;}else if(stuck>1.2){target=null;pathPts=[];stuck=0;if(openOnArrive){const id=openOnArrive;openOnArrive=null;arrive(id);}}}else stuck=0;
     const ang=Math.atan2(mv.x,mv.z);
     let dA=ang-me.rotation.y;dA=Math.atan2(Math.sin(dA),Math.cos(dA));me.rotation.y+=dA*Math.min(1,dt*12);
   }
@@ -2339,7 +2352,7 @@ $("#stampPill").onclick=()=>showStamps();if(!FEAT.stamps)$("#stampPill").style.d
 $("#questPill").onclick=()=>questSheet();renderQuestPill();$("#questPill").hidden=!FEAT.missions;
 $("#xmasBtn").onclick=()=>{seasonOn=!seasonOn;store.set("knollo.fair.xmas",seasonOn);applySeason();toast(seasonOn?"🎄 크리스마스 모드! 눈이 내려요":"☀️ 낮으로 돌아왔어요");};$("#xmasBtn").classList.toggle("on",seasonOn);
 $("#fabShot").onclick=()=>takePhoto();
-$("#fabInv").onclick=()=>inviteSheet();
+$("#fabInv").onclick=()=>inviteSheet();if(!FEAT.invite)$("#fabInv").style.display="none";
 $("#coatBtn").onclick=()=>{coatIdx=(coatIdx+1)%COATS.length;recolor(me,COATS[coatIdx]);store.set("knollo.fair.coat",coatIdx);$("#coatBtn").textContent="🐶 "+COATS[coatIdx].name;};
 $("#coatBtn").textContent="🐶 "+COATS[coatIdx%COATS.length].name;
 let nearId=null;
@@ -2561,9 +2574,6 @@ function viewConsult(b){
     <div class="duo"><div><span>🩺</span><b>설채현 수의사</b><small>마음과 몸을 함께 보는 행동 진료</small></div><div><span>🏋️</span><b>놀로 전문 트레이너</b><small>집에서 바로 하는 맞춤 교육</small></div></div>
     <div class="sec">어떤 고민이 있나요?</div>
     <div class="worry">${WORRIES.map(w=>`<button data-k="${w.k}"><span>${w.e}</span>${w.t}</button>`).join("")}</div><div id="tipBox"></div>
-    <div class="sec">✍️ 우리 아이 고민 직접 적기</div>
-    <textarea id="cqT" maxlength="160" placeholder="예: 3살 말티즈예요. 산책 나가면 다른 강아지를 보고 계속 짖어요."></textarea>
-    <button class="cta" id="cqGo">📝 상담 전에 미리 정리해 보기</button><div id="cqOut"></div>
     <div class="sec">놀로 교육 프로그램</div>
     <div class="progs">${PROGRAMS.map(p=>`<a class="prog2" href="${K}/care" target="_blank" rel="noopener"><span>${p.e}</span><div><b>${p.n}</b><small>${p.w} · ${p.d}</small></div></a>`).join("")}</div>
     ${cta(K+"/care","놀로에서 상담·교육 예약하기")}<div class="note">청담 놀로 트레이너 교육 문의 1644-8590 (내선 3) · 부산 수의사 행동진료도 예약할 수 있어요.</div></div>`);
@@ -2572,10 +2582,10 @@ function viewConsult(b){
     const w=WORRIES.find(x=>x.k===btn.dataset.k),pg=PROGRAMS.find(p=>p.k===REC_OF[w.k]);
     $("#tipBox").innerHTML=`<div class="tip" style="background:#e2effc;color:#3b3043"><div class="av">🩺</div><div><b>설채현 수의사 한마디</b><p>${w.tip}</p></div></div>
       <div class="tip" style="background:#e6f6ee;color:#3b3043"><div class="av">🏋️</div><div><b>전문 트레이너 한마디</b><p>${TRAINER_TIP[w.k]}</p></div></div>
-      <div class="recpg"><span>${pg.e}</span><div><small>이런 교육이 잘 맞아요</small><b>${pg.n}</b></div></div>`;
+      <a class="recpg go" href="${K}/care" target="_blank" rel="noopener"><span>${pg.e}</span><div><small>이런 교육이 잘 맞아요</small><b>${pg.n}</b></div><em>교육 보러 가기 →</em></a>`;
     $("#tipBox").scrollIntoView({behavior:"smooth",block:"nearest"});
   });
-  $("#cqGo").onclick=async()=>{
+  if($("#cqGo"))$("#cqGo").onclick=async()=>{
     const t=$("#cqT").value.trim(),out=$("#cqOut"),btn=$("#cqGo");if(t.length<5){toast("고민을 조금 더 적어 주세요");return;}
     const kw=(/짖/.test(t)?"bark":/혼자|분리|외출|낑낑/.test(t)?"alone":/당기|산책|끌/.test(t)?"pull":/물|입질|공격|으르렁/.test(t)?"bite":/배변|오줌|쉬|똥|실수/.test(t)?"potty":/아기|퍼피|개월/.test(t)?"puppy":"bark");
     const show=r=>{const pg=PROGRAMS.find(p=>p.k===r.program)||PROGRAMS.find(p=>p.k===REC_OF[kw]);
@@ -2706,7 +2716,15 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   const h=document.createElement("div");h.id="tophint";h.innerHTML="<b>🎄</b> 크리스마스 모드 켜고 끄기<br><b>🐶</b> 누를 때마다 우리 강아지 털색이 바뀌어요"+(FEAT.stamps?"<br><b>도장</b> 부스와 놀이기구 도장판 보기":"");
   document.getElementById("app").appendChild(h);requestAnimationFrame(()=>h.classList.add("on"));
   const off=()=>{h.classList.remove("on");setTimeout(()=>h.remove(),350);};setTimeout(off,5200);document.addEventListener("pointerdown",off,{once:true,capture:true});};
- document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#inGo"))setTimeout(showHint,1400);},true);}
+ /* 들어오자마자 '어디부터 갈지' 골라 주는 안내 카드 (입장할 때마다) */
+ const GUIDE=[["pick","🛍️","설쌤 추천 마켓","고민을 고르면 상품을 골라 줘요"],["knolloday","🎁","놀로데이 특가","놀로 회원 쿠폰 · 인기 특가"],["assess","🔍","우리 강아지 성향평가","설쌤과 6가지 성향 미리 보기"],["carousel","🎠","회전목마 타기","한 바퀴 돌고 사진도 찰칵"]];
+ const showGuide=()=>{if(document.getElementById("guide"))return;const g=document.createElement("div");g.id="guide";
+  g.innerHTML=`<div class="gh"><b>어디부터 가볼까요? 🐾</b><small>누르면 ${esc(dname())}${batchim(dname())?"이":""}랑 같이 걸어가요</small></div><div class="gl">${GUIDE.filter(x=>document.querySelector(`#chips [data-id="${x[0]}"]`)).map(([id,e,t,d])=>`<button data-g="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div></button>`).join("")}</div><button class="gx">천천히 둘러볼게요</button>`;
+  document.getElementById("app").appendChild(g);requestAnimationFrame(()=>g.classList.add("on"));
+  const off=()=>{g.classList.remove("on");setTimeout(()=>g.remove(),300);};
+  g.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{off();track("guide_pick",{booth:b.dataset.g});document.querySelector(`#chips [data-id="${b.dataset.g}"]`)?.click();});
+  g.querySelector(".gx").onclick=()=>{off();track("guide_pick",{booth:"skip"});setTimeout(showHint,500);};};
+ document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#inGo"))setTimeout(showGuide,900);},true);}
 </script>
 
 </body>
