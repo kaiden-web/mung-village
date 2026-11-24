@@ -359,7 +359,7 @@ try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard V
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 // 보류 기능 스위치 (공개 버전은 build_fair.py 가 모두 false 로 바꿔요)
-const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false};
+const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false,stamps:false};
 const BOOTHS = [
   {id:"pick",   name:"설쌤 추천 마켓", icon:"🛍️", sub:"고민별로 골라 주는 놀로 상품", color:"#f28daa", light:"#fde3ea", pos:[-10.5, 1.5]},
   {id:"assess", name:"우리 강아지 성향평가", icon:"🔍", sub:"3분 테스트 · 예시 결과 보기", color:"#5fb8a0", light:"#dff3ec", pos:[10.5, 1.5]},
@@ -1112,11 +1112,11 @@ function endGame(ok){
   hearts();confetti();
   const s=ST[id],info=PLAY_INFO[id];
   const msg=id==="fetch"?`${dogName||"우리 강아지"}${batchim(dogName||"우리 강아지")?"이":"가"} 공을 세 번 다 물어 왔어요!`:id==="nose"?`킁킁! ${game_tries_msg}`:`허들 3개 중 ${lastCleared}개를 깔끔하게 넘었어요!`;
-  setTimeout(()=>openSheet(`<div class="sh-head" style="background:#e6f6ee;color:#3b3043">${X}<div class="kick">${s.icon} 놀이 챌린지 ${first?"도장 쾅!":"성공"}</div><h2>${s.name} 성공!</h2><p>${msg}</p></div>
+  setTimeout(()=>openSheet(`<div class="sh-head" style="background:#e6f6ee;color:#3b3043">${X}<div class="kick">${s.icon} 놀이 챌린지 ${first&&FEAT.stamps?"도장 쾅!":"성공"}</div><h2>${s.name} 성공!</h2><p>${msg}</p></div>
     <div class="sh-body"><div class="tip" style="background:#fff7e6"><div class="av">🏠</div><div><b>집에서도 해 봐요</b><p>${info.tip}</p></div></div>
     ${info.kn?cta(KN+info.kn.id,`놀로 1분 챌린지 · ${info.kn.t}`):cta(K+"/play","놀로 1분 챌린지 더 보기")}
     <button class="cta ghost" id="pShot">📸 지금 모습 사진으로 남기기</button>
-    <div class="note">놀이 도장 ${plays.size}/3 · 놀로에서 챌린지에 성공하면 트릿을 받을 수 있어요.</div></div>`),500);
+    <div class="note">${FEAT.stamps?`놀이 도장 ${plays.size}/3 · `:""}놀로에서 챌린지에 성공하면 트릿을 받을 수 있어요.</div></div>`),500);
   setTimeout(()=>{const b=$("#pShot");if(b)b.onclick=()=>{closeSheet();setTimeout(takePhoto,300);};},560);
 }
 let game_tries_msg="", lastCleared=0;
@@ -1611,7 +1611,7 @@ async function saveShared(coll,key,doc){
 }
 const mineId=()=>fdb?fUid:"me";
 const SEASON=new Set(store.get("knollo.fair.season",[]));   // 'orn','wish'
-function seasonStamp(k,msg){if(SEASON.has(k))return;SEASON.add(k);store.set("knollo.fair.season",[...SEASON]);toast(msg);renderChips();}
+function seasonStamp(k,msg){if(SEASON.has(k))return;SEASON.add(k);store.set("knollo.fair.season",[...SEASON]);toast(FEAT.stamps?msg:msg.replace(/[!.]? ?\S* ?도장 쾅/,"!"));renderChips();}
 
 /* ---------- ground: ring road, area lawns ---------- */
 {
@@ -2335,7 +2335,7 @@ function renderChips(){
   const n=stampCount();$("#stampN").textContent=`${n}/${NS}`;$("#playN").textContent=`${plays.size}/3`;$("#playN").hidden=!FEAT.playground;$("#stampPill").classList.toggle("done",n>=NS&&(!FEAT.playground||plays.size>=3));
 }
 renderChips();
-$("#stampPill").onclick=()=>showStamps();
+$("#stampPill").onclick=()=>showStamps();if(!FEAT.stamps)$("#stampPill").style.display="none";
 $("#questPill").onclick=()=>questSheet();renderQuestPill();$("#questPill").hidden=!FEAT.missions;
 $("#xmasBtn").onclick=()=>{seasonOn=!seasonOn;store.set("knollo.fair.xmas",seasonOn);applySeason();toast(seasonOn?"🎄 크리스마스 모드! 눈이 내려요":"☀️ 낮으로 돌아왔어요");};$("#xmasBtn").classList.toggle("on",seasonOn);
 $("#fabShot").onclick=()=>takePhoto();
@@ -2358,12 +2358,13 @@ function stamp(id){
   hearts();quest("booth",id);
   if(visited.has(id))return;visited.add(id);store.set("knollo.fair.visited",[...visited]);renderChips();
   const b=byId[id];if(b.lbl)b.lbl.material.map=labelTex(b.name,b.icon,b.color,true);
+  if(!FEAT.stamps)return;
   toast(`${b.icon} ${b.house?"상담소":b.name} 도장 쾅! (${stampCount()}/${NS})`);
   checkDone();
 }
 function rideStamp(k){
   if(rides.has(k))return;rides.add(k);store.set("knollo.fair.rides",[...rides]);renderChips();
-  const r=RIDES.find(x=>x.id===k);setTimeout(()=>toast(`${r.icon} ${r.name} 도장 쾅! (${stampCount()}/${NS})`),2000);
+  const r=RIDES.find(x=>x.id===k);if(!FEAT.stamps)return;setTimeout(()=>toast(`${r.icon} ${r.name} 도장 쾅! (${stampCount()}/${NS})`),2000);
   checkDone();
 }
 function checkDone(){
@@ -2616,7 +2617,7 @@ function nameSheet(){
 }
 function intro(){
   openSheet(`<div class="intro">${X}<div class="em">🎪🐶</div><h2>놀로랜드에 오신 걸 환영해요</h2>
-   <p>우리 강아지와 광장을 걸으며 부스 ${NB}곳과<br>회전목마 · 바이킹 · 운동장에서 도장 ${NS}개를 모아요.</p>
+   <p>${FEAT.stamps?`우리 강아지와 광장을 걸으며 부스 ${NB}곳과<br>회전목마 · 바이킹 · 운동장에서 도장 ${NS}개를 모아요.`:`우리 강아지와 광장을 걸으며 부스 ${NB}곳과<br>회전목마 · 바이킹 · 운동장을 둘러봐요.`}</p>
    <input id="nm" maxlength="10" placeholder="우리 강아지 이름 (예: 콩이)" value="${esc(dogName)}" style="width:100%;margin:14px 0 2px;padding:14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink);text-align:center">
    <div class="how"><div>👆 땅을 누르면 걸어가요</div><div>🎪 부스를 누르면 바로 들어가요</div>${FEAT.playground?"<div>🎾 놀이터에서 놀이 챌린지</div>":"<div>🎄 크리스마스 파티</div>"}<div>📸 사진 찍고 인스타 자랑</div></div>
    <button class="cta" id="inGo">입장하기</button></div>`);
@@ -2702,7 +2703,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
 {const ch=document.getElementById("chips");const upd=()=>{if(ch)ch.classList.toggle("more",ch.scrollWidth>ch.clientWidth+4&&ch.scrollLeft+ch.clientWidth<ch.scrollWidth-6);};
  if(ch){ch.addEventListener("scroll",upd,{passive:true});addEventListener("resize",upd);setTimeout(upd,300);setInterval(upd,2000);}
  const showHint=()=>{if(store.get("knollo.fair.hint",false))return;store.set("knollo.fair.hint",true);
-  const h=document.createElement("div");h.id="tophint";h.innerHTML="<b>🎄</b> 크리스마스 모드 켜고 끄기<br><b>🐶</b> 누를 때마다 우리 강아지 털색이 바뀌어요<br><b>도장</b> 부스와 놀이기구 도장판 보기";
+  const h=document.createElement("div");h.id="tophint";h.innerHTML="<b>🎄</b> 크리스마스 모드 켜고 끄기<br><b>🐶</b> 누를 때마다 우리 강아지 털색이 바뀌어요"+(FEAT.stamps?"<br><b>도장</b> 부스와 놀이기구 도장판 보기":"");
   document.getElementById("app").appendChild(h);requestAnimationFrame(()=>h.classList.add("on"));
   const off=()=>{h.classList.remove("on");setTimeout(()=>h.remove(),350);};setTimeout(off,5200);document.addEventListener("pointerdown",off,{once:true,capture:true});};
  document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#inGo"))setTimeout(showHint,1400);},true);}
