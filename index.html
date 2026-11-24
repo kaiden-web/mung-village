@@ -26,8 +26,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>놀로랜드</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#cfe9f6; --ink:#3b3043; --ink2:#7a6e80; --card:#fffdf9; --line:#eadfd6;
@@ -311,6 +309,14 @@ body:has(#veil:not([hidden])) .toast{top:calc(10px + env(safe-area-inset-top));z
 #fabs{bottom:calc(76px + env(safe-area-inset-bottom));right:calc(12px + env(safe-area-inset-right))}
 #near{bottom:calc(92px + env(safe-area-inset-bottom))}
 @media (max-width:640px){#fabs{bottom:calc(72px + env(safe-area-inset-bottom))}.sheet{max-height:88dvh;padding-bottom:env(safe-area-inset-bottom)}}
+/* --- 모바일 UI 다듬기 (11/24): 글자 12px 이상 · 버튼 40px 이상 · 바로가기 줄 힌트 --- */
+.hcf .tg,.szs i,.st small,.pg em,.exres .bar .lb small{font-size:12px}.rec i{font-size:12.5px}
+#chips.more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent)}
+#tophint{position:absolute;right:10px;top:calc(62px + env(safe-area-inset-top));max-width:250px;background:#3b3043;color:#fff;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.55;box-shadow:var(--shadow);z-index:6;pointer-events:none;opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .3s}
+#tophint.on{opacity:1;transform:none}#tophint::before{content:"";position:absolute;top:-6px;right:22px;border:6px solid transparent;border-top:0;border-bottom-color:#3b3043}
+#tophint b{font-weight:800}
+@media (max-width:640px){.tr .pill{min-height:40px;min-width:40px;justify-content:center}#fabs .fab{width:54px;height:54px;font-size:19px;gap:2px}.fab span{display:block;font-size:12px}}
+@media (max-width:420px){.tr .pill{padding:6px 10px}.tr .pill .n{font-size:12px}#coatBtn::before{font-size:17px}}
 </style>
 </head>
 <body>
@@ -381,17 +387,20 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 /* ---------- renderer ---------- */
 const canvas = document.getElementById("c");
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-const PR_MAX = Math.min(devicePixelRatio || 1, matchMedia("(pointer:coarse)").matches ? 2 : 2);
+const IS_TOUCH = matchMedia("(pointer:coarse)").matches;
+// 저사양 폰(메모리 4GB 이하 또는 코어 4개 이하)은 효과를 줄여 끊김·발열을 막아요
+const LOW_END = IS_TOUCH && ((navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4));
+const PR_MAX = Math.min(devicePixelRatio || 1, LOW_END ? 1.25 : IS_TOUCH ? 1.5 : 2);
 renderer.setPixelRatio(PR_MAX);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = LOW_END ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.NoToneMapping;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, 1, 0.5, 220);
 { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), .04).texture; }
-const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:4}));
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:IS_TOUCH?2:4}));
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), .3, .45, 1.12); composer.addPass(bloom);
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), .3, .45, 1.12); bloom.enabled = !LOW_END; composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
 // sky gradient
@@ -405,7 +414,7 @@ scene.fog = new THREE.Fog("#e6f1f3", 55, 120);
 const hemi = new THREE.HemisphereLight("#f2f8ff", "#e0cdb4", 1.05); scene.add(hemi);
 const sun = new THREE.DirectionalLight("#fff0dc", 2.0);
 sun.position.set(-14, 26, 16); sun.castShadow = true;
-sun.shadow.mapSize.set(2048,2048);
+sun.shadow.mapSize.set(LOW_END?1024:2048,LOW_END?1024:2048);
 Object.assign(sun.shadow.camera,{left:-30,right:30,top:30,bottom:-30,near:1,far:80});
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; sun.shadow.radius = 4;
 scene.add(sun);
@@ -705,7 +714,7 @@ function buildHouse(b){
   const aw=mk(RB(2.3,.18,1.0,.08),TM({map:stripes("#6aa8e6","#fffdf8",8),roughness:.7}),0,2.6,.45);aw.rotation.x=.25;dg.add(aw);
   // sign
   const sg=tex(1024,200,(x,W,H)=>{x.fillStyle="#fffdf8";rr(x,0,0,W,H,60);x.fill();x.lineWidth=12;x.strokeStyle="#6aa8e6";rr(x,8,8,W-16,H-16,54);x.stroke();
-    x.font=`800 96px ${FF}`;x.fillStyle="#3b3043";x.textAlign="center";x.textBaseline="middle";x.fillText("🩺 설채현 교육상담소",W/2,H/2+6);});
+    x.font=`800 96px ${FF}`;x.fillStyle="#3b3043";x.textAlign="center";x.textBaseline="middle";x.fillText("🩺 수의사 · 트레이너 상담",W/2,H/2+6);});
   const sp=new THREE.Mesh(new THREE.PlaneGeometry(5.2,1.02),TM({map:sg,transparent:true,roughness:.8}));sp.position.set(0,3.25,2.46);g.add(sp);
   // flower boxes
   [-2.4,2.4].forEach(wx=>{dg.add(mk(RB(1.4,.3,.35,.06),wood,wx,1.15,.25));for(let i=0;i<5;i++)dg.add(mk(new THREE.SphereGeometry(.13,8,6),M(flowerCols[i]),wx-.5+i*.25,1.36,.3,false));});
@@ -1888,7 +1897,7 @@ applySeason();
   const T=person("#5fb8a0","#3a2a22","#3b4a5a");T.g.position.set(-3.6,0,-8.4);T.g.rotation.y=.35;T.g.scale.setScalar(1.25);scene.add(T.g);
   T.inner.add(mk(new THREE.CylinderGeometry(.05,.05,.18,8),M("#ffd36b"),.12,1.55,.38));const lan=mk(new THREE.TorusGeometry(.2,.015,6,20),M("#ffd36b"),0,1.72,.05,false);lan.rotation.x=Math.PI/2.4;T.inner.add(lan);
   const cap=mk(new THREE.SphereGeometry(.38,16,12,0,Math.PI*2,0,Math.PI/2),M("#5fb8a0"),0,.08,0);T.h.add(cap);const brim=mk(new THREE.CylinderGeometry(.22,.22,.04,16),M("#5fb8a0"),0,.06,.3);brim.scale.set(1,1,.6);T.h.add(brim);
-  const lb=label("놀로 전문 트레이너","🏋️","#5fb8a0",.72);lb.position.set(0,3.3,0);T.g.add(lb);
+  const lb=label("놀로 전문 트레이너","🏋️","#5fb8a0",.62);lb.position.set(0,3.05,0);T.g.add(lb);
   T.g.traverse(o=>{if(o.isMesh){o.userData.booth="consult";clickables.push(o);}});obstacles.push({x:-3.6,z:-8.4,r:1});
   window.__trainer=T;
 }
@@ -2619,7 +2628,7 @@ addEventListener("resize",resize);resize();
 const clock=new THREE.Clock();
 const camOff=new THREE.Vector3();
 const camLook=new THREE.Vector3();
-function camOffset(){const a=camera.aspect;const k=a<.55?1.95:a<.8?1.6:a<1.2?1.22:1;return camOff.set(0,21*k,21*k);}
+function camOffset(){const a=camera.aspect;const k=a<.55?2.2:a<.8?1.7:a<1.2?1.22:1;return camOff.set(0,21*k,21*k);}
 camera.position.copy(me.position).add(camOffset());camLook.copy(me.position);
 function frame(){
   const dt=Math.min(clock.getDelta(),.05), t=clock.elapsedTime;
@@ -2687,6 +2696,15 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   for(const k in UTM)u.searchParams.set(k,UTM[k]);u.searchParams.set("utm_content",gaCtx);el.href=u.toString();
   track("store_click",{link_url:(u.origin+u.pathname).slice(0,120),link_text:(el.textContent||"").trim().slice(0,40),place:gaCtx});},true);
 }
+
+/* --- 모바일 도움말 · 바로가기 줄 힌트 --- */
+{const ch=document.getElementById("chips");const upd=()=>{if(ch)ch.classList.toggle("more",ch.scrollWidth>ch.clientWidth+4&&ch.scrollLeft+ch.clientWidth<ch.scrollWidth-6);};
+ if(ch){ch.addEventListener("scroll",upd,{passive:true});addEventListener("resize",upd);setTimeout(upd,300);setInterval(upd,2000);}
+ const showHint=()=>{if(store.get("knollo.fair.hint",false))return;store.set("knollo.fair.hint",true);
+  const h=document.createElement("div");h.id="tophint";h.innerHTML="<b>🎄</b> 크리스마스 모드 켜고 끄기<br><b>🐶</b> 누를 때마다 우리 강아지 털색이 바뀌어요<br><b>도장</b> 부스와 놀이기구 도장판 보기";
+  document.getElementById("app").appendChild(h);requestAnimationFrame(()=>h.classList.add("on"));
+  const off=()=>{h.classList.remove("on");setTimeout(()=>h.remove(),350);};setTimeout(off,5200);document.addEventListener("pointerdown",off,{once:true,capture:true});};
+ document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#inGo"))setTimeout(showHint,1400);},true);}
 </script>
 
 </body>
