@@ -399,7 +399,8 @@ const canvas = document.getElementById("c");
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
 const IS_TOUCH = matchMedia("(pointer:coarse)").matches;
 // 저사양 폰(메모리 4GB 이하 또는 코어 4개 이하)은 효과를 줄여 끊김·발열을 막아요
-const LOW_END = IS_TOUCH && ((navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4));
+// 저사양: 메모리 2GB 이하 또는 코어 2개 이하인 기기만 (보통 폰은 deviceMemory를 4로 알려 줘서 전엔 대부분이 저사양으로 잡혔어요)
+const LOW_END = IS_TOUCH && ((navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2));
 const PR_MAX = Math.min(devicePixelRatio || 1, LOW_END ? 1.5 : 2);
 renderer.setPixelRatio(PR_MAX);
 renderer.shadowMap.enabled = true;
@@ -408,7 +409,7 @@ renderer.toneMapping = THREE.NoToneMapping;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, 1, 0.5, 220);
 { const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(new RoomEnvironment(), .04).texture; }
-const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:IS_TOUCH?2:4}));
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType,samples:LOW_END?2:4}));
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), .3, .45, 1.12); bloom.enabled = !LOW_END; composer.addPass(bloom);
 composer.addPass(new OutputPass());
