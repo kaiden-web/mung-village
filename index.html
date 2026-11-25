@@ -368,7 +368,8 @@ body:has(#veil:not([hidden])) .toast{top:calc(10px + env(safe-area-inset-top));z
 (function(){try{if(localStorage.getItem("knollo.fair.seen")==="true")return;}catch(e){}
  var P=window.__pre={state:"open",ready:false,t:Date.now()};
  var veil=document.getElementById("veil"),sh=document.getElementById("sheet");
- sh.innerHTML='<div class="intro"><button class="x" data-close aria-label="닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="em">🎪🐶</div><h2>놀로랜드에 오신 걸 환영해요</h2><p>우리 강아지와 광장을 걸으며 부스와<br>회전목마 · 바이킹 · 운동장을 둘러봐요.</p><input id="nm" maxlength="10" placeholder="우리 강아지 이름 (예: 콩이)" style="width:100%;margin:14px 0 2px;padding:14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink);text-align:center"><div class="how"><div>👆 땅을 누르면 걸어가요</div><div>🎪 부스를 누르면 바로 들어가요</div><div>🎄 크리스마스 파티</div><div>📸 사진 찍고 인스타 자랑</div></div><button class="cta" id="inGo">입장하기</button></div>';
+ var XM_=(Date.now()>=Date.parse("2026-11-26T00:00:00+09:00")&&Date.now()<Date.parse("2027-01-01T00:00:00+09:00"))||/[?&]xmas=on/.test(location.search);
+ sh.innerHTML='<div class="intro"><button class="x" data-close aria-label="닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+(XM_?'<div class="em">🎄🐶</div><h2>놀로랜드 크리스마스에 오신 걸 환영해요</h2><p>눈 내리는 광장에서 우리 강아지와 부스와<br>회전목마 · 바이킹 · 크리스마스 파티를 둘러봐요.</p>':'<div class="em">🎪🐶</div><h2>놀로랜드에 오신 걸 환영해요</h2><p>우리 강아지와 광장을 걸으며 부스와<br>회전목마 · 바이킹 · 운동장을 둘러봐요.</p>')+'<input id="nm" maxlength="10" placeholder="우리 강아지 이름 (예: 콩이)" style="width:100%;margin:14px 0 2px;padding:14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink);text-align:center"><div class="how"><div>👆 땅을 누르면 걸어가요</div><div>🎪 부스를 누르면 바로 들어가요</div><div>🎄 크리스마스 파티</div><div>📸 사진 찍고 인스타 자랑</div></div><button class="cta" id="inGo">입장하기</button></div>';
  veil.hidden=false;
  var go=function(){if(P.ready){P.go();return;}P.state="enter";var b=document.getElementById("inGo");b.disabled=true;b.textContent="광장 준비 중… 🐾";};
  var skip=function(){if(P.ready){P.close();return;}if(P.state==="enter")return;P.state="skip";P.name=document.getElementById("nm").value;veil.hidden=true;sh.innerHTML="";};
@@ -388,7 +389,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 function track(n,p){try{if(typeof window.gtag==="function")window.gtag("event",n,p||{});}catch(e){}}
 const FF='"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
-try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 댕냥상식 퀴즈 멍카페 맛집 골목 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,600))]);}catch(e){}
+try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 산타의 행운 선물 프롬프트 맛집 크리스마스에 오신 걸 환영해요 댕냥상식 퀴즈 멍카페 맛집 골목 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,600))]);}catch(e){}
 
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
@@ -406,6 +407,8 @@ BOOTHS.splice(BOOTHS.findIndex(b=>b.id===(FEAT.match?"knolloday":"match")),1);
 // 놀로데이는 11/25 23:59 이후 자동으로 빠져요 (?kd=off 로 미리 보기)
 const KD_OFF=Date.now()>Date.parse("2026-11-25T23:59:59+09:00")||/[?&]kd=off/.test(location.search);
 if(KD_OFF&&BOOTHS.some(b=>b.id==="knolloday"))BOOTHS.splice(BOOTHS.findIndex(b=>b.id==="knolloday"),1);
+// 크리스마스 시즌: 11/26 00:00 ~ 12/31 (?xmas=on 으로 미리 보기)
+const XMAS=(Date.now()>=Date.parse("2026-11-26T00:00:00+09:00")&&Date.now()<Date.parse("2027-01-01T00:00:00+09:00"))||/[?&]xmas=on/.test(location.search);
 const NB=BOOTHS.length;
 const byId = Object.fromEntries(BOOTHS.map(b=>[b.id,b]));
 
@@ -607,7 +610,8 @@ for(let i=0;i<7;i++){
 }
 
 /* ---------- trees, bushes, flowers ---------- */
-function coneTree(x,z,s=1){const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(s);
+const CONES=[];
+function coneTree(x,z,s=1){const g=new THREE.Group();CONES.push(g);g.position.set(x,0,z);g.scale.setScalar(s);
   g.add(mk(new THREE.CylinderGeometry(.22,.3,1.2,8),M("#a8795a"),0,.6,0));
   const cs=["#6fbf8a","#82cc96","#97d8a5"];
   [[1.5,2,1.6],[1.15,1.7,2.6],[.75,1.4,3.5]].forEach(([r,h,y],i)=>g.add(mk(new THREE.ConeGeometry(r,h,9),M(cs[i]),0,y,0)));
@@ -1623,11 +1627,15 @@ const PSHOP=[
   {id:"gwansang",kind:"text",isNew:true,icon:"🔮",bg:"linear-gradient(160deg,#efe5fb,#fde3ea)",t:"강아지 관상 풀이",d:"사진 한 장으로 보는 재미있는 멍상(犬相)",
    p:"첨부한 사진 속 강아지의 얼굴을 보고 재미로 보는 '멍상(강아지 관상)' 풀이를 해 줘.\n- 눈, 코, 귀, 입매, 표정을 하나씩 보고 어떤 성격일지 다정하게 풀어 줘.\n- 마지막에 '이 강아지를 한 줄로 표현하면'과 '어울리는 별명 3개'를 알려 줘.\n- 건강이나 질병 이야기는 하지 말고, 밝고 따뜻한 말투로 전체 300자 안팎으로 써 줘."},
   {id:"xmas",kind:"img",season:true,icon:"🎄",bg:"linear-gradient(160deg,#2b3a6b,#4a6fb0)",t:"크리스마스 카드",d:"산타 모자 쓰고 눈 오는 밤에 찰칵"},
+  {id:"rudolph",kind:"img",season:true,icon:"🦌",bg:"linear-gradient(160deg,#7a2e2e,#d9485f)",t:"루돌프가 된 우리 강아지",d:"뿔 머리띠 쓰고 벽난로 앞에서 찰칵",
+   p:"Create a cute Christmas portrait of the dog in the reference photo wearing a soft plush reindeer antler headband and a small red pom-pom nose prop, sitting in front of a cozy fireplace with knitted stockings and warm fairy lights. Keep the dog's face, fur color, markings and breed exactly the same. Warm soft lighting, gentle bokeh, 4:5, high resolution."},
+  {id:"snowwalk",kind:"img",season:true,icon:"⛄",bg:"linear-gradient(160deg,#cfe3f5,#ffffff)",t:"눈 오는 날 산책 엽서",d:"빨간 목도리 두르고 눈길 산책",
+   p:"Create a soft watercolor winter postcard of the dog in the reference photo wearing a knitted red scarf, happily walking on a snowy path lined with warm street lamps and small decorated trees, gentle snowfall, cozy and calm mood. Keep the dog's face, fur color, markings and breed recognizable. Add the small handwritten text \"Merry Christmas\" in the corner. 4:5, high resolution."},
   {id:"idphoto",kind:"img",icon:"🪪",bg:"linear-gradient(160deg,#d6e8f7,#ffffff)",t:"증멍사진",d:"나비넥타이 매고 찰칵, 우리 강아지 증명사진"},
   {id:"hill",kind:"img",icon:"🖼️",bg:"linear-gradient(160deg,#6fb8f2,#bfe6a6)",t:"윈도우 언덕 바탕화면",d:"초원 언덕 너머로 우리 강아지가 빼꼼!"},
   {id:"retro",kind:"img",icon:"🎮",bg:"linear-gradient(160deg,#e9e4d8,#cfd8c6)",t:"레트로 게임기 속 내 새끼",d:"그 시절 휴대용 게임기 속으로 들어간 우리 강아지"},
   {id:"pepero",kind:"img",icon:"🍫",bg:"linear-gradient(160deg,#ffd6e2,#fff1d6)",t:"멍빼로 데이",d:"초코 막대 과자(장난감 소품)를 든 우리 강아지"}
-].map(x=>Object.assign({},x,{p:x.p||(PROMPTS.find(y=>y.id===x.id)||{}).prompt||""})).filter(x=>x.p);
+].filter(x=>XMAS?x.id!=="pepero":!x.season||x.id==="xmas").map(x=>Object.assign({},x,{p:x.p||(PROMPTS.find(y=>y.id===x.id)||{}).prompt||""})).filter(x=>x.p);
 const PS_APPS={gpt:["챗GPT","https://chatgpt.com/"],gem:["제미나이","https://gemini.google.com/app"]};
 function openPromptShop(){
   track("pshop_open",{});
@@ -1934,11 +1942,34 @@ function tickCourse(dt){
 }
 
 /* ---------- 🎄 season mode (auto in December, toggle anytime) ---------- */
-let seasonOn=store.get("knollo.fair.xmas",new Date().getMonth()===11);
+let seasonOn=/[?&]xmas=on/.test(location.search)?true:store.get("knollo.fair.xmas26",XMAS);
 const gSnowN=700,gSnowPos=new Float32Array(gSnowN*3);for(let i=0;i<gSnowN;i++){gSnowPos[i*3]=rand(-24,24);gSnowPos[i*3+1]=rand(0,16);gSnowPos[i*3+2]=rand(-24,24);}
 const gSnowG=new THREE.BufferGeometry();gSnowG.setAttribute("position",new THREE.BufferAttribute(gSnowPos,3));const gSnow=new THREE.Points(gSnowG,new THREE.PointsMaterial({color:"#fff",size:.16,transparent:true,opacity:.9,depthWrite:false}));scene.add(gSnow);
+/* 🎄 시즌 장식: 나무 눈모자·전구, 부스마다 작은 트리와 선물 상자, 눈 더미 */
+const xDecor=new THREE.Group();xDecor.visible=false;scene.add(xDecor);
+{
+  const snowM=M("#ffffff",{roughness:.9}),bc=["#ff8fa3","#ffd36b","#9be7ff","#b8f5a8"];
+  const bulbMs=bc.map(c=>{const m=M(c,{emissive:c,emissiveIntensity:1.4});xmasBulbs.push(m);return m;});
+  const bG=new THREE.SphereGeometry(.09,8,6);
+  CONES.forEach((t,ti)=>{const g=new THREE.Group();g.position.copy(t.position);g.scale.copy(t.scale);xDecor.add(g);
+    g.add(mk(new THREE.ConeGeometry(.5,.55,9),snowM,0,4.0,0,false));
+    [[1.5,1.3],[1.15,2.3],[.75,3.2]].forEach(([r,y],k)=>{for(let j=0;j<5;j++){const a=j/5*Math.PI*2+k+ti;g.add(mk(bG,bulbMs[(j+k+ti)%4],Math.sin(a)*r*.78,y,Math.cos(a)*r*.78,false));}});});
+  const giftC=[["#d9485f","#ffd36b"],["#2f7a55","#ffffff"],["#6aa8e6","#ffffff"],["#f2a84a","#d9485f"]];
+  function gift(g,x,z,s,ci){const [a,b]=giftC[ci%4];const bx=mk(RB(s,s*.8,s,.04),M(a),x,s*.4,z);g.add(bx);
+    g.add(mk(new THREE.BoxGeometry(s*1.02,s*.82,s*.16),M(b),x,s*.4,z,false));g.add(mk(new THREE.BoxGeometry(s*.16,s*.82,s*1.02),M(b),x,s*.4,z,false));}
+  function miniTree(x,z,k){const g=new THREE.Group();g.position.set(x,0,z);xDecor.add(g);
+    g.add(mk(new THREE.CylinderGeometry(.12,.16,.5,8),M("#8a5a3c"),0,.25,0));
+    [[.85,1.1,.9],[.62,.95,1.5],[.38,.8,2.05]].forEach(([r,h,y])=>g.add(mk(new THREE.ConeGeometry(r,h,10),M("#2f7a55"),0,y,0)));
+    for(let j=0;j<12;j++){const a=j*2.4,y=.6+j*.12,r=.82-j*.055;g.add(mk(bG,bulbMs[(j+k)%4],Math.sin(a)*r,y,Math.cos(a)*r,false));}
+    g.add(mk(new THREE.OctahedronGeometry(.18),M("#ffd36b",{emissive:"#ffb800",emissiveIntensity:1.2}),0,2.55,0,false));
+    gift(g,.7,.35,.36,k);gift(g,-.55,.55,.28,k+1);
+    if(XMAS)obstacles.push({x,z,r:1.0});}
+  BOOTHS.forEach((b,k)=>{const [px,pz]=b.pos,dx=b.door.x-px,dz=b.door.z-pz,L=Math.hypot(dx,dz)||1;
+    miniTree(b.door.x+(-dz/L)*2.6,b.door.z+(dx/L)*2.6,k);});
+  for(let i=0;i<46;i++){const a=Math.random()*Math.PI*2,r=19+Math.random()*16;const m=mk(new THREE.SphereGeometry(.5+Math.random()*.7,10,6),snowM,Math.cos(a)*r,0,Math.sin(a)*r,false);m.scale.y=.32;xDecor.add(m);}
+}
 const xHats=[];
-function applySeason(){
+function applySeason(){xDecor.visible=seasonOn;
   paintSky(...(seasonOn?SKY_EVE:SKY_DAY));gSnow.visible=seasonOn;hemi.intensity=seasonOn?.5:.8;sun.intensity=seasonOn?1.0:1.85;sun.color.set(seasonOn?"#c9d6ff":"#ffe6c6");bloom.strength=seasonOn?.6:.3;
   scene.fog.color.set(seasonOn?"#4a5a9a":"#e6f1f3");
   xHats.splice(0).forEach(h=>h.parent&&h.parent.remove(h));
@@ -2204,7 +2235,15 @@ function tickRunField(t,dt){if(!runField)return;
 /* ---------- 🍀 매일 행운 뽑기 (plaza) ---------- */
 // 운영 설정: 놀로스토어 '매일 쿠폰' 페이지 주소가 정해지면 url 만 바꾸면 돼요.
 const LUCKY=KD_OFF?{url:"https://www.knollo.store",cta:"🛍️ 놀로스토어 둘러보기"}:{url:"https://www.knollo.store/event/knolloday",cta:"🎟️ 놀로스토어 매일 쿠폰 확인하기"};
-const LUCK=[
+const LUCK=XMAS?[
+  {e:"🎁",t:"선물운",c:"#d9485f",d:"오늘은 작은 간식 하나에도 꼬리가 크게 흔들릴 거예요."},
+  {e:"🎄",t:"트리운",c:"#2f7a55",d:"반짝이는 불빛 앞에서 찍은 사진이 예쁘게 나올 거예요."},
+  {e:"🧣",t:"포근운",c:"#e8577a",d:"담요 속에서 꼭 붙어 쉬는 시간이 가장 행복할 거예요."},
+  {e:"🔔",t:"방울운",c:"#f2a84a",d:"이름을 부르면 평소보다 신나게 달려올 거예요."},
+  {e:"⛄",t:"눈사람운",c:"#6aa8e6",d:"짧아도 즐거운 겨울 산책이 기다리고 있어요."},
+  {e:"🦌",t:"루돌프운",c:"#b8613c",d:"오늘 산책길엔 코끝이 빨개질 만큼 신나는 일이 생길 거예요."},
+  {e:"✨",t:"반짝운",c:"#ffd36b",d:"오늘 빗질하면 털이 유난히 반짝일 거예요."},
+  {e:"💌",t:"사랑운",c:"#e8577a",d:"꼬리 흔들기를 평소보다 많이 받을 거예요."}]:[
   {e:"🍀",t:"행운 가득",c:"#5fb8a0",d:"오늘은 산책길에 반가운 친구를 만날 것 같아요."},
   {e:"🦴",t:"간식운",c:"#f2a84a",d:"오늘 간식은 평소보다 더 맛있게 느껴질 거예요."},
   {e:"💤",t:"꿀잠운",c:"#b48ae8",d:"오늘 밤엔 우리 강아지와 푹 잘 수 있을 거예요."},
@@ -2228,7 +2267,7 @@ var lucky=null;
   g.add(mk(RB(.4,.3,.12,.05),M("#3b3043"),0,.38,.6));
   const sg=tex(512,140,(x2,W,H)=>{x2.fillStyle="#fffdf8";rr(x2,4,4,W-8,H-8,40);x2.fill();x2.font=`800 60px ${FF}`;x2.fillStyle="#2f7a62";x2.textAlign="center";x2.textBaseline="middle";x2.fillText("🍀 하루 한 번",W/2,H/2+3);});
   const sp=new THREE.Mesh(new THREE.PlaneGeometry(1.3,.36),TM({map:sg}));sp.position.set(0,1.1,.61);g.add(sp);
-  const lb=label("매일 행운 뽑기","🍀","#5fb8a0",.8);lb.position.set(0,3.9,0);g.add(lb);
+  const lb=(XMAS?label("산타의 행운 선물","🎅","#d9485f",.8):label("매일 행운 뽑기","🍀","#5fb8a0",.8));lb.position.set(0,3.9,0);g.add(lb);
   tagClick(g,"lucky");obstacles.push({x,z,r:1});
   lucky={g,caps,knob,lb,spin:0,out:new THREE.Vector3(0,.4,.8)};
   spot("lucky",x,z,2.1,()=>{me.rotation.y=Math.atan2(x-me.position.x,z-me.position.z);luckySheet();});
@@ -2238,7 +2277,7 @@ const luckDay=()=>{const d=new Date();return `${d.getFullYear()}-${d.getMonth()+
 function luckyResultHTML(L){return `<div class="luckres" style="--lc:${L.c}"><div class="cap">${L.e}</div><b>오늘의 ${L.t}</b><p>${L.d}</p></div>`;}
 function luckySheet(){
   const st=store.get("knollo.fair.lucky",null),today=st&&st.day===luckDay()?LUCK[st.i]:null;
-  openSheet(`<div class="intro">${X}<div class="em">🍀</div><h2>매일 행운 뽑기</h2><p>하루에 한 번, ${esc(dname())}의 오늘 운세 캡슐을 뽑아요.</p>
+  openSheet(`<div class="intro">${X}<div class="em">${XMAS?"🎅":"🍀"}</div><h2>${XMAS?"산타의 행운 선물":"매일 행운 뽑기"}</h2><p>하루에 한 번, ${esc(dname())}의 ${XMAS?"크리스마스 선물 캡슐":"오늘 운세 캡슐"}을 뽑아요.</p>
     <div id="luckOut">${today?luckyResultHTML(today)+`<p class="note">오늘은 이미 뽑았어요. 내일 또 만나요!</p>`:`<button class="cta" id="luckGo">🎰 뽑기 돌리기</button>`}</div>
     <a class="cta ghost" href="${LUCKY.url}" target="_blank" rel="noopener">${LUCKY.cta}</a>
     <p class="note">재미로 보는 운세예요. 놀로랜드에서는 쿠폰을 직접 드리지 않고, 놀로스토어 이벤트 페이지로 안내해요.</p></div>`);
@@ -2407,7 +2446,7 @@ addEventListener("blur",()=>keys.clear());
 const $=s=>document.querySelector(s);
 const veil=$("#veil"), sheet=$("#sheet");
 function renderChips(){
-  $("#chips").innerHTML=BOOTHS.map(b=>`<button class="chip${visited.has(b.id)?" v":""}" data-id="${b.id}"><span>${b.icon}</span>${b.house?"상담소":b.name.replace("놀로 ","").replace("우리 강아지 ","").replace("보호자 ","")}</button>`).join("")+`<button class="chip" data-id="carousel"><span>🎠</span>회전목마</button><button class="chip" data-id="viking"><span>⛵</span>바이킹</button><button class="chip" data-id="runfield"><span>🐕</span>운동장</button><button class="chip" data-id="lucky"><span>🍀</span>행운 뽑기</button>`;
+  $("#chips").innerHTML=BOOTHS.map(b=>`<button class="chip${visited.has(b.id)?" v":""}" data-id="${b.id}"><span>${b.icon}</span>${b.house?"상담소":b.name.replace("놀로 ","").replace("우리 강아지 ","").replace("보호자 ","")}</button>`).join("")+`<button class="chip" data-id="carousel"><span>🎠</span>회전목마</button><button class="chip" data-id="viking"><span>⛵</span>바이킹</button><button class="chip" data-id="runfield"><span>🐕</span>운동장</button><button class="chip" data-id="lucky"><span>${XMAS?"🎅":"🍀"}</span>${XMAS?"산타 선물":"행운 뽑기"}</button>`;
   $("#chips").insertAdjacentHTML("beforeend",`${FEAT.playground?`<button class="chip${plays.size>=3?" v":""}" data-id="playground"><span>🎾</span>놀이터</button>`:""}${FEAT.aiwall?`<button class="chip" data-id="wall"><span>🤖</span>AI 포토월</button>`:(FEAT.pshop?`<button class="chip" data-id="wall"><span>🪄</span>프롬프트 맛집</button>`:`<button class="chip" data-id="wall"><span>📸</span>포토존</button>`)}<button class="chip${SEASON.has("orn")?" v":""}" data-id="party"><span>🎄</span>파티</button>${FEAT.sunrise?`<button class="chip${SEASON.has("wish")?" v":""}" data-id="sunhill"><span>🌅</span>일출 언덕</button>`:""}${FEAT.courses?`<button class="chip${Object.keys(walks).length?" v":""}" data-id="courses"><span>🐾</span>산책 코스</button>`:""}<button class="chip${SEASON.has("cafe")?" v":""}" data-id="cafezone"><span>☕</span>멍카페</button>`);
   $("#chips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>walkTo(c.dataset.id));
   const n=stampCount();$("#stampN").textContent=`${n}/${NS}`;$("#playN").textContent=`${plays.size}/3`;$("#playN").hidden=!FEAT.playground;$("#stampPill").classList.toggle("done",n>=NS&&(!FEAT.playground||plays.size>=3));
@@ -2415,7 +2454,7 @@ function renderChips(){
 renderChips();
 $("#stampPill").onclick=()=>showStamps();if(!FEAT.stamps)$("#stampPill").style.display="none";
 $("#questPill").onclick=()=>questSheet();renderQuestPill();$("#questPill").hidden=!FEAT.missions;
-$("#xmasBtn").onclick=()=>{seasonOn=!seasonOn;store.set("knollo.fair.xmas",seasonOn);applySeason();toast(seasonOn?"🎄 크리스마스 모드! 눈이 내려요":"☀️ 낮으로 돌아왔어요");};$("#xmasBtn").classList.toggle("on",seasonOn);
+$("#xmasBtn").onclick=()=>{seasonOn=!seasonOn;store.set("knollo.fair.xmas26",seasonOn);applySeason();toast(seasonOn?"🎄 크리스마스 모드! 눈이 내려요":"☀️ 낮으로 돌아왔어요");};$("#xmasBtn").classList.toggle("on",seasonOn);
 $("#fabShot").onclick=()=>takePhoto();
 $("#fabInv").onclick=()=>inviteSheet();if(!FEAT.invite)$("#fabInv").style.display="none";
 $("#coatBtn").onclick=()=>{coatIdx=(coatIdx+1)%COATS.length;recolor(me,COATS[coatIdx]);store.set("knollo.fair.coat",coatIdx);$("#coatBtn").textContent="🐶 "+COATS[coatIdx].name;};
@@ -2691,7 +2730,7 @@ function nameSheet(){
   const i=$("#nm");i.focus();const ok=()=>{setName(i.value);closeSheet();};$("#nmOk").onclick=ok;i.onkeydown=e=>{if(e.key==="Enter")ok();};
 }
 function intro(){
-  openSheet(`<div class="intro">${X}<div class="em">🎪🐶</div><h2>놀로랜드에 오신 걸 환영해요</h2>
+  openSheet(`<div class="intro">${X}<div class="em">${XMAS?"🎄🐶":"🎪🐶"}</div><h2>${XMAS?"놀로랜드 크리스마스에 오신 걸 환영해요":"놀로랜드에 오신 걸 환영해요"}</h2>
    <p>${FEAT.stamps?`우리 강아지와 광장을 걸으며 부스 ${NB}곳과<br>회전목마 · 바이킹 · 운동장에서 도장 ${NS}개를 모아요.`:`우리 강아지와 광장을 걸으며 부스 ${NB}곳과<br>회전목마 · 바이킹 · 운동장을 둘러봐요.`}</p>
    <input id="nm" maxlength="10" placeholder="우리 강아지 이름 (예: 콩이)" value="${esc(dogName)}" style="width:100%;margin:14px 0 2px;padding:14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink);text-align:center">
    <div class="how"><div>👆 땅을 누르면 걸어가요</div><div>🎪 부스를 누르면 바로 들어가요</div>${FEAT.playground?"<div>🎾 놀이터에서 놀이 챌린지</div>":"<div>🎄 크리스마스 파티</div>"}<div>📸 사진 찍고 인스타 자랑</div></div>
@@ -2782,7 +2821,7 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   document.getElementById("app").appendChild(h);requestAnimationFrame(()=>h.classList.add("on"));
   const off=()=>{h.classList.remove("on");setTimeout(()=>h.remove(),350);};setTimeout(off,5200);document.addEventListener("pointerdown",off,{once:true,capture:true});};
  /* 들어오자마자 '어디부터 갈지' 골라 주는 안내 카드 (입장할 때마다) */
- const GUIDE=[["pick","🛍️","설쌤 추천 마켓","고민을 고르면 상품을 골라 줘요"],(KD_OFF?["viking","🏴‍☠️","바이킹 타기","우리 강아지랑 같이 슝"]:["knolloday","🎁","놀로데이 특가","놀로 회원 쿠폰 · 인기 특가"]),["assess","🔍","우리 강아지 성향평가","설쌤과 6가지 성향 미리 보기"],["carousel","🎠","회전목마 타기","한 바퀴 돌고 사진도 찰칵"]];
+ const GUIDE=[["pick","🛍️","설쌤 추천 마켓","고민을 고르면 상품을 골라 줘요"],(XMAS?["party","🎄","크리스마스 파티","트리에 장식 달고 산타 선물 받기"]:KD_OFF?["viking","🏴‍☠️","바이킹 타기","우리 강아지랑 같이 슝"]:["knolloday","🎁","놀로데이 특가","놀로 회원 쿠폰 · 인기 특가"]),["assess","🔍","우리 강아지 성향평가","설쌤과 6가지 성향 미리 보기"],["carousel","🎠","회전목마 타기","한 바퀴 돌고 사진도 찰칵"]];
  const showGuide=()=>{if(document.getElementById("guide"))return;const g=document.createElement("div");g.id="guide";
   g.innerHTML=`<div class="gh"><b>어디부터 가볼까요? 🐾</b><small>누르면 ${esc(dname())}${batchim(dname())?"이":""}랑 같이 걸어가요</small></div><div class="gl">${GUIDE.filter(x=>document.querySelector(`#chips [data-id="${x[0]}"]`)).map(([id,e,t,d])=>`<button data-g="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div></button>`).join("")}</div><button class="gx">천천히 둘러볼게요</button>`;
   document.getElementById("app").appendChild(g);requestAnimationFrame(()=>g.classList.add("on"));
