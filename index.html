@@ -19,12 +19,17 @@
 <style>html,body{margin:0;padding:0;height:100%}*{box-sizing:border-box}[hidden]{display:none!important}</style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HZLKD10P7G"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-HZLKD10P7G');</script>
-<script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="adapter.js"></script>
+<script defer src="config.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script defer src="adapter.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>놀로랜드</title>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<!-- 3D 엔진 파일을 미리 받아 둬요 (로딩 단축) -->
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/geometries/RoundedBoxGeometry.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/OutputPass.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/Pass.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/ShaderPass.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/MaskPass.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/shaders/CopyShader.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/shaders/LuminosityHighPassShader.js"><link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/shaders/OutputShader.js">
 <meta name="robots" content="noindex">
 <style>
 :root{
@@ -350,8 +355,21 @@ body:has(#veil:not([hidden])) .toast{top:calc(10px + env(safe-area-inset-top));z
   <div id="veil" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 </div>
 
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+
+<script>
+/* 처음 온 사람에게는 3D 로딩을 기다리지 않고 환영 화면을 바로 보여 줘요 (뒤에서 광장이 준비돼요) */
+(function(){try{if(localStorage.getItem("knollo.fair.seen")==="true")return;}catch(e){}
+ var P=window.__pre={state:"open",ready:false,t:Date.now()};
+ var veil=document.getElementById("veil"),sh=document.getElementById("sheet");
+ sh.innerHTML='<div class="intro"><button class="x" data-close aria-label="닫기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="em">🎪🐶</div><h2>놀로랜드에 오신 걸 환영해요</h2><p>우리 강아지와 광장을 걸으며 부스와<br>회전목마 · 바이킹 · 운동장을 둘러봐요.</p><input id="nm" maxlength="10" placeholder="우리 강아지 이름 (예: 콩이)" style="width:100%;margin:14px 0 2px;padding:14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink);text-align:center"><div class="how"><div>👆 땅을 누르면 걸어가요</div><div>🎪 부스를 누르면 바로 들어가요</div><div>🎄 크리스마스 파티</div><div>📸 사진 찍고 인스타 자랑</div></div><button class="cta" id="inGo">입장하기</button></div>';
+ veil.hidden=false;
+ var go=function(){if(P.ready){P.go();return;}P.state="enter";var b=document.getElementById("inGo");b.disabled=true;b.textContent="광장 준비 중… 🐾";};
+ var skip=function(){if(P.ready){P.close();return;}if(P.state==="enter")return;P.state="skip";P.name=document.getElementById("nm").value;veil.hidden=true;sh.innerHTML="";};
+ document.getElementById("inGo").onclick=go;
+ document.getElementById("nm").onkeydown=function(e){if(e.key==="Enter")go();};
+ sh.querySelector("[data-close]").onclick=skip;
+ veil.addEventListener("click",function(e){if(e.target===veil&&!P.ready)skip();});
+})();
 </script>
 <script type="module">
 import * as THREE from "three";
@@ -363,7 +381,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 function track(n,p){try{if(typeof window.gtag==="function")window.gtag("event",n,p||{});}catch(e){}}
 const FF='"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
-try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 댕냥상식 퀴즈 멍카페 맛집 골목 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,2500))]);}catch(e){}
+try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 댕냥상식 퀴즈 멍카페 맛집 골목 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,600))]);}catch(e){}
 
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
@@ -378,6 +396,9 @@ const BOOTHS = [
   {id:"consult",name:"설채현 교육상담소", icon:"🩺", sub:"수의사 + 전문 트레이너 상담", color:"#6aa8e6", light:"#e2effc", pos:[0, -12.8], house:true},
 ];
 BOOTHS.splice(BOOTHS.findIndex(b=>b.id===(FEAT.match?"knolloday":"match")),1);
+// 놀로데이는 11/25 23:59 이후 자동으로 빠져요 (?kd=off 로 미리 보기)
+const KD_OFF=Date.now()>Date.parse("2026-11-25T23:59:59+09:00")||/[?&]kd=off/.test(location.search);
+if(KD_OFF&&BOOTHS.some(b=>b.id==="knolloday"))BOOTHS.splice(BOOTHS.findIndex(b=>b.id==="knolloday"),1);
 const NB=BOOTHS.length;
 const byId = Object.fromEntries(BOOTHS.map(b=>[b.id,b]));
 
@@ -2144,7 +2165,7 @@ function tickRunField(t,dt){if(!runField)return;
 }
 /* ---------- 🍀 매일 행운 뽑기 (plaza) ---------- */
 // 운영 설정: 놀로스토어 '매일 쿠폰' 페이지 주소가 정해지면 url 만 바꾸면 돼요.
-const LUCKY={url:"https://www.knollo.store/event/knolloday",cta:"🎟️ 놀로스토어 매일 쿠폰 확인하기"};
+const LUCKY=KD_OFF?{url:"https://www.knollo.store",cta:"🛍️ 놀로스토어 둘러보기"}:{url:"https://www.knollo.store/event/knolloday",cta:"🎟️ 놀로스토어 매일 쿠폰 확인하기"};
 const LUCK=[
   {e:"🍀",t:"행운 가득",c:"#5fb8a0",d:"오늘은 산책길에 반가운 친구를 만날 것 같아요."},
   {e:"🦴",t:"간식운",c:"#f2a84a",d:"오늘 간식은 평소보다 더 맛있게 느껴질 거예요."},
@@ -2697,7 +2718,7 @@ function frame(){
 outline(scene);
 $("#load").remove();
 frame();
-if(!store.get("knollo.fair.seen",false)){intro();store.set("knollo.fair.seen",true);}
+if(!window.__pre&&!store.get("knollo.fair.seen",false)){intro();store.set("knollo.fair.seen",true);}
 
 /* ---------- 📈 GA4 이벤트 + 놀로스토어 링크 UTM (공개 사이트에서만 gtag 가 있어요 · 이름 등 입력값은 보내지 않아요) ---------- */
 let gaCtx="plaza";
@@ -2708,7 +2729,7 @@ luckySheet=W(luckySheet,"lucky_open",undefined,"lucky");memoryCard=W(memoryCard,
 truckSheet=W(truckSheet,"truck_open",undefined,"truck");cafeSheet=W(cafeSheet,"cafe_open",undefined,"cafe");openAIStudio=W(openAIStudio,"ai_photowall_open",undefined,"photowall");ornSheet=W(ornSheet,"ornament_open",undefined,"party");spotsSheet=W(spotsSheet,"spots_open",undefined,"spots");
 const UTM={utm_source:"knolloland",utm_medium:"fair",utm_campaign:"knolloland"};
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("a[href],#inGo");if(!el)return;
-  if(el.id==="inGo"){track("fair_enter");return;}
+  if(el.id==="inGo")return; // 입장은 아래 enterFair 에서 기록해요
   let u;try{u=new URL(el.getAttribute("href"),"https://www.knollo.store");}catch(x){return;}
   if(!/(^|\.)knollo\.store$/.test(u.hostname)||u.hostname==="fair.knollo.store")return;
   for(const k in UTM)u.searchParams.set(k,UTM[k]);u.searchParams.set("utm_content",gaCtx);el.href=u.toString();
@@ -2723,14 +2744,26 @@ document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closes
   document.getElementById("app").appendChild(h);requestAnimationFrame(()=>h.classList.add("on"));
   const off=()=>{h.classList.remove("on");setTimeout(()=>h.remove(),350);};setTimeout(off,5200);document.addEventListener("pointerdown",off,{once:true,capture:true});};
  /* 들어오자마자 '어디부터 갈지' 골라 주는 안내 카드 (입장할 때마다) */
- const GUIDE=[["pick","🛍️","설쌤 추천 마켓","고민을 고르면 상품을 골라 줘요"],["knolloday","🎁","놀로데이 특가","놀로 회원 쿠폰 · 인기 특가"],["assess","🔍","우리 강아지 성향평가","설쌤과 6가지 성향 미리 보기"],["carousel","🎠","회전목마 타기","한 바퀴 돌고 사진도 찰칵"]];
+ const GUIDE=[["pick","🛍️","설쌤 추천 마켓","고민을 고르면 상품을 골라 줘요"],(KD_OFF?["viking","🏴‍☠️","바이킹 타기","우리 강아지랑 같이 슝"]:["knolloday","🎁","놀로데이 특가","놀로 회원 쿠폰 · 인기 특가"]),["assess","🔍","우리 강아지 성향평가","설쌤과 6가지 성향 미리 보기"],["carousel","🎠","회전목마 타기","한 바퀴 돌고 사진도 찰칵"]];
  const showGuide=()=>{if(document.getElementById("guide"))return;const g=document.createElement("div");g.id="guide";
   g.innerHTML=`<div class="gh"><b>어디부터 가볼까요? 🐾</b><small>누르면 ${esc(dname())}${batchim(dname())?"이":""}랑 같이 걸어가요</small></div><div class="gl">${GUIDE.filter(x=>document.querySelector(`#chips [data-id="${x[0]}"]`)).map(([id,e,t,d])=>`<button data-g="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div></button>`).join("")}</div><button class="gx">천천히 둘러볼게요</button>`;
   document.getElementById("app").appendChild(g);requestAnimationFrame(()=>g.classList.add("on"));
   const off=()=>{g.classList.remove("on");setTimeout(()=>g.remove(),300);};
   g.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{off();track("guide_pick",{booth:b.dataset.g});document.querySelector(`#chips [data-id="${b.dataset.g}"]`)?.click();});
   g.querySelector(".gx").onclick=()=>{off();track("guide_pick",{booth:"skip"});setTimeout(showHint,500);};};
- document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#inGo"))setTimeout(showGuide,900);},true);}
+ /* 입장 기록: 버튼 · 엔터 · X/바깥 눌러 닫기 모두 입장으로 쳐요 */
+ let entered=false;
+ const enterFair=via=>{if(entered)return;entered=true;track("fair_enter",{via});setTimeout(showGuide,900);};
+ document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#inGo:not([disabled])"))enterFair("button");},true);
+ document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target&&e.target.id==="nm"&&sheet.querySelector("#inGo"))enterFair("enter");},true);
+ {let had=!!sheet.querySelector("#inGo");new MutationObserver(()=>{const now=!!sheet.querySelector("#inGo");if(had&&!now)enterFair("close");had=now;}).observe(sheet,{childList:true});}
+ /* 3D 준비 완료: 걸린 시간 기록 + 먼저 띄운 환영 화면 이어받기 */
+ const P=window.__pre;
+ track("fair_ready",{load_ms:Math.round(performance.now()),pre:P?P.state:"none"});
+ if(P){P.ready=true;store.set("knollo.fair.seen",true);P.close=closeSheet;P.go=()=>{setName($("#nm").value);closeSheet();};
+  if(P.state==="enter"){enterFair("button_wait");P.go();}
+  else if(P.state==="skip"){if(P.name)setName(P.name);enterFair("close");}}
+}
 </script>
 
 </body>
