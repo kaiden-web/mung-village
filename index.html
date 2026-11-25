@@ -230,6 +230,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .fr{display:flex;gap:8px;margin-top:8px}.fr input{flex:1;min-width:0;padding:12px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:15px;background:#fff;color:#3b3043}
 .fr .cta{width:auto;margin:0;padding:12px 18px;font-size:16px}
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chips2 button{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:6px 11px;font-size:13px;color:#3b3043}
+.ps-how{list-style:none;padding:0;margin:0 0 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.ps-how li{background:#faf6f1;border-radius:14px;padding:9px 6px;font-size:12.5px;text-align:center;line-height:1.35}.ps-how b{display:block;font-size:15px;color:#b48ae8}
+.ps-list{display:flex;flex-direction:column;gap:12px}.ps-card{border:1.5px solid var(--line);border-radius:18px;padding:12px;background:var(--card)}
+.ps-top{display:flex;gap:12px;align-items:center}.ps-th{flex:0 0 64px;height:64px;border-radius:14px;display:grid;place-items:center;font-size:32px;overflow:hidden}.ps-th img{width:100%;height:100%;object-fit:cover}
+.ps-top b{display:block;font-size:16px;margin:2px 0}.ps-top small{color:var(--ink2);font-size:13px;line-height:1.4}
+.ps-tags{display:flex;gap:4px;flex-wrap:wrap}.ps-tags em{font-style:normal;font-size:11px;padding:2px 7px;border-radius:99px;background:#efe5fb;color:#6b4fa0}.ps-tags em.nw{background:#f28daa;color:#fff}.ps-tags em.ss{background:#dff3ec;color:#2f7d68}
+.ps-card details{margin:10px 0 0}.ps-card summary{font-size:13px;color:var(--ink2);cursor:pointer}.ps-card textarea{width:100%;box-sizing:border-box;margin-top:6px;height:110px;border:1.5px solid var(--line);border-radius:12px;padding:8px;font:13px/1.45 inherit;resize:vertical;background:#faf6f1}
+.ps-btns{display:grid;grid-template-columns:.8fr 1fr 1fr;gap:6px;margin-top:10px}.ps-b{border-radius:12px;padding:10px 4px;font-weight:700;font-size:13.5px;background:#faf6f1;border:1.5px solid var(--line)}.ps-b.dk{background:var(--ink);color:var(--card);border-color:var(--ink)}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
 .pg{text-align:left;border:1.5px solid var(--line);border-radius:18px;padding:10px;display:flex;flex-direction:column;gap:4px;background:var(--card);transition:transform .15s}
 .pg:hover{transform:translateY(-2px)}
@@ -386,7 +393,7 @@ try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard V
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
 // 보류 기능 스위치 (공개 버전은 build_fair.py 가 모두 false 로 바꿔요)
-const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false,stamps:false,invite:false,aiwall:false};
+const FEAT={reward:false,sunrise:false,courses:false,playground:false,match:false,missions:false,stamps:false,invite:false,aiwall:false,pshop:true};
 const BOOTHS = [
   {id:"pick",   name:"설쌤 추천 마켓", icon:"🛍️", sub:"고민별로 골라 주는 놀로 상품", color:"#f28daa", light:"#fde3ea", pos:[-10.5, 1.5]},
   {id:"knolloday", name:"놀로데이 특가", icon:"🎁", sub:"매월 22일 회원 혜택", color:"#c4512f", light:"#fbe3d4", pos:[-9.2, -7.6]},
@@ -919,7 +926,7 @@ const wall={x:-13.4,z:8.6};
   const g=new THREE.Group();g.position.set(wall.x,0,wall.z);g.rotation.y=facing(wall.x,wall.z);scene.add(g);
   const bt=tex(1024,640,(x,W,H)=>{const gr=x.createLinearGradient(0,0,W,H);gr.addColorStop(0,"#fde3ea");gr.addColorStop(1,"#e2effc");x.fillStyle=gr;x.fillRect(0,0,W,H);
     x.globalAlpha=.22;x.fillStyle="#f28daa";for(let yy=40;yy<H;yy+=110)for(let xx=(yy/110%2)*70+30;xx<W;xx+=140)paw(x,xx,yy,1.1,.3);x.globalAlpha=1;
-    x.fillStyle="#3b3043";x.textAlign="center";x.textBaseline="middle";x.font=`800 120px ${FF}`;x.fillText("놀로랜드",W/2,H/2-40);x.font=`800 56px ${FF}`;x.fillStyle="#f28daa";x.fillText(FEAT.aiwall?"AI 프롬프트 포토월 🤖":"포토존에서 찰칵 📸",W/2,H/2+80);});
+    x.fillStyle="#3b3043";x.textAlign="center";x.textBaseline="middle";x.font=`800 120px ${FF}`;x.fillText("놀로랜드",W/2,H/2-40);x.font=`800 56px ${FF}`;x.fillStyle="#f28daa";x.fillText(FEAT.aiwall?"AI 프롬프트 포토월 🤖":FEAT.pshop?"프롬프트 맛집 🪄":"포토존에서 찰칵 📸",W/2,H/2+80);});
   g.add(mk(RB(5.4,3.5,.25,.12),M("#fffdf8"),0,2.3,0));
   const face=new THREE.Mesh(new THREE.PlaneGeometry(5.1,3.2),TM({map:bt,roughness:.85}));face.position.set(0,2.3,.13);g.add(face);
   [-2.5,2.5].forEach(px=>{g.add(mk(RB(.25,.3,1.2,.06),M("#d79b6e"),px,.15,0));});
@@ -1110,7 +1117,7 @@ SPOTS.g_fetch={door:new THREE.Vector3(ST.fetch.x-1.6,0,ST.fetch.z+1.4),act:()=>s
 SPOTS.g_nose={door:new THREE.Vector3(ST.nose.x,0,ST.nose.z+2.6),act:()=>startGame("nose")};
 SPOTS.g_hurdle={door:new THREE.Vector3(ST.hurdle.x-5,0,ST.hurdle.z),act:()=>startGame("hurdle")};
 SPOTS.playground={door:new THREE.Vector3(PG.x-PG.r+1.6,0,0),act:()=>toast("🎾 놀이터에 왔어요! 해 보고 싶은 놀이를 눌러 보세요")};
-SPOTS.wall.act=FEAT.aiwall?()=>{me.rotation.y=Math.atan2(wall.x-me.position.x,wall.z-me.position.z);openAIStudio();}:()=>{me.rotation.y=Math.atan2(-wall.x+me.position.x,-wall.z+me.position.z);flash();hearts();setTimeout(()=>takePhoto(),450);};
+SPOTS.wall.act=FEAT.aiwall?()=>{me.rotation.y=Math.atan2(wall.x-me.position.x,wall.z-me.position.z);openAIStudio();}:FEAT.pshop?()=>{me.rotation.y=Math.atan2(wall.x-me.position.x,wall.z-me.position.z);openPromptShop();}:()=>{me.rotation.y=Math.atan2(-wall.x+me.position.x,-wall.z+me.position.z);flash();hearts();setTimeout(()=>takePhoto(),450);};
 
 /* game banner */
 const gbar=document.createElement("div");gbar.id="gbar";gbar.hidden=true;gbar.innerHTML='<span id="gbT"></span><button id="gbX" aria-label="그만하기">그만</button>';document.getElementById("app").appendChild(gbar);
@@ -1611,7 +1618,38 @@ async function promptParams(t){
   return p;
 }
 
-const wallLbl=label("AI 프롬프트 포토월","🤖","#b48ae8",.85);wallLbl.position.set(wall.x,5.7,wall.z);scene.add(wallLbl);
+/* ---------- 🪄 놀로 프롬프트 맛집 (복사해서 챗GPT·제미나이에서 만들기) ---------- */
+const PSHOP=[
+  {id:"gwansang",kind:"text",isNew:true,icon:"🔮",bg:"linear-gradient(160deg,#efe5fb,#fde3ea)",t:"강아지 관상 풀이",d:"사진 한 장으로 보는 재미있는 멍상(犬相)",
+   p:"첨부한 사진 속 강아지의 얼굴을 보고 재미로 보는 '멍상(강아지 관상)' 풀이를 해 줘.\n- 눈, 코, 귀, 입매, 표정을 하나씩 보고 어떤 성격일지 다정하게 풀어 줘.\n- 마지막에 '이 강아지를 한 줄로 표현하면'과 '어울리는 별명 3개'를 알려 줘.\n- 건강이나 질병 이야기는 하지 말고, 밝고 따뜻한 말투로 전체 300자 안팎으로 써 줘."},
+  {id:"xmas",kind:"img",season:true,icon:"🎄",bg:"linear-gradient(160deg,#2b3a6b,#4a6fb0)",t:"크리스마스 카드",d:"산타 모자 쓰고 눈 오는 밤에 찰칵"},
+  {id:"idphoto",kind:"img",icon:"🪪",bg:"linear-gradient(160deg,#d6e8f7,#ffffff)",t:"증멍사진",d:"나비넥타이 매고 찰칵, 우리 강아지 증명사진"},
+  {id:"hill",kind:"img",icon:"🖼️",bg:"linear-gradient(160deg,#6fb8f2,#bfe6a6)",t:"윈도우 언덕 바탕화면",d:"초원 언덕 너머로 우리 강아지가 빼꼼!"},
+  {id:"retro",kind:"img",icon:"🎮",bg:"linear-gradient(160deg,#e9e4d8,#cfd8c6)",t:"레트로 게임기 속 내 새끼",d:"그 시절 휴대용 게임기 속으로 들어간 우리 강아지"},
+  {id:"pepero",kind:"img",icon:"🍫",bg:"linear-gradient(160deg,#ffd6e2,#fff1d6)",t:"멍빼로 데이",d:"초코 막대 과자(장난감 소품)를 든 우리 강아지"}
+].map(x=>Object.assign({},x,{p:x.p||(PROMPTS.find(y=>y.id===x.id)||{}).prompt||""})).filter(x=>x.p);
+const PS_APPS={gpt:["챗GPT","https://chatgpt.com/"],gem:["제미나이","https://gemini.google.com/app"]};
+function openPromptShop(){
+  track("pshop_open",{});
+  openSheet(`<div class="sh-head" style="background:linear-gradient(135deg,#efe5fb,#e2effc);color:#3b3043">${X}<div class="kick">🪄 @knollo.store 인기 프롬프트</div><h2>놀로 프롬프트 맛집</h2><p>마음에 드는 프롬프트를 복사해서 우리 강아지 사진과 함께 챗GPT나 제미나이에 붙여 넣으면 끝!</p></div>
+  <div class="sh-body"><ol class="ps-how"><li><b>1</b>프롬프트 고르기</li><li><b>2</b>복사하고 앱 열기</li><li><b>3</b>강아지 사진 올리고 붙여 넣기</li></ol>
+    <div class="ps-list">${PSHOP.map(p=>`<div class="ps-card" data-p="${p.id}">
+      <div class="ps-top"><span class="ps-th" style="background:${p.bg}">${p.ex?`<img src="${p.ex}" alt="">`:p.icon}</span><div><div class="ps-tags">${p.isNew?'<em class="nw">NEW</em>':""}${p.season?'<em class="ss">이번 시즌</em>':""}<em>${p.kind==="text"?"글로 풀이":"사진 만들기"}</em></div><b>${p.t}</b><small>${p.d}</small></div></div>
+      <details><summary>프롬프트 보기</summary><textarea readonly>${esc(p.p)}</textarea></details>
+      <div class="ps-btns"><button class="ps-b" data-a="copy">📋 복사</button><button class="ps-b dk" data-a="gpt">복사 + 챗GPT</button><button class="ps-b dk" data-a="gem">복사 + 제미나이</button></div></div>`).join("")}</div>
+    <p class="note">영어 프롬프트는 영어 그대로 붙여 넣는 게 결과가 더 좋아요. 결과는 AI가 만들어서 매번 조금씩 달라요.</p>
+    <button class="cta ghost" id="psPhoto">📸 놀로랜드에서 기념사진 찍기</button>
+    <a class="cta ghost" href="${IG_URL}" target="_blank" rel="noopener" id="psIg">📷 새 프롬프트는 @knollo.store 인스타에서</a></div>`);
+  sheet.querySelectorAll(".ps-card").forEach(c=>{const p=PSHOP.find(x=>x.id===c.dataset.p);
+    c.querySelectorAll(".ps-b").forEach(b=>b.onclick=()=>{const a=b.dataset.a;
+      try{navigator.clipboard.writeText(p.p).then(()=>toast("📋 프롬프트를 복사했어요"),()=>toast("복사가 안 되면 '프롬프트 보기'에서 길게 눌러 복사해 주세요"));}catch(e){toast("복사가 안 되면 '프롬프트 보기'에서 길게 눌러 복사해 주세요");}
+      track(a==="copy"?"prompt_copy":"prompt_open",{prompt:p.id,app:a});
+      if(PS_APPS[a])window.open(PS_APPS[a][1],"_blank","noopener");});
+    const d=c.querySelector("details");d.ontoggle=()=>{if(d.open)track("prompt_view",{prompt:p.id});};});
+  $("#psPhoto").onclick=()=>{closeSheet();flash();hearts();setTimeout(()=>takePhoto(),450);};
+  $("#psIg").onclick=()=>track("store_click",{place:"pshop_ig",link_url:IG_URL});
+}
+const wallLbl=FEAT.aiwall?label("AI 프롬프트 포토월","🤖","#b48ae8",.85):FEAT.pshop?label("놀로 프롬프트 맛집","🪄","#b48ae8",.85):label("포토존","📸","#f28daa",.85);wallLbl.position.set(wall.x,5.7,wall.z);scene.add(wallLbl);
 /* ================= v8: Christmas party · 2027 sunrise wishes · walking courses ================= */
 const XM={x:-31,z:0,r:9.2}, SR={x:0,z:-34,r:10};
 const RING={r0:23.6,r1:27.4};
@@ -2370,7 +2408,7 @@ const $=s=>document.querySelector(s);
 const veil=$("#veil"), sheet=$("#sheet");
 function renderChips(){
   $("#chips").innerHTML=BOOTHS.map(b=>`<button class="chip${visited.has(b.id)?" v":""}" data-id="${b.id}"><span>${b.icon}</span>${b.house?"상담소":b.name.replace("놀로 ","").replace("우리 강아지 ","").replace("보호자 ","")}</button>`).join("")+`<button class="chip" data-id="carousel"><span>🎠</span>회전목마</button><button class="chip" data-id="viking"><span>⛵</span>바이킹</button><button class="chip" data-id="runfield"><span>🐕</span>운동장</button><button class="chip" data-id="lucky"><span>🍀</span>행운 뽑기</button>`;
-  $("#chips").insertAdjacentHTML("beforeend",`${FEAT.playground?`<button class="chip${plays.size>=3?" v":""}" data-id="playground"><span>🎾</span>놀이터</button>`:""}${FEAT.aiwall?`<button class="chip" data-id="wall"><span>🤖</span>AI 포토월</button>`:`<button class="chip" data-id="wall"><span>📸</span>포토존</button>`}<button class="chip${SEASON.has("orn")?" v":""}" data-id="party"><span>🎄</span>파티</button>${FEAT.sunrise?`<button class="chip${SEASON.has("wish")?" v":""}" data-id="sunhill"><span>🌅</span>일출 언덕</button>`:""}${FEAT.courses?`<button class="chip${Object.keys(walks).length?" v":""}" data-id="courses"><span>🐾</span>산책 코스</button>`:""}<button class="chip${SEASON.has("cafe")?" v":""}" data-id="cafezone"><span>☕</span>멍카페</button>`);
+  $("#chips").insertAdjacentHTML("beforeend",`${FEAT.playground?`<button class="chip${plays.size>=3?" v":""}" data-id="playground"><span>🎾</span>놀이터</button>`:""}${FEAT.aiwall?`<button class="chip" data-id="wall"><span>🤖</span>AI 포토월</button>`:(FEAT.pshop?`<button class="chip" data-id="wall"><span>🪄</span>프롬프트 맛집</button>`:`<button class="chip" data-id="wall"><span>📸</span>포토존</button>`)}<button class="chip${SEASON.has("orn")?" v":""}" data-id="party"><span>🎄</span>파티</button>${FEAT.sunrise?`<button class="chip${SEASON.has("wish")?" v":""}" data-id="sunhill"><span>🌅</span>일출 언덕</button>`:""}${FEAT.courses?`<button class="chip${Object.keys(walks).length?" v":""}" data-id="courses"><span>🐾</span>산책 코스</button>`:""}<button class="chip${SEASON.has("cafe")?" v":""}" data-id="cafezone"><span>☕</span>멍카페</button>`);
   $("#chips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>walkTo(c.dataset.id));
   const n=stampCount();$("#stampN").textContent=`${n}/${NS}`;$("#playN").textContent=`${plays.size}/3`;$("#playN").hidden=!FEAT.playground;$("#stampPill").classList.toggle("done",n>=NS&&(!FEAT.playground||plays.size>=3));
 }
