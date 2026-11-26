@@ -337,6 +337,7 @@ body:has(#veil:not([hidden])) .toast{top:calc(10px + env(safe-area-inset-top));z
 #guide .gl button{display:flex;align-items:center;gap:8px;text-align:left;border:0;background:#fff7ee;border-radius:14px;padding:10px;min-height:58px;font:inherit;cursor:pointer}
 #guide .gl span{font-size:22px}#guide .gl b{display:block;font-size:14px;font-weight:800;color:#3b3043;line-height:1.25}#guide .gl small{display:block;font-size:12px;color:var(--ink2);line-height:1.3;margin-top:2px}
 #guide .gx{display:block;width:100%;border:0;background:none;color:var(--ink2);font:inherit;font-size:13px;padding:10px 0 4px;cursor:pointer}
+.cnreal{background:#fff1e2;border-radius:14px;padding:10px 12px;margin:0 0 6px;font-size:14px;color:var(--ink)}.cnreal small{display:block;color:var(--ink2);font-size:12px;margin-top:3px}.mi .cnp{font-style:normal;font-size:12px;color:#c98a6a;font-weight:700}.cnvisit{background:#fff1e2;border:2px solid #f2c08a;border-radius:16px;padding:12px 14px;margin:12px 0 6px;text-align:left}.cnvisit b{display:block;font-size:15px}.cnvisit small{display:block;color:var(--ink2);font-size:12.5px;margin-top:6px;line-height:1.5}.cnperk{margin:8px 0 0;font-size:13.5px;font-weight:700;color:#d9485f}
 .mreal{display:flex;align-items:center;gap:10px;background:#fff7ee;border-radius:14px;padding:10px 12px;margin:12px 0 4px;text-align:left}.mreal span{font-size:24px}.mreal small{display:block;font-size:12px;color:var(--ink2)}.mreal b{display:block;font-size:15px;font-weight:800;color:#3b3043}
 @media (max-width:640px){.tr .pill{min-height:40px;min-width:40px;justify-content:center}#fabs .fab{width:54px;height:54px;font-size:19px;gap:2px}.fab span{display:block;font-size:12px}}
 @media (max-width:420px){.tr .pill{padding:6px 10px}.tr .pill .n{font-size:12px}#coatBtn::before{font-size:17px}}
@@ -390,7 +391,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 function track(n,p){try{if(typeof window.gtag==="function")window.gtag("event",n,p||{});}catch(e){}}
 const FF='"Pretendard Variable",Pretendard,"Noto Sans KR","Apple SD Gothic Neo",sans-serif';
-try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 산타의 행운 선물 프롬프트 맛집 크리스마스에 오신 걸 환영해요 댕냥상식 퀴즈 멍카페 맛집 골목 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,600))]);}catch(e){}
+try{await Promise.race([Promise.all([document.fonts.load('800 64px "Pretendard Variable"','놀로랜드 설채현 수의사 교육상담소 추천 마켓 성향평가 놀로데이 특가 회전목마 바이킹 운동장 행운 뽑기 산타의 행운 선물 프롬프트 맛집 크리스마스에 오신 걸 환영해요 댕냥상식 퀴즈 카페놀로 맛집 골목 청담에 진짜 있어요 우리 강아지 전문 트레이너 어서 와요 반가워요 오늘도 즐겁게 산책해요 크리스마스 파티'),document.fonts.load("800 64px 'Noto Sans KR'"),document.fonts.load("500 16px 'Noto Sans KR'")]),new Promise(r=>setTimeout(r,600))]);}catch(e){}
 
 const K = "https://www.knollo.store";
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
@@ -2008,7 +2009,7 @@ applySeason();
   T.g.traverse(o=>{if(o.isMesh){o.userData.booth="consult";clickables.push(o);}});obstacles.push({x:-3.6,z:-8.4,r:1});
   window.__trainer=T;
 }
-/* ================= v10: 멍카페 & 맛집 골목 · 같이 해돋이 ================= */
+/* ================= v10: 카페놀로 & 맛집 골목 · 같이 해돋이 ================= */
 const CF={x:21,z:-21,r:7.6};
 WALK.push({t:"c",x:CF.x,z:CF.z,r:CF.r-.5});
 const cafeTables=[];let barista=null;
@@ -2025,7 +2026,7 @@ const cafeTables=[];let barista=null;
   fr.add(mk(RB(1.3,2.1,.15,.1),M("#8a5a3b"),0,1.05,0));
   const win=M("#fff1b8",{emissive:"#ffd76a",emissiveIntensity:.6});[-1.8,1.8].forEach(x=>{fr.add(mk(RB(1.2,1.0,.12,.1),win,x,1.8,0,false));});
   const aw=mk(RB(5.2,.12,1.1,.05),TM({map:stripes("#c98a6a","#fffdf8",14)}),0,2.75,.5);aw.rotation.x=.35;fr.add(aw);
-  const sg=tex(768,170,(x,W,H)=>{x.fillStyle="#fffdf8";rr(x,6,6,W-12,H-12,60);x.fill();x.lineWidth=10;x.strokeStyle="#c98a6a";x.stroke();x.font=`800 92px ${FF}`;x.fillStyle="#5a3424";x.textAlign="center";x.textBaseline="middle";x.fillText("☕ 멍카페",W/2,H/2+6);});
+  const sg=tex(768,170,(x,W,H)=>{x.fillStyle="#fffdf8";rr(x,6,6,W-12,H-12,60);x.fill();x.lineWidth=10;x.strokeStyle="#c98a6a";x.stroke();x.font=`800 92px ${FF}`;x.fillStyle="#5a3424";x.textAlign="center";x.textBaseline="middle";x.fillText("☕ 카페놀로",W/2,H/2+6);});
   const sp=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.72),TM({map:sg}));sp.position.set(0,3.35,.15);fr.add(sp);
   const counter=mk(RB(2.4,1.0,.8,.12),M("#fffdf8"),-1.2,.5,2.7);c.add(counter);c.add(mk(RB(2.44,.18,.84,.06),M("#c98a6a"),-1.2,1.02,2.7));
   [[-1.9,"#ffd36b"],[-1.4,"#f28daa"],[-.9,"#9fd8ef"]].forEach(([x,col])=>{c.add(mk(new THREE.CylinderGeometry(.1,.08,.2,12),M("#fff"),x,1.21,2.7));c.add(mk(new THREE.SphereGeometry(.09,10,8),M(col),x,1.36,2.7));});
@@ -2034,7 +2035,7 @@ const cafeTables=[];let barista=null;
   // barista
   const B=person("#c98a6a","#3a2a22","#3b3043");const bp=new THREE.Vector3(-1.2,0,1.9).applyAxisAngle(new THREE.Vector3(0,1,0),c.rotation.y).add(c.position);
   B.g.position.copy(bp);B.g.rotation.y=c.rotation.y;B.g.scale.setScalar(1.15);scene.add(B.g);B.inner.add(mk(RB(.62,.7,.1,.05),M("#fffdf8"),0,1.3,.4));
-  const lb=label("멍카페 바리스타","☕","#c98a6a",.72);lb.position.set(0,3.25,0);B.g.add(lb);B.g.traverse(o=>{if(o.isMesh){o.userData.booth="cafe";clickables.push(o);}});barista=B;
+  const lb=label("카페놀로 바리스타","☕","#c98a6a",.72);lb.position.set(0,3.25,0);B.g.add(lb);B.g.traverse(o=>{if(o.isMesh){o.userData.booth="cafe";clickables.push(o);}});barista=B;
   [c,counter].forEach(o=>o.traverse(m=>{if(m.isMesh){m.userData.booth="cafe";clickables.push(m);}}));
   CF.order=new THREE.Vector3(-1.2,0,4.1).applyAxisAngle(new THREE.Vector3(0,1,0),c.rotation.y).add(c.position);
   // tables with parasols
@@ -2053,7 +2054,8 @@ const cafeTables=[];let barista=null;
   const bt=tex(560,360,(x,W,H)=>{x.fillStyle="#fff7e6";rr(x,6,6,W-12,H-12,34);x.fill();x.strokeStyle="#5fb8a0";x.lineWidth=10;x.stroke();x.fillStyle="#3b3043";x.textAlign="center";x.font=`800 54px ${FF}`;x.fillText("🗺️ 강아지 동반",W/2,120);x.fillText("맛집 추천 게시판",W/2,200);x.font=`800 34px ${FF}`;x.fillStyle="#5fb8a0";x.fillText("우리 동네 맛집을 알려 주세요!",W/2,290);});
   const bpn=new THREE.Mesh(new THREE.PlaneGeometry(2.1,1.35),TM({map:bt}));bpn.position.set(0,1.75,.08);bd.add(bpn);bd.add(mk(RB(2.2,1.45,.1,.06),M("#8a5a3b"),0,1.75,0));
   bd.traverse(o=>{if(o.isMesh){o.userData.booth="spots";clickables.push(o);}});obstacles.push({x:bd.position.x,z:bd.position.z,r:1});
-  const al=label("멍카페 & 맛집 골목","☕","#c98a6a",.95);al.position.set(CF.x,6.2,CF.z+1);g.add(al);
+  const al=label("카페놀로 & 맛집 골목","☕","#c98a6a",.95);al.position.set(CF.x,6.2,CF.z+1);g.add(al);
+  const pin=label("청담에 진짜 있어요","📍","#d9485f",.7);pin.position.set(c.position.x,5.9,c.position.z);g.add(pin);
   for(let i=0;i<5;i++)flowers(CF.x+Math.cos(i*1.25+.5)*6.6,CF.z+Math.sin(i*1.25+.5)*6.6,5);
 }
 /* 🍯 허니콤츄 맛별 소개 (시식 트럭) — 문구는 운영팀 검수 후 확정 */
@@ -2077,15 +2079,21 @@ function truckSheet(){
   $("#hcMore").onclick=()=>{closeSheet();const h=hexMesh(1);scene.add(h);flyers.push({m:h,a:truck.counter.clone(),b:me.position.clone().add(new THREE.Vector3(0,1.6,0)),t:0,done:()=>{hearts();toast("🍯 한 조각 더! 냠냠");}});};
 }
 /* ☕ 놀로스퀘어 1층 카페 실제 메뉴 (네이버 플레이스 기준, 2026-11 확인) */
-const SQ_CAFE={name:"놀로스퀘어 1층 카페",addr:"서울 강남구 삼성로133길 7 놀로스퀘어 · 7호선 청담역 8번 출구 도보",map:"https://map.naver.com/p/entry/place/1519764149",
+const SQ_CAFE={name:"카페놀로",ig:"https://www.instagram.com/knollo.square/",
+  // 방문 혜택: 매장과 협의되면 문구만 넣어요 (예: "카운터에서 '놀로랜드 보고 왔어요'라고 말하면 …"). 빈 값이면 안 보여요.
+  perk:"",addr:"서울 강남구 삼성로133길 7 놀로스퀘어 · 7호선 청담역 8번 출구 도보",map:"https://map.naver.com/p/entry/place/1519764149",
   dog:[["멍푸치노","강아지 전용 우유 거품 한 잔","3,000원"],["도기플레이트","반려견 전용 한 접시","7,900원"],["멍양식","반려견 전용 식사 메뉴","8,900원"]],
   human:[["아메리카노 / 에스프레소","","5,500원"],["카페라떼","","6,000원"],["티 / 에이드","","6,500원"]]};
 function sqMenuHTML(){const li=a=>a.map(([n,d,p])=>`<li><div>${n}${d?`<br><span>${d}</span>`:""}</div><em>${p}</em></li>`).join("");
-  return `<div class="realmenu"><h3>📍 진짜로 놀러 오세요! ${SQ_CAFE.name}</h3><p class="addr">${SQ_CAFE.addr}</p>
+  return `<div class="realmenu"><h3>📍 진짜로 놀러 오세요! 청담 ${SQ_CAFE.name}</h3><p class="addr">${SQ_CAFE.addr}</p>
   <div class="grp">🐶 반려견 메뉴</div><ul>${li(SQ_CAFE.dog)}</ul><div class="grp">☕ 보호자 메뉴</div><ul>${li(SQ_CAFE.human)}</ul>
   <p class="tip">가격은 네이버 플레이스 기준이에요. 전체 메뉴와 영업시간은 플레이스에서 확인해 주세요. 놀로스퀘어 이용 시 주차 할인이 있어요.</p>
-  <a class="cta ghost" href="${SQ_CAFE.map}" target="_blank" rel="noopener">🗺️ 네이버 지도에서 보기 · 예약</a></div>`;}
+  ${SQ_CAFE.perk?`<p class="cnperk">🎁 ${SQ_CAFE.perk}</p>`:""}<div class="btns"><a class="cta ghost" data-cn="cafe_map" data-from="menu" href="${SQ_CAFE.map}" target="_blank" rel="noopener">🗺️ 지도 · 예약</a><a class="cta ghost" data-cn="cafe_ig" data-from="menu" href="${SQ_CAFE.ig}" target="_blank" rel="noopener">📷 인스타</a></div></div>`;}
+function bindCN(){sheet.querySelectorAll("[data-cn]").forEach(a=>a.addEventListener("click",()=>track(a.dataset.cn,{from:a.dataset.from})));}
 const MENU=[
+  {k:"puccino",e:"☕",n:"멍푸치노",d:"강아지 전용 우유 거품 한 잔",col:"#fff1e2",real:"3,000원"},
+  {k:"plate",e:"🍽️",n:"도기플레이트",d:"반려견 전용 한 접시",col:"#f7d9b0",real:"7,900원"},
+  {k:"yang",e:"🥘",n:"멍양식",d:"반려견 전용 식사 메뉴",col:"#ffe3b8",real:"8,900원"},
   {k:"baro",e:"🍖",n:"바로트릿 한 접시",d:"치킨·소고기·황태, 칭찬할 때 바로 주는 한 입 트릿",col:"#f7d9b0",url:"/product/2FV7R4HURSN5",p:"놀로 바로트릿 3종",b:"바로트릿 보러 가기"},
   {k:"turkey",e:"🦃",n:"터키츄 스테이크",d:"칠면조 힘줄을 오래오래 씹는 든든한 한 접시",col:"#f2c08a",url:"/product/YEYRJTCQWJ6M",p:"놀로 터키츄 칠면조 힘줄 스틱",b:"터키츄 보러 가기"},
   {k:"hanwoo",e:"🐄",n:"한우스틱",d:"한우로 만든 쫄깃한 스틱, 즐겅즐겅 씹어요",col:"#c98a6a",url:"/product/8CKWZ5VUYNWV",p:"놀로 즐겅즐겅 한우스틱",b:"한우스틱 보러 가기"},
@@ -2093,13 +2101,16 @@ const MENU=[
   {k:"honey",e:"🍯",n:"허니콤츄 디저트",d:"양치 습관까지 챙기는 달콤한 마무리",col:"#f6b93b",url:"/product/4PUYY7K8BTF9",p:"바이레프 허니콤츄",b:"허니콤츄 보러 가기"}
 ];
 let meal=null;
+const miHTML=m=>`<button class="mi" data-k="${m.k}"><span style="background:${m.col}">${m.e}</span><div><b>${m.n}${m.real?` <i class="cnp">${m.real}</i>`:""}</b><small>${m.d}</small></div><em>주문</em></button>`;
 function cafeSheet(){
-  openSheet(`<div class="sh-head" style="background:linear-gradient(135deg,#fff1e2,#fde3ea);color:#3b3043">${X}<div class="hbadge">☕</div><div class="kick">☕ 멍카페 & 맛집 골목</div><h2>오늘 뭐 먹을까?</h2><p>메뉴를 고르면 ${esc(dname())}${batchim(dname())?"이":""}가 테이블에 앉아 맛있게 먹어요. 놀로의 진짜 간식으로 만든 메뉴예요.</p></div>
-  <div class="sh-body"><div class="menu">${MENU.map(m=>`<button class="mi" data-k="${m.k}"><span style="background:${m.col}">${m.e}</span><div><b>${m.n}</b><small>${m.d}</small></div><em>주문</em></button>`).join("")}</div>
+  openSheet(`<div class="sh-head" style="background:linear-gradient(135deg,#fff1e2,#fde3ea);color:#3b3043">${X}<div class="hbadge">☕</div><div class="kick">☕ 카페놀로 & 맛집 골목</div><h2>오늘 뭐 먹을까?</h2><p>메뉴를 고르면 ${esc(dname())}${batchim(dname())?"이":""}가 테이블에 앉아 맛있게 먹어요. 청담 카페놀로의 실제 메뉴와 놀로 간식으로 차렸어요.</p></div>
+  <div class="sh-body"><div class="cnreal">📍 <b>청담 카페놀로</b>에서 진짜로 파는 메뉴예요<small>${SQ_CAFE.addr}</small></div>
+  <div class="sec">☕ 카페놀로 반려견 메뉴</div><div class="menu">${MENU.filter(m=>m.real).map(miHTML).join("")}</div>
+  <div class="sec">🍖 놀로 간식 메뉴</div><div class="menu">${MENU.filter(m=>!m.real).map(miHTML).join("")}</div>
   ${sqMenuHTML()}
   <button class="cta ghost" id="toSpots">🗺️ 강아지 동반 맛집 추천 게시판 보기</button>
   <p class="note">간식은 우리 아이 체중과 건강 상태에 맞게 적당히 주세요.</p></div>`);
-  sheet.querySelectorAll(".mi").forEach(b=>b.onclick=()=>order(b.dataset.k));$("#toSpots").onclick=()=>spotsSheet();
+  bindCN();sheet.querySelectorAll(".mi").forEach(b=>b.onclick=()=>order(b.dataset.k));$("#toSpots").onclick=()=>spotsSheet();
 }
 function order(k){
   const m=MENU.find(x=>x.k===k);closeSheet();
@@ -2109,6 +2120,8 @@ function order(k){
     const dish=new THREE.Group();dish.add(mk(new THREE.CylinderGeometry(.32,.26,.05,20),M("#ffffff"),0,0,0));
     if(k==="puccino"){dish.add(mk(new THREE.CylinderGeometry(.14,.11,.24,16),M("#fff"),0,.14,0));dish.add(mk(new THREE.SphereGeometry(.14,14,10),M("#fff8ee"),0,.27,0));}
     else if(k==="honey"){const h=hexMesh(.8);h.position.y=.14;dish.add(h);}
+    else if(k==="plate"){[[-.12,0,"#c98a6a"],[.1,.06,"#9fd88f"],[.02,-.12,"#ffd36b"]].forEach(([x,z,col])=>dish.add(mk(new THREE.SphereGeometry(.08,12,8),M(col),x,.07,z)));}
+    else if(k==="yang"){dish.add(mk(new THREE.CylinderGeometry(.22,.16,.1,18),M("#fffdf8"),0,.07,0));dish.add(mk(new THREE.SphereGeometry(.17,14,8,0,Math.PI*2,0,Math.PI/2),M("#e9a96a"),0,.1,0));}
     else if(k==="cookie"){[[-.1,0],[.1,.05],[0,-.1]].forEach(([x,z])=>{const c=mk(new THREE.CylinderGeometry(.09,.09,.04,14),M("#ffe3b8"),x,.05,z);dish.add(c);});}
     else{const s2=mk(new THREE.CapsuleGeometry(.05,.34,6,8),M(m.col),0,.07,0);s2.rotation.z=Math.PI/2;dish.add(s2);const s3=s2.clone();s3.position.z=.1;s3.rotation.y=.5;dish.add(s3);}
     dish.position.set(free.g.position.x+.35,.88,free.g.position.z+.1);scene.add(dish);meal={t:0,dish,m};};
@@ -2119,9 +2132,10 @@ function tickCafe(t,dt){
   if(meal.t>.6&&meal.t-dt<=.6)hearts();
   if(meal.t>2.4){const {dish,m}=meal;meal=null;me.userData.head.rotation.x=0;scene.remove(dish);hearts();quest("cafe");seasonStamp("cafe",`${m.e} 냠냠! 맛집 도장 쾅`);
     openSheet(`<div class="intro">${X}<div class="em">${m.e}</div><h2>${esc(m.n)} 맛있게 먹었어요!</h2><p>${esc(dname())}${batchim(dname())?"이":""}의 오늘 맛집 후기: “또 먹고 싶어요 🐾”</p>
-      <div class="mreal"><span>${m.e}</span><div><small>방금 먹은 메뉴는 진짜 놀로 간식이에요</small><b>${esc(m.p)}</b></div></div>
-      ${cta(K+m.url,m.b)}<div class="btns"><button class="cta ghost" id="mShot">📸 인증 사진</button><button class="cta ghost" id="mMore">☕ 다른 메뉴</button></div></div>`);
-    $("#mShot").onclick=()=>{closeSheet();setTimeout(takePhoto,250);};$("#mMore").onclick=()=>cafeSheet();}
+      ${m.real?`<div class="cnvisit"><b>${m.e} 방금 먹은 ${esc(m.n)}, 청담 카페놀로에서 진짜로 먹을 수 있어요</b><small>${esc(m.n)} ${m.real} · ${SQ_CAFE.addr}<br>놀로스퀘어 이용 시 주차 할인이 있어요.</small>${SQ_CAFE.perk?`<p class="cnperk">🎁 ${SQ_CAFE.perk}</p>`:""}</div>
+      <a class="cta" data-cn="cafe_map" data-from="meal" href="${SQ_CAFE.map}" target="_blank" rel="noopener">🗺️ 길찾기 · 예약하기</a><a class="cta ghost" data-cn="cafe_ig" data-from="meal" href="${SQ_CAFE.ig}" target="_blank" rel="noopener">📷 카페놀로 인스타 구경하기</a>`:`<div class="mreal"><span>${m.e}</span><div><small>방금 먹은 메뉴는 진짜 놀로 간식이에요</small><b>${esc(m.p)}</b></div></div>
+      ${cta(K+m.url,m.b)}`}<div class="btns"><button class="cta ghost" id="mShot">📸 인증 사진</button><button class="cta ghost" id="mMore">☕ 다른 메뉴</button></div></div>`);
+    bindCN();$("#mShot").onclick=()=>{closeSheet();setTimeout(takePhoto,250);};$("#mMore").onclick=()=>cafeSheet();}
 }
 /* dog-friendly spots board (shared) */
 SH.spots=[];
@@ -2133,7 +2147,7 @@ setTimeout(loadSpots,1500);
 function renderSpotList(){const l=$("#spList");if(!l)return;l.innerHTML=SH.spots.length?SH.spots.map(o=>`<div class="spot"><span>${o.kind==="카페"?"☕":o.kind==="공원"?"🌳":"🍽️"}</span><div><b>${esc(o.name)}</b><small>${esc(o.area)} · ${esc(o.dog||"멍멍이")}네 추천</small><p>${esc(o.text)}</p></div></div>`).join(""):`<p class="note">아직 추천이 없어요. 첫 번째로 우리 동네 맛집을 알려 주세요!</p>`;}
 function spotsSheet(){
   const mine=SH.spots.find(o=>o.id===mineId());let kind=mine?.kind||"식당";
-  openSheet(`<div class="sh-head" style="background:linear-gradient(135deg,#e6f6ee,#fff6ea);color:#3b3043">${X}<div class="hbadge">🗺️</div><div class="kick">☕ 멍카페 & 맛집 골목</div><h2>강아지 동반 맛집 추천</h2><p>우리 강아지와 같이 갈 수 있는 동네 식당·카페·공원을 서로 알려 줘요.</p></div>
+  openSheet(`<div class="sh-head" style="background:linear-gradient(135deg,#e6f6ee,#fff6ea);color:#3b3043">${X}<div class="hbadge">🗺️</div><div class="kick">☕ 카페놀로 & 맛집 골목</div><h2>강아지 동반 맛집 추천</h2><p>우리 강아지와 같이 갈 수 있는 동네 식당·카페·공원을 서로 알려 줘요.</p></div>
   <div class="sh-body"><div id="spList"></div>
   <div class="sec">✍️ 우리 동네 추천하기</div>
   <div class="stks" id="spK">${["식당","카페","공원"].map(k=>`<button data-k="${k}" class="${k===kind?"on":""}">${k==="식당"?"🍽️":k==="카페"?"☕":"🌳"} ${k}</button>`).join("")}</div>
@@ -2149,7 +2163,7 @@ function spotsSheet(){
 }
 SPOTS.cafe={door:CF.order,act:()=>{me.rotation.y=Math.atan2(barista.g.position.x-me.position.x,barista.g.position.z-me.position.z);cafeSheet();}};
 SPOTS.spots={door:new THREE.Vector3(CF.x+3.8,0,CF.z+2.4),act:()=>spotsSheet()};
-SPOTS.cafezone={door:new THREE.Vector3(CF.x-3.2,0,CF.z+4.2),act:()=>toast("☕ 멍카페 & 맛집 골목이에요! 바리스타에게 주문해 보세요")};
+SPOTS.cafezone={door:new THREE.Vector3(CF.x-3.2,0,CF.z+4.2),act:()=>toast("☕ 카페놀로 & 맛집 골목이에요! 바리스타에게 주문해 보세요")};
 /* ---------- ⛵ 멍멍 바이킹 (south-west zone) ---------- */
 var VK={x:-21,z:-21,r:7.6},viking=null;
 WALK.push({t:"c",x:VK.x,z:VK.z,r:VK.r-.5});
@@ -2344,7 +2358,7 @@ function ungather(){gathered.forEach(({o,p,r})=>{o.position.copy(p);o.rotation.y
 const REWARD={live:false,title:"허니콤츄 1봉 무료",code:"",url:"https://www.knollo.store/my/coupon",product:"https://www.knollo.store/product/4PUYY7K8BTF9",note:"1인 1회 · 쿠폰 소진 시 종료"};
 const QPOOL0=[
   {k:"ride",e:"🎠",t:"회전목마 타고 추억 남기기",n:1},{k:"play",e:"🎾",t:"놀이 챌린지 1개 성공하기",n:1},{k:"course",e:"🐾",t:"산책 코스 1개 완주하기",n:1},
-  {k:"booth",e:"🎪",t:"부스 3곳 둘러보기",n:3},{k:"cafe",e:"☕",t:"멍카페 메뉴 먹어 보기",n:1},{k:"photo",e:"📸",t:"우리 강아지 사진 찍기",n:1},
+  {k:"booth",e:"🎪",t:"부스 3곳 둘러보기",n:3},{k:"cafe",e:"☕",t:"카페놀로 메뉴 먹어 보기",n:1},{k:"photo",e:"📸",t:"우리 강아지 사진 찍기",n:1},
   {k:"orn",e:"🎄",t:"소원 트리에 장식 달기",n:1},{k:"wish",e:"🌅",t:"2027 소원 빌기",n:1}
 ];
 const QPOOL=QPOOL0.filter(q=>!(q.k==="play"&&!FEAT.playground)&&!(q.k==="course"&&!FEAT.courses)&&!(q.k==="wish"&&!FEAT.sunrise));
@@ -2445,7 +2459,7 @@ function step(dt){
   if(moving){
     mv.normalize();
     const prev=me.position.clone();
-    // 멀리 가는 길(멍카페·바이킹 등)은 달려가요: 남은 거리가 길수록 빠르게, 가까워지면 원래 속도
+    // 멀리 가는 길(카페놀로·바이킹 등)은 달려가요: 남은 거리가 길수록 빠르게, 가까워지면 원래 속도
     const far=(target&&!keys.size)?Math.hypot(target.x-me.position.x,target.z-me.position.z):0;
     const SP=SPEED*(far>7?Math.min(2.8,1+(far-7)*.18):1);
     me.position.addScaledVector(mv,SP*dt);resolve(me.position);
@@ -2489,7 +2503,7 @@ const $=s=>document.querySelector(s);
 const veil=$("#veil"), sheet=$("#sheet");
 function renderChips(){
   $("#chips").innerHTML=BOOTHS.map(b=>`<button class="chip${visited.has(b.id)?" v":""}" data-id="${b.id}"><span>${b.icon}</span>${b.house?"상담소":b.name.replace("놀로 ","").replace("우리 강아지 ","").replace("보호자 ","")}</button>`).join("")+`<button class="chip" data-id="carousel"><span>🎠</span>회전목마</button><button class="chip" data-id="viking"><span>⛵</span>바이킹</button><button class="chip" data-id="runfield"><span>🐕</span>운동장</button><button class="chip" data-id="lucky"><span>${XMAS?"🎅":"🍀"}</span>${XMAS?"산타 선물":"행운 뽑기"}</button>`;
-  $("#chips").insertAdjacentHTML("beforeend",`${FEAT.playground?`<button class="chip${plays.size>=3?" v":""}" data-id="playground"><span>🎾</span>놀이터</button>`:""}${FEAT.aiwall?`<button class="chip" data-id="wall"><span>🤖</span>AI 포토월</button>`:(FEAT.pshop?`<button class="chip" data-id="wall"><span>🪄</span>프롬프트 맛집</button>`:`<button class="chip" data-id="wall"><span>📸</span>포토존</button>`)}<button class="chip${SEASON.has("orn")?" v":""}" data-id="party"><span>🎄</span>파티</button>${FEAT.sunrise?`<button class="chip${SEASON.has("wish")?" v":""}" data-id="sunhill"><span>🌅</span>일출 언덕</button>`:""}${FEAT.courses?`<button class="chip${Object.keys(walks).length?" v":""}" data-id="courses"><span>🐾</span>산책 코스</button>`:""}<button class="chip${SEASON.has("cafe")?" v":""}" data-id="cafezone"><span>☕</span>멍카페</button>`);
+  $("#chips").insertAdjacentHTML("beforeend",`${FEAT.playground?`<button class="chip${plays.size>=3?" v":""}" data-id="playground"><span>🎾</span>놀이터</button>`:""}${FEAT.aiwall?`<button class="chip" data-id="wall"><span>🤖</span>AI 포토월</button>`:(FEAT.pshop?`<button class="chip" data-id="wall"><span>🪄</span>프롬프트 맛집</button>`:`<button class="chip" data-id="wall"><span>📸</span>포토존</button>`)}<button class="chip${SEASON.has("orn")?" v":""}" data-id="party"><span>🎄</span>파티</button>${FEAT.sunrise?`<button class="chip${SEASON.has("wish")?" v":""}" data-id="sunhill"><span>🌅</span>일출 언덕</button>`:""}${FEAT.courses?`<button class="chip${Object.keys(walks).length?" v":""}" data-id="courses"><span>🐾</span>산책 코스</button>`:""}<button class="chip${SEASON.has("cafe")?" v":""}" data-id="cafezone"><span>☕</span>카페놀로</button>`);
   $("#chips").querySelectorAll(".chip").forEach(c=>c.onclick=()=>walkTo(c.dataset.id));
   const n=stampCount();$("#stampN").textContent=`${n}/${NS}`;$("#playN").textContent=`${plays.size}/3`;$("#playN").hidden=!FEAT.playground;$("#stampPill").classList.toggle("done",n>=NS&&(!FEAT.playground||plays.size>=3));
 }
@@ -2759,7 +2773,7 @@ function showStamps(finish){
    <div class="stamps" style="grid-template-columns:repeat(${NB},1fr)">${BOOTHS.map(b=>`<div class="st${visited.has(b.id)?" on":""}" style="${visited.has(b.id)?`background:${b.light}`:""}">${visited.has(b.id)?b.icon:""}<small>${b.house?"상담소":b.name.split(" ").pop()}</small></div>`).join("")}</div>
    <div class="sec">🎠 놀이기구 도장</div><div class="stamps three">${RIDES.map(r=>`<div class="st${rides.has(r.id)?" on":""}" style="${rides.has(r.id)?"background:#e2effc":""}">${rides.has(r.id)?r.icon:""}<small>${r.name}</small></div>`).join("")}</div>
    ${FEAT.playground?`<div class="sec">🎾 놀이 챌린지 ${plays.size}/3</div>`:""}<div class="stamps three"${FEAT.playground?"":" hidden"}>${Object.entries(ST).map(([k,v])=>`<div class="st${plays.has(k)?" on":""}" style="${plays.has(k)?"background:#e6f6ee":""}">${plays.has(k)?v.icon:""}<small>${v.name.split(" ")[0]}</small></div>`).join("")}</div>
-   <div class="sec">🎄 시즌 도장</div><div class="stamps three">${[["orn","🎄","트리 장식",SEASON.has("orn"),1],["cafe","☕","멍카페",SEASON.has("cafe"),1],["wish","🌅","새해 소원",SEASON.has("wish"),FEAT.sunrise],["walk","🐾","산책 완주",Object.keys(walks).length>0,FEAT.courses]].filter(x=>x[4]).map(([k,e,n,on])=>`<div class="st${on?" on":""}" style="${on?"background:#fff1d6":""}">${on?e:""}<small>${n}</small></div>`).join("")}</div>
+   <div class="sec">🎄 시즌 도장</div><div class="stamps three">${[["orn","🎄","트리 장식",SEASON.has("orn"),1],["cafe","☕","카페놀로",SEASON.has("cafe"),1],["wish","🌅","새해 소원",SEASON.has("wish"),FEAT.sunrise],["walk","🐾","산책 완주",Object.keys(walks).length>0,FEAT.courses]].filter(x=>x[4]).map(([k,e,n,on])=>`<div class="st${on?" on":""}" style="${on?"background:#fff1d6":""}">${on?e:""}<small>${n}</small></div>`).join("")}</div>
    <div style="height:18px"></div>
    ${finish?cta(LUCKY.url,"🎟️ 놀로스토어 혜택 확인하기")+`<a class="cta ghost" href="${K}" target="_blank" rel="noopener">놀로스토어 구경 가기</a>`:`<button class="cta" data-close>계속 둘러보기</button>`}</div>`);
 }
