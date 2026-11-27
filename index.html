@@ -356,6 +356,7 @@ body:has(#veil:not([hidden])) .toast{top:calc(10px + env(safe-area-inset-top));z
 .rback{margin-top:auto;padding-top:18px;background:none;border:0;font:inherit;font-size:14px;color:var(--ink2);font-weight:700}
 .lyr.bon{background:#fff0e6;margin-top:12px}.lyr.bon .lh{color:#e0784a}
 .rvo{display:flex;align-items:center;gap:6px;justify-content:center;font-size:14px;font-weight:700;margin:8px 0 2px;color:var(--ink)}.rvo small{font-weight:600;color:var(--ink2);font-size:11.5px}.rvo input{width:18px;height:18px;accent-color:#7b5cd6}
+.phg{background:#fff6ea;border-radius:16px;padding:14px 14px 12px;margin-top:14px;text-align:left}.phg>b{display:block;font-size:15px;margin-bottom:6px}.phg ol{margin:0;padding-left:20px;font-size:14px;line-height:1.65;color:var(--ink)}.phg li{margin:3px 0}.phg .cta{margin-top:10px}.phg small{display:block;font-size:12px;color:var(--ink2);margin-top:8px}
 .rnm{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);font:inherit;font-size:16px;background:var(--card);color:var(--ink)}
 .rres{position:relative;padding:44px 20px 24px;text-align:center;color:#fff;background:linear-gradient(160deg,var(--b1),var(--b2));border-radius:26px 26px 0 0}
 .rres .rlbl{font-size:12px;font-weight:800;letter-spacing:.16em;color:var(--a);margin-bottom:14px}
@@ -836,16 +837,7 @@ function buildHouse(b){
   boothGroups[b.id]=g;
 }
 BOOTHS.forEach(b=>b.house?buildHouse(b):buildTent(b));
-// 오른쪽 뒤 빈자리: 카페놀로(오른쪽 뒤 모서리) 가는 길 표지판 · 누르면 카페로 가요
-if(!BOOTHS.some(b=>b.pos[0]===9.2&&b.pos[1]===-7.6)){
-  const g=new THREE.Group();g.position.set(10.2,0,-8.4);g.rotation.y=Math.atan2(21-10.2,-21+8.4);scene.add(g);
-  g.add(mk(new THREE.CylinderGeometry(.12,.14,3.2,10),M("#9a6b4a"),0,1.6,0));
-  const ar=mk(RB(2.4,.62,.14,.08),M("#d9485f"),.7,2.6,0);g.add(ar);
-  const tip=mk(new THREE.ConeGeometry(.42,.6,3),M("#d9485f"),2.05,2.6,0);tip.rotation.z=-Math.PI/2;g.add(tip);
-  [[-1.2,"#ffd36b"],[1.2,"#f28daa"]].forEach(([px,c])=>{g.add(mk(new THREE.SphereGeometry(.45,14,10),M(c),px,.4,.6));});
-  const lb=label("카페놀로는 이쪽!","☕","#d9485f",.85);lb.position.set(0,4.4,0);g.add(lb);
-  tagClick(g,"cafe");obstacles.push({x:10.2,z:-8.4,r:.9});
-}
+
 BOOTHS.forEach(b=>{
   const ring=mk(new THREE.RingGeometry(.9,1.15,40),new THREE.MeshBasicMaterial({color:b.color,transparent:true,opacity:.75,depthWrite:false}),b.door.x,.05,b.door.z,false);ring.rotation.x=-Math.PI/2;scene.add(ring);
   const pad=mk(new THREE.CircleGeometry(.9,40),new THREE.MeshBasicMaterial({color:b.color,transparent:true,opacity:.18,depthWrite:false}),b.door.x,.045,b.door.z,false);pad.rotation.x=-Math.PI/2;scene.add(pad);
@@ -1309,7 +1301,15 @@ function photoSheet(url,storyUrl,title){
     <img src="${url}" alt="놀로랜드 사진" style="width:100%;border-radius:16px;margin:10px 0 6px;box-shadow:0 6px 18px rgba(0,0,0,.12)">
     <div class="btns"><button class="cta" id="phSave">💾 사진 저장</button><button class="cta ig" id="phStory">📲 인스타 스토리용 저장</button></div>
     <button class="cta ghost" id="phShare">💌 친구에게 자랑하기</button>
-    <p class="note">인스타 앱에서 스토리를 열고 저장한 이미지를 올린 뒤, @knollo.store 를 태그해 주세요. 링크 스티커로 놀로랜드 주소를 붙일 수 있어요.</p></div>`);
+    <div class="phg"><b>📲 인스타 스토리에 올리는 법</b>
+     <ol><li><b>'인스타 스토리용 저장'</b>을 눌러요. 공유창이 뜨면 <b>'이미지 저장'</b>을 골라 주세요.</li>
+      <li>인스타그램 앱에서 왼쪽 위 <b>내 프로필 사진(＋)</b>을 눌러 스토리를 열어요.</li>
+      <li>방금 저장한 <b>세로 사진</b>을 골라요.</li>
+      <li>위쪽 <b>스티커</b> 버튼 → <b>'@멘션'</b>에 <b>knollo.store</b> 를 적어 주세요.</li>
+      <li>스티커 → <b>'링크'</b>를 누르고 아래 주소를 붙여 넣으면 친구들이 바로 놀러 와요.</li></ol>
+     <button class="cta ghost" id="phCopy">🔗 놀로랜드 주소 복사하기</button>
+     <small>사진이 저장되지 않으면 사진을 길게 눌러 '사진 앱에 저장'을 눌러 주세요.</small></div></div>`);
+  $("#phCopy").onclick=()=>{track("photo_copylink");copyText("https://fair.knollo.store/?utm_source=instagram&utm_medium=story","🔗 주소를 복사했어요. 링크 스티커에 붙여 넣어 주세요");};
   $("#phSave").onclick=()=>saveImg(url,`놀로랜드-${ymd()}.png`);
   $("#phStory").onclick=async()=>{if(!(await shareImg(storyUrl,`놀로랜드-스토리-${ymd()}.png`,"놀로랜드에서 🐾 @knollo.store")))saveImg(storyUrl,`놀로랜드-스토리-${ymd()}.png`);};
   $("#phShare").onclick=()=>inviteSheet();
@@ -2168,7 +2168,7 @@ const MENU=[
   {k:"cookie",e:"🍪",n:"밀크세라 쿠키",d:"피부 영양을 생각한 이지트릿 쿠키",col:"#ffe3b8",url:"/product/JXABC32QM2K5",p:"바이레프 밀크세라 이지트릿",b:"밀크세라 이지트릿 보러 가기"},
   {k:"honey",e:"🍯",n:"허니콤츄 디저트",d:"양치 습관까지 챙기는 달콤한 마무리",col:"#f6b93b",url:"/product/4PUYY7K8BTF9",p:"바이레프 허니콤츄",b:"허니콤츄 보러 가기"}
 ];
-let meal=null;
+let meal=null,cafeIn=false;
 // 실제 메뉴 사진: MENU 항목에 img:"data:image/jpeg;base64,…" 를 넣으면 이모지 대신 사진이 보여요
 const miHTML=m=>`<button class="mi" data-k="${m.k}">${m.img?`<img class="mth" src="${m.img}" alt="${m.n}">`:`<span style="background:${m.col}">${m.e}</span>`}<div><b>${m.n}${m.real?` <i class="cnp">${m.real}</i>`:""}</b><small>${m.d}</small></div><em>주문</em></button>`;
 function cafeSheet(){
@@ -3080,6 +3080,7 @@ function frame(){
   if(hoverId==="me")hoverId=null;
   if(marker.material.opacity>0){marker.material.opacity=Math.max(0,marker.material.opacity-dt*1.4);marker.scale.multiplyScalar(1+dt*1.6);}
   // near prompt
+  {const inC=Math.hypot(me.position.x-CF.x,me.position.z-CF.z)<CF.r-1.2;if(inC&&!cafeIn&&veil.hidden&&!meal&&!game&&!ride)cafeSheet();cafeIn=inC;}
   let best=null,bd=1e9;BOOTHS.forEach(b=>{const d=me.position.distanceTo(b.door);if(d<bd){bd=d;best=b;}});
   const nid=bd<2.8?best.id:null;
   if(nid!==nearId){nearId=nid;if(nid&&veil.hidden){const b=byId[nid];$("#nearIc").textContent=b.icon;$("#nearT").textContent=b.name;$("#nearS").textContent=b.sub;$("#near").hidden=false;}else $("#near").hidden=true;}
