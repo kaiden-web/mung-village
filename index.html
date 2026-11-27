@@ -864,26 +864,27 @@ const COATS=[
 ];
 function makeDog(c,s=1){
   const g=new THREE.Group();g.scale.setScalar(s);
-  const coat=M(c.coat),ear=M(c.ear),dark=M("#2d2430"),pinkM=M("#ffb3c6",{emissive:"#ff8fab",emissiveIntensity:.25}),white=M("#ffffff",{emissive:"#ffffff",emissiveIntensity:.9});
+  const coat=M(c.coat),ear=M(c.ear),dark=M("#2d2430"),pinkM=M("#ffa3bb",{emissive:"#ff8fab",emissiveIntensity:.35}),white=M("#ffffff",{emissive:"#ffffff",emissiveIntensity:.9});
   const inner=new THREE.Group();g.add(inner);
-  const body=mk(new THREE.CapsuleGeometry(.36,.42,10,18),coat,0,.72,-.02);body.rotation.x=Math.PI/2;inner.add(body);
-  const head=new THREE.Group();head.position.set(0,1.4,.46);inner.add(head);
+  const body=mk(new THREE.CapsuleGeometry(.38,.34,10,18),coat,0,.68,-.02);body.rotation.x=Math.PI/2;inner.add(body);
+  const head=new THREE.Group();head.position.set(0,1.42,.44);head.scale.setScalar(1.14);inner.add(head);
   head.add(mk(new THREE.SphereGeometry(.56,32,24),coat));
   head.add(mk(new THREE.SphereGeometry(.13,14,10),coat,0,.5,.08));
   const sn=mk(new THREE.SphereGeometry(.25,20,14),M(c.coat==="#4a4250"?"#8a7f8c":"#fffaf3"),0,-.17,.42);sn.scale.set(1.2,.8,1);head.add(sn);
   const nose=mk(new THREE.SphereGeometry(.065,12,10),dark,0,-.09,.66,false);nose.scale.set(1.25,.9,1);head.add(nose);
   head.add(mk(new THREE.SphereGeometry(.018,8,6),white,-.02,-.07,.72,false));
   [-1,1].forEach(k=>{const m=mk(new THREE.TorusGeometry(.045,.013,6,14,Math.PI),dark,k*.045,-.235,.655,false);m.rotation.z=Math.PI;head.add(m);});
+  {const tg=mk(new THREE.SphereGeometry(.07,12,10),M("#ff7f9e"),0,-.3,.6,false);tg.scale.set(1,1.25,.5);tg.userData.noOutline=true;head.add(tg);}
   const eyes=[];
   [-1,1].forEach(k=>{const eg=new THREE.Group();eg.position.set(k*.2,.06,.5);head.add(eg);
-    const e=mk(new THREE.SphereGeometry(.088,16,12),dark,0,0,0,false);e.scale.set(1,1.12,.7);eg.add(e);
-    eg.add(mk(new THREE.SphereGeometry(.032,10,8),white,.03,.045,.06,false));eg.add(mk(new THREE.SphereGeometry(.015,8,6),white,-.03,-.03,.065,false));eyes.push(eg);
-    const ck=mk(new THREE.SphereGeometry(.09,12,10),pinkM,k*.34,-.1,.4,false);ck.scale.set(1,.55,.35);ck.userData.noOutline=true;head.add(ck);});
+    const e=mk(new THREE.SphereGeometry(.105,16,12),dark,0,0,0,false);e.scale.set(1,1.15,.7);eg.add(e);
+    eg.add(mk(new THREE.SphereGeometry(.042,10,8),white,.035,.05,.065,false));eg.add(mk(new THREE.SphereGeometry(.02,8,6),white,-.035,-.035,.07,false));eyes.push(eg);
+    const ck=mk(new THREE.SphereGeometry(.11,12,10),pinkM,k*.34,-.12,.41,false);ck.scale.set(1,.6,.35);ck.userData.noOutline=true;head.add(ck);});
   const ears=[];
-  [-1,1].forEach(sx=>{const e=mk(new THREE.SphereGeometry(.24,16,12),ear,sx*.5,.04,-.04);e.scale.set(.52,1.22,.86);e.rotation.z=sx*.38;head.add(e);ears.push(e);});
+  [-1,1].forEach(sx=>{const e=mk(new THREE.SphereGeometry(.25,16,12),ear,sx*.5,.02,-.04);e.scale.set(.6,1.08,.86);e.rotation.z=sx*.42;head.add(e);ears.push(e);});
   const legs=[];
   [[-.2,.3],[.2,.3],[-.2,-.34],[.2,-.34]].forEach(([lx,lz])=>{const pv=new THREE.Group();pv.position.set(lx,.44,lz);inner.add(pv);
-    pv.add(mk(new THREE.CapsuleGeometry(.115,.16,6,10),coat,0,-.2,0));const pd=mk(new THREE.SphereGeometry(.13,12,10),coat,0,-.36,.03);pd.scale.set(1,.6,1.15);pv.add(pd);legs.push(pv);});
+    pv.add(mk(new THREE.CapsuleGeometry(.125,.1,6,10),coat,0,-.2,0));const pd=mk(new THREE.SphereGeometry(.14,12,10),coat,0,-.34,.03);pd.scale.set(1,.6,1.15);pv.add(pd);legs.push(pv);});
   const tail=new THREE.Group();tail.position.set(0,.92,-.56);inner.add(tail);
   const tm=mk(new THREE.CapsuleGeometry(.06,.16,6,8),ear,0,.1,-.03);tm.rotation.x=-.6;tail.add(tm);tail.add(mk(new THREE.SphereGeometry(.14,14,10),ear,0,.24,-.12));
   const sc=mk(new THREE.TorusGeometry(.31,.08,10,24),M(c.scarf),0,1.0,.36);sc.rotation.x=Math.PI/2.3;inner.add(sc);
@@ -1889,7 +1890,7 @@ function partyPhoto(){
 let wishGroup=null,sunrise=null;const WTREE={x:SR.x,z:SR.z-4.2,y:4.9};
 const skyCv=document.createElement("canvas");skyCv.width=4;skyCv.height=256;const skyTex=new THREE.CanvasTexture(skyCv);skyTex.colorSpace=THREE.SRGBColorSpace;
 function paintSky(a,b,c){const x=skyCv.getContext("2d"),g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,a);g.addColorStop(.55,b);g.addColorStop(1,c);x.fillStyle=g;x.fillRect(0,0,4,256);skyTex.needsUpdate=true;scene.background=skyTex;}
-const SKY_DAY=["#7fc0ec","#cfe8f5","#ffe6cc"],SKY_EVE=["#1c2a55","#4a5a9a","#c98aa8"],SKY_NIGHT=["#0c1230","#222b5a","#4a3f70"],SKY_DAWN=["#6fb8ea","#ffd2a8","#ffb07a"];
+const SKY_DAY=["#7fc0ec","#cfe8f5","#ffe6cc"],SKY_SNOW=["#8fbde6","#d6e6f3","#f7e4ec"],SKY_EVE=["#1c2a55","#4a5a9a","#c98aa8"],SKY_NIGHT=["#0c1230","#222b5a","#4a3f70"],SKY_DAWN=["#6fb8ea","#ffd2a8","#ffb07a"];
 const mixC=(a,b,t)=>{const p=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)),A=p(a),B=p(b);return "#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join("");};
 if(!FEAT.sunrise)sunrise={sun:{position:{y:0}},t:-1};
 else{
@@ -2040,8 +2041,9 @@ const xDecor=new THREE.Group();xDecor.visible=false;scene.add(xDecor);
 }
 const xHats=[];
 function applySeason(){xDecor.visible=seasonOn;
-  paintSky(...(seasonOn?SKY_EVE:SKY_DAY));gSnow.visible=seasonOn;hemi.intensity=seasonOn?.5:.8;sun.intensity=seasonOn?1.0:1.85;sun.color.set(seasonOn?"#c9d6ff":"#ffe6c6");bloom.strength=seasonOn?.6:.3;
-  scene.fog.color.set(seasonOn?"#4a5a9a":"#e6f1f3");
+  // 크리스마스: 어두운 저녁 대신 눈 오는 밝은 오후 (11/27 유저 피드백)
+  paintSky(...(seasonOn?SKY_SNOW:SKY_DAY));gSnow.visible=seasonOn;hemi.intensity=seasonOn?.82:.8;sun.intensity=seasonOn?1.6:1.85;sun.color.set(seasonOn?"#fff2e6":"#ffe6c6");bloom.strength=seasonOn?.42:.3;
+  scene.fog.color.set(seasonOn?"#dbe6f1":"#e6f1f3");
   xHats.splice(0).forEach(h=>h.parent&&h.parent.remove(h));
   if(seasonOn){xHats.push(santaHat(me,1));const vh=new THREE.Group();vh.position.set(0,.44,0);vh.rotation.z=.25;vet.userData.h.add(vh);vh.add(mk(new THREE.ConeGeometry(.36,.6,18),M("#d9485f"),0,.3,0));const b=mk(new THREE.TorusGeometry(.34,.08,8,20),M("#ffffff"),0,0,0);b.rotation.x=Math.PI/2;vh.add(b);vh.add(mk(new THREE.SphereGeometry(.09),M("#ffffff"),0,.62,0));xHats.push(vh);
     npcs.forEach(d=>xHats.push(santaHat(d,.85)));}
